@@ -100,22 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-
-                        MaterialPageRoute(
-                          builder: (_) => const CustomersScreen(),
-                        ),
-                      );
-
-                      loadDashboard();
-                    },
-
-                    child: const Text('Customers'),
-                  ),
+                  
                 ],
               ),
             ),

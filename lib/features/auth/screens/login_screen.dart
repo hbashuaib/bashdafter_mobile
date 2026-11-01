@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+
 import '../services/auth_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
+import '../../../core/navigation/main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() =>
-      _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -25,33 +26,27 @@ class _LoginScreenState extends State<LoginScreen> {
       final access = response.data['access'];
       final refresh = response.data['refresh'];
 
-      await TokenStorage.saveTokens(
-        access: access,
-        refresh: refresh,
-      );
+      await TokenStorage.saveTokens(access: access, refresh: refresh);
 
       if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const DashboardScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
       );
 
       // debugPrint('Login Successful',);
     } catch (e) {
-
-      debugPrint('Login Failed: $e',);
+      debugPrint('Login Failed: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("BashDafter"),),
-      body: Padding(padding: const EdgeInsets.all(24),
+      appBar: AppBar(title: const Text("BashDafter")),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -59,14 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
             const Text(
               "Welcome Back",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
-            const Text("Sign in to continue", textAlign: TextAlign.center,),
+            const Text("Sign in to continue", textAlign: TextAlign.center),
             const SizedBox(height: 40),
 
             TextField(
@@ -90,12 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: login,
-              child: const Text(
-                "Login",
-              ),
-            ),
+            ElevatedButton(onPressed: login, child: const Text("Login")),
           ],
         ),
       ),
