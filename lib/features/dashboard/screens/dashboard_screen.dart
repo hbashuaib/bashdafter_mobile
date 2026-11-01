@@ -33,10 +33,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(title: const Text('Dashboard')),
       body: dashboardData == null
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+          : RefreshIndicator(
+              onRefresh: loadDashboard,
+
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+
                 children: [
                   Card(
                     child: ListTile(
@@ -71,17 +73,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 20),
 
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      await Navigator.push(
                         context,
 
                         MaterialPageRoute(
                           builder: (_) => const CustomersScreen(),
                         ),
                       );
+
+                      loadDashboard();
                     },
 
                     child: const Text('Customers'),

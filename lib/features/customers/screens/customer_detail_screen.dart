@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../services/customer_detail_service.dart';
 import '../../purchases/screens/purchases_screen.dart';
 import '../../payments/screens/payments_screen.dart';
+import '../../reports/screens/customer_statement_screen.dart';
+import '../../payments/screens/add_payment_screen.dart';
 
 class CustomerDetailScreen extends StatefulWidget {
   final int customerId;
@@ -92,6 +94,44 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
               },
 
               child: const Text('Payments'),
+            ),
+
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        CustomerStatementScreen(customerId: widget.customerId),
+                  ),
+                );
+              },
+
+              child: const Text('Statement'),
+            ),
+
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        AddPaymentScreen(customerId: widget.customerId),
+                  ),
+                );
+
+                if (result == true) {
+                  loadCustomer();
+                }
+              },
+
+              child: const Text('Add Payment'),
             ),
           ],
         ),

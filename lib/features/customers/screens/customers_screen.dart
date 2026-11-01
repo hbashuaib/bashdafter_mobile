@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/customer_service.dart';
 import 'customer_detail_screen.dart';
+import 'add_customer_screen.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -34,7 +35,27 @@ class _CustomersScreenState extends State<CustomersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Customers')),
+      appBar: AppBar(
+        title: const Text('Customers'),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+
+                MaterialPageRoute(builder: (_) => const AddCustomerScreen()),
+              );
+
+              if (result == true) {
+                loadCustomers();
+              }
+            },
+          ),
+        ],
+      ),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -46,14 +67,17 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
                 return Card(
                   child: ListTile(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
+
                         MaterialPageRoute(
                           builder: (_) =>
                               CustomerDetailScreen(customerId: customer['id']),
                         ),
                       );
+
+                      loadCustomers();
                     },
 
                     title: Text(customer['name']),
