@@ -13,7 +13,7 @@ class CustomersScreen extends StatefulWidget {
 
 class _CustomersScreenState extends State<CustomersScreen> {
   List<dynamic> customers = [];
-
+  List<dynamic> filteredCustomers = [];
   bool isLoading = true;
 
   @override
@@ -22,12 +22,22 @@ class _CustomersScreenState extends State<CustomersScreen> {
     loadCustomers();
   }
 
+  void searchCustomers(String value) {
+    setState(() {
+      filteredCustomers = customers.where((customer) {
+        final name = customer['name'].toString().toLowerCase();
+
+        return name.contains(value.toLowerCase());
+      }).toList();
+    });
+  }
+
   Future<void> loadCustomers() async {
     final data = await CustomerService().getCustomers();
 
     setState(() {
       customers = data;
-
+      filteredCustomers = data;
       isLoading = false;
     });
   }
@@ -59,35 +69,58 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: customers.length,
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
 
-              itemBuilder: (context, index) {
-                final customer = customers[index];
+                  child: TextField(
+                    onChanged: searchCustomers,
 
-                return Card(
-                  child: ListTile(
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
+                    decoration: const InputDecoration(
+                      hintText: 'Search customer...',
 
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              CustomerDetailScreen(customerId: customer['id']),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredCustomers.length,
+
+                    itemBuilder: (context, index) {
+                      final customer = filteredCustomers[index];
+
+                      return Card(
+                        child: ListTile(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+
+                              MaterialPageRoute(
+                                builder: (_) => CustomerDetailScreen(
+                                  customerId: customer['id'],
+                                ),
+                              ),
+                            );
+
+                            loadCustomers();
+                          },
+
+                          title: Text(customer['name']),
+
+                          subtitle: Text(customer['phone']),
+
+                          trailing: Chip(
+                            label: Text(customer['balance'].toString()),
+                          ),
                         ),
                       );
-
-                      loadCustomers();
                     },
-
-                    title: Text(customer['name']),
-
-                    subtitle: Text(customer['phone']),
-
-                    trailing: Chip(label: Text(customer['balance'].toString())),
                   ),
-                );
-              },
+                ),
+              ],
             ),
     );
   }
