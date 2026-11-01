@@ -1,51 +1,78 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/storage/token_storage.dart';
+import '../services/dashboard_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() =>
-      _DashboardScreenState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState
-    extends State<DashboardScreen> {
-
-  String token = '';
+class _DashboardScreenState extends State<DashboardScreen> {
+  Map<String, dynamic>? dashboardData;
 
   @override
   void initState() {
     super.initState();
-    loadToken();
+    loadDashboard();
   }
 
-  Future<void> loadToken() async {
-
-    final access =
-        await TokenStorage.getAccessToken();
+  Future<void> loadDashboard() async {
+    final data = await DashboardService().getDashboard();
 
     setState(() {
-      token = access ?? 'No Token';
+      dashboardData = data;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Dashboard',
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text(
-          token,
-        ),
-      ),
+      appBar: AppBar(title: const Text('Dashboard')),
+      body: dashboardData == null
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Card(
+                    child: ListTile(
+                      title: const Text('Customers'),
+                      trailing: Text(dashboardData!['customers'].toString()),
+                    ),
+                  ),
+
+                  Card(
+                    child: ListTile(
+                      title: const Text('Total Purchases'),
+                      trailing: Text(
+                        dashboardData!['total_purchases'].toString(),
+                      ),
+                    ),
+                  ),
+
+                  Card(
+                    child: ListTile(
+                      title: const Text('Total Payments'),
+                      trailing: Text(
+                        dashboardData!['total_payments'].toString(),
+                      ),
+                    ),
+                  ),
+
+                  Card(
+                    child: ListTile(
+                      title: const Text('Balance'),
+                      trailing: Text(
+                        dashboardData!['total_balance'].toString(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
