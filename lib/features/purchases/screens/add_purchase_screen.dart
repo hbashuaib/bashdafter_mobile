@@ -5,7 +5,6 @@ import '../services/create_purchase_item_service.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
-
   const AddPurchaseScreen({super.key, required this.customerId});
 
   @override
@@ -14,16 +13,34 @@ class AddPurchaseScreen extends StatefulWidget {
 
 class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   final itemController = TextEditingController();
-
   final quantityController = TextEditingController();
-
   final unitPriceController = TextEditingController();
-
   final notesController = TextEditingController();
-
   bool isSaving = false;
+  List<Map<String, dynamic>> purchaseItems = [];
+
+  void addItem() {
+    if (itemController.text.isEmpty) {
+      return;
+    }
+
+    purchaseItems.add({
+      'item_name': itemController.text,
+      'quantity': quantityController.text,
+      'unit_price': unitPriceController.text,
+    });
+
+    itemController.clear();
+    quantityController.clear();
+    unitPriceController.clear();
+    setState(() {});
+  }
 
   Future<void> savePurchase() async {
+    if (purchaseItems.isEmpty) {
+      return;
+    }
+
     setState(() {
       isSaving = true;
     });
@@ -31,19 +48,17 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     try {
       final purchaseId = await CreatePurchaseService().createPurchase(
         customerId: widget.customerId,
-
         notes: notesController.text,
       );
 
-      await CreatePurchaseItemService().createItem(
-        purchaseId: purchaseId,
-
-        itemName: itemController.text,
-
-        quantity: quantityController.text,
-
-        unitPrice: unitPriceController.text,
-      );
+      for (final item in purchaseItems) {
+        await CreatePurchaseItemService().createItem(
+          purchaseId: purchaseId,
+          itemName: item['item_name'],
+          quantity: item['quantity'],
+          unitPrice: item['unit_price'],
+        );
+      }
 
       if (!mounted) return;
 
@@ -57,6 +72,18 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     setState(() {
       isSaving = false;
     });
+  }
+
+  double get totalAmount {
+    double total = 0;
+
+    for (final item in purchaseItems) {
+      final quantity = double.tryParse(item['quantity'].toString()) ?? 0;
+      final unitPrice = double.tryParse(item['unit_price'].toString()) ?? 0;
+      total += quantity * unitPrice;
+    }
+
+    return total;
   }
 
   @override
@@ -92,16 +119,55 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             const SizedBox(height: 15),
 
+            ElevatedButton(onPressed: addItem, child: const Text('Add Item')),
+
+            const SizedBox(height: 15),
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: purchaseItems.length,
+
+                itemBuilder: (context, index) {
+                  final item = purchaseItems[index];
+
+                  return Card(
+                    child: ListTile(
+                      title: Text(item['item_name']),
+
+                      subtitle: Text(
+                        '${item['quantity']} × ${item['unit_price']}',
+                      ),
+
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+
+                        onPressed: () {
+                          purchaseItems.removeAt(index);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
             TextField(
               controller: notesController,
               decoration: const InputDecoration(labelText: 'Notes'),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 15),
+
+            Text(
+              'Total: ${totalAmount.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 20),
 
             ElevatedButton(
               onPressed: isSaving ? null : savePurchase,
-
               child: Text(isSaving ? 'Saving...' : 'Save Purchase'),
             ),
           ],
