@@ -6,6 +6,7 @@ import '../../payments/screens/payments_screen.dart';
 import '../../reports/screens/customer_statement_screen.dart';
 import '../../payments/screens/add_payment_screen.dart';
 import '../../purchases/screens/add_purchase_screen.dart';
+import 'edit_customer_screen.dart';
 
 class CustomerDetailScreen extends StatefulWidget {
   final int customerId;
@@ -40,7 +41,29 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(customer!['name'])),
+      appBar: AppBar(
+        title: Text(customer!['name']),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+
+                MaterialPageRoute(
+                  builder: (_) => EditCustomerScreen(customer: customer!),
+                ),
+              );
+
+              if (result == true) {
+                loadCustomer();
+              }
+            },
+          ),
+        ],
+      ),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
