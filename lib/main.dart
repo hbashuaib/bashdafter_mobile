@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'features/auth/screens/login_screen.dart';
+
+import 'features/auth/screens/splash_screen.dart';
 
 import 'core/theme/app_theme.dart';
 
 void main() {
-  runApp(
-    const BashDafterApp(),
-  );
+  runApp(const BashDafterApp());
 }
 
 class BashDafterApp extends StatelessWidget {
@@ -21,7 +20,7 @@ class BashDafterApp extends StatelessWidget {
 
       theme: AppTheme.lightTheme,
 
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

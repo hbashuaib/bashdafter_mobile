@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../services/dashboard_service.dart';
 import '../../customers/screens/customers_screen.dart';
+import '../../../core/storage/token_storage.dart';
+import '../../auth/screens/login_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,7 +32,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
+      appBar: AppBar(
+        title: const Text('Dashboard'),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+
+              await TokenStorage.clear();
+
+              if (!mounted) return;
+
+              navigator.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+
+                (route) => false,
+              );
+            },
+          ),
+        ],
+      ),
+
       body: dashboardData == null
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
