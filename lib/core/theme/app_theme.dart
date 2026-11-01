@@ -10,9 +10,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
 
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryBlue,
-    ),
+    colorScheme: ColorScheme.fromSeed(seedColor: primaryBlue),
 
     scaffoldBackgroundColor: backgroundColor,
 
@@ -31,15 +29,23 @@ class AppTheme {
 
     cardTheme: CardThemeData(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     ),
+  );
+
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: primaryBlue,
+      brightness: Brightness.dark,
+    ),
+
+    appBarTheme: const AppBarTheme(centerTitle: true),
   );
 }
