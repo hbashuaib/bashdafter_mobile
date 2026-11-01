@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/customer_detail_service.dart';
+import '../../purchases/screens/purchases_screen.dart';
 
 class CustomerDetailScreen extends StatefulWidget {
   final int customerId;
@@ -57,6 +58,27 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             const SizedBox(height: 10),
 
             Text('Notes: ${customer!['notes']}'),
+
+            const SizedBox(height: 30),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        PurchasesScreen(customerId: widget.customerId),
+                  ),
+                );
+              },
+
+              child: const Text('Purchases'),
+            ),
+
+            const SizedBox(height: 10),
+
+            ElevatedButton(onPressed: () {}, child: const Text('Payments')),
           ],
         ),
       ),
