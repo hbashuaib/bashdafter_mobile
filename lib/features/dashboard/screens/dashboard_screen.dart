@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/dashboard_service.dart';
+import '../../customers/screens/customers_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -69,6 +70,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         dashboardData!['total_balance'].toString(),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (_) => const CustomersScreen(),
+                        ),
+                      );
+                    },
+
+                    child: const Text('Customers'),
                   ),
                 ],
               ),
