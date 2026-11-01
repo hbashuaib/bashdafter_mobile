@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
 import '../../../core/storage/token_storage.dart';
-import '../../dashboard/screens/dashboard_screen.dart';
 import '../../../core/navigation/main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
