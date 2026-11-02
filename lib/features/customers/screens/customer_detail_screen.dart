@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/customer_detail_service.dart';
+import '../services/update_customer_service.dart';
 import '../../purchases/screens/purchases_screen.dart';
 import '../../payments/screens/payments_screen.dart';
 import '../../reports/screens/customer_statement_screen.dart';
@@ -34,6 +35,95 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     });
   }
 
+  Future<void> deactivateCustomer() async {
+    final balance = double.tryParse(customer!['balance'].toString()) ?? 0;
+
+    if (balance != 0) {
+      showDialog(
+        context: context,
+
+        builder: (_) {
+          return AlertDialog(
+            title: const Text('Cannot Deactivate'),
+
+            content: const Text(
+              'Customer balance must be zero before deactivation.',
+            ),
+
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Deactivate Customer'),
+
+          content: Text('Deactivate ${customer!['name']} ?'),
+
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+
+              child: const Text('Cancel'),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+
+              child: const Text('Deactivate'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) return;
+
+    await UpdateCustomerService().updateCustomer(
+      customerId: customer!['id'],
+
+      name: customer!['name'],
+
+      phone: customer!['phone'],
+
+      address: customer!['address'],
+
+      notes: customer!['notes'],
+
+      isActive: false,
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Customer deactivated successfully')),
+    );
+
+    Navigator.pop(context);
+
+    // Next step:
+    // call API and set is_active=false
+  }
+
   @override
   Widget build(BuildContext context) {
     if (customer == null) {
@@ -61,6 +151,11 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 loadCustomer();
               }
             },
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.person_off),
+            onPressed: deactivateCustomer,
           ),
         ],
       ),

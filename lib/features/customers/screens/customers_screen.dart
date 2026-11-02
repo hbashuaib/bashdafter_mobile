@@ -36,8 +36,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
     final data = await CustomerService().getCustomers();
 
     setState(() {
-      customers = data;
-      filteredCustomers = data;
+      customers = data.where((customer) => customer['is_active']).toList();
+      filteredCustomers = customers;
       isLoading = false;
     });
   }
