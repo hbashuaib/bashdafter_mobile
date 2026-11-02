@@ -103,26 +103,6 @@ class CustomerStatementPdfService {
 
         build: (context) {
           return [
-            pw.Container(
-              alignment: pw.Alignment.center,
-
-              child: pw.Transform.rotate(
-                angle: -0.5,
-
-                child: pw.Text(
-                  'BASHSOFT DIGITAL',
-
-                  style: pw.TextStyle(
-                    fontSize: 50,
-                    color: PdfColors.grey200,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-
-            pw.SizedBox(height: 10),
-
             pw.Center(
               child: pw.Text(
                 'Customer Statement',
@@ -133,35 +113,64 @@ class CustomerStatementPdfService {
               ),
             ),
 
-            pw.SizedBox(height: 15),
-            pw.Text('Customer: $customer'),
+            pw.SizedBox(height: 30),
 
-            pw.Container(
-              padding: const pw.EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
 
-              decoration: pw.BoxDecoration(
-                color: PdfColors.blue100,
-                border: pw.Border.all(color: PdfColors.blue700),
-                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
-              ),
+              children: [
+                pw.RichText(
+                  text: pw.TextSpan(
+                    children: [
+                      pw.TextSpan(
+                        text: 'Customer: ',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
 
-              child: pw.Text(
-                'Statement #: $statementNumber',
-
-                style: pw.TextStyle(
-                  color: PdfColors.blue900,
-                  fontWeight: pw.FontWeight.bold,
+                      pw.TextSpan(text: customer),
+                    ],
+                  ),
                 ),
-              ),
+
+                pw.Container(
+                  padding: const pw.EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.blue100,
+                    border: pw.Border.all(color: PdfColors.blue700),
+                  ),
+
+                  child: pw.Text(
+                    'Statement #: $statementNumber',
+
+                    style: pw.TextStyle(
+                      color: PdfColors.blue900,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             pw.SizedBox(height: 10),
 
             pw.SizedBox(height: 10),
-            pw.Text('Generated: ${DateTime.now().toString().split(' ').first}'),
+
+            pw.RichText(
+              text: pw.TextSpan(
+                children: [
+                  pw.TextSpan(
+                    text: 'Generated: ',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+
+                  pw.TextSpan(text: DateTime.now().toString().split(' ').first),
+                ],
+              ),
+            ),
             pw.SizedBox(height: 10),
 
             pw.Table.fromTextArray(
@@ -186,7 +195,20 @@ class CustomerStatementPdfService {
             ),
 
             pw.SizedBox(height: 10),
-            pw.Text('Total Transactions: ${transactions.length}'),
+            // pw.Text('Total Transactions: ${transactions.length}'),
+
+            pw.RichText(
+              text: pw.TextSpan(
+                children: [
+                  pw.TextSpan(
+                    text: 'Total Transactions: ',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+
+                  pw.TextSpan(text: '${transactions.length}'),
+                ],
+              ),
+            ),
 
             pw.SizedBox(height: 10),
 
@@ -202,19 +224,54 @@ class CustomerStatementPdfService {
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
 
                 children: [
-                  pw.Text(
-                    'Total Purchases: ${totalPurchases.toStringAsFixed(2)} $currency',
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      pw.Text(
+                        'Total Purchases',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+
+                      pw.Text('${totalPurchases.toStringAsFixed(2)} $currency'),
+                    ],
                   ),
 
-                  pw.Text(
-                    'Total Payments: ${totalPayments.toStringAsFixed(2)} $currency',
+                  pw.SizedBox(height: 4),
+
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      pw.Text(
+                        'Total Payments',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+
+                      pw.Text('${totalPayments.toStringAsFixed(2)} $currency'),
+                    ],
                   ),
 
                   pw.Divider(),
 
-                  pw.Text(
-                    'Balance: ${(double.tryParse(balance.toString()) ?? 0).toStringAsFixed(2)} $currency',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      pw.Text(
+                        'Balance',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+
+                      pw.Text(
+                        '${(double.tryParse(balance.toString()) ?? 0).toStringAsFixed(2)} $currency',
+
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.blue900,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
