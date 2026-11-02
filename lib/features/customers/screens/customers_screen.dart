@@ -15,6 +15,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   List<dynamic> customers = [];
   List<dynamic> filteredCustomers = [];
   bool isLoading = true;
+  String currentFilter = 'active';
 
   @override
   void initState() {
@@ -32,12 +33,28 @@ class _CustomersScreenState extends State<CustomersScreen> {
     });
   }
 
+  void applyFilter() {
+    if (currentFilter == 'all') {
+      filteredCustomers = customers;
+    } else if (currentFilter == 'active') {
+      filteredCustomers = customers
+          .where((customer) => customer['is_active'])
+          .toList();
+    } else {
+      filteredCustomers = customers
+          .where((customer) => !customer['is_active'])
+          .toList();
+    }
+
+    setState(() {});
+  }
+
   Future<void> loadCustomers() async {
     final data = await CustomerService().getCustomers();
 
     setState(() {
-      customers = data.where((customer) => customer['is_active']).toList();
-      filteredCustomers = customers;
+      customers = data;
+      applyFilter();
       isLoading = false;
     });
   }
@@ -82,6 +99,46 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
                       prefixIcon: Icon(Icons.search),
                     ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+
+                  child: Wrap(
+                    spacing: 8,
+
+                    children: [
+                      ChoiceChip(
+                        label: const Text('All'),
+                        selected: currentFilter == 'all',
+
+                        onSelected: (_) {
+                          currentFilter = 'all';
+                          applyFilter();
+                        },
+                      ),
+
+                      ChoiceChip(
+                        label: const Text('Active'),
+                        selected: currentFilter == 'active',
+
+                        onSelected: (_) {
+                          currentFilter = 'active';
+                          applyFilter();
+                        },
+                      ),
+
+                      ChoiceChip(
+                        label: const Text('Inactive'),
+                        selected: currentFilter == 'inactive',
+
+                        onSelected: (_) {
+                          currentFilter = 'inactive';
+                          applyFilter();
+                        },
+                      ),
+                    ],
                   ),
                 ),
 

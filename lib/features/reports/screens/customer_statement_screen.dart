@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/customer_statement_service.dart';
+import '../services/customer_statement_pdf_service.dart';
 
 class CustomerStatementScreen extends StatefulWidget {
   final int customerId;
@@ -40,7 +41,23 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     final transactions = statement!['transactions'] as List<dynamic>;
 
     return Scaffold(
-      appBar: AppBar(title: Text(statement!['customer'])),
+      appBar: AppBar(
+        title: Text(statement!['customer']),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+
+            onPressed: () async {
+              await CustomerStatementPdfService().generatePdf(
+                customer: statement!['customer'],
+                balance: statement!['balance'],
+                transactions: transactions,
+              );
+            },
+          ),
+        ],
+      ),
 
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -64,13 +81,11 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                 itemBuilder: (context, index) {
                   final item = transactions[index];
-
                   final isPurchase = item['type'] == 'purchase';
 
                   return Card(
                     child: ListTile(
                       title: Text(item['date']),
-
                       subtitle: Text(item['type']),
 
                       trailing: Text(

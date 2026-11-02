@@ -72,7 +72,6 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       builder: (_) {
         return AlertDialog(
           title: const Text('Deactivate Customer'),
-
           content: Text('Deactivate ${customer!['name']} ?'),
 
           actions: [
@@ -100,15 +99,10 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
     await UpdateCustomerService().updateCustomer(
       customerId: customer!['id'],
-
       name: customer!['name'],
-
       phone: customer!['phone'],
-
       address: customer!['address'],
-
       notes: customer!['notes'],
-
       isActive: false,
     );
 
@@ -119,9 +113,25 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     );
 
     Navigator.pop(context);
+  }
 
-    // Next step:
-    // call API and set is_active=false
+  Future<void> reactivateCustomer() async {
+    await UpdateCustomerService().updateCustomer(
+      customerId: customer!['id'],
+      name: customer!['name'],
+      phone: customer!['phone'],
+      address: customer!['address'],
+      notes: customer!['notes'],
+      isActive: true,
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Customer reactivated successfully')),
+    );
+
+    loadCustomer();
   }
 
   @override
@@ -154,8 +164,13 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
           ),
 
           IconButton(
-            icon: const Icon(Icons.person_off),
-            onPressed: deactivateCustomer,
+            icon: Icon(
+              customer!['is_active'] ? Icons.person_off : Icons.person,
+            ),
+
+            onPressed: customer!['is_active']
+                ? deactivateCustomer
+                : reactivateCustomer,
           ),
         ],
       ),
@@ -168,19 +183,12 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
           children: [
             Text('Phone: ${customer!['phone']}'),
-
             const SizedBox(height: 10),
-
             Text('Balance: ${customer!['balance']}'),
-
             const SizedBox(height: 10),
-
             Text('Address: ${customer!['address']}'),
-
             const SizedBox(height: 10),
-
             Text('Notes: ${customer!['notes']}'),
-
             const SizedBox(height: 30),
 
             ElevatedButton(
