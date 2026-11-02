@@ -6,6 +6,8 @@ import '../../auth/screens/login_screen.dart';
 import '../../../core/theme/theme_provider.dart';
 
 import 'about_screen.dart';
+import 'profile_screen.dart';
+import 'shop_profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -18,9 +20,27 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: const Icon(Icons.store),
+            title: const Text('Shop Profile'),
 
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ShopProfileScreen()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.person),
             title: const Text('Profile'),
+
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            },
           ),
 
           Consumer<ThemeProvider>(
@@ -39,7 +59,6 @@ class SettingsScreen extends StatelessWidget {
 
           ListTile(
             leading: const Icon(Icons.info),
-
             title: const Text('About'),
 
             onTap: () {
@@ -55,19 +74,15 @@ class SettingsScreen extends StatelessWidget {
 
           ListTile(
             leading: const Icon(Icons.logout),
-
             title: const Text('Logout'),
 
             onTap: () async {
               await TokenStorage.clear();
-
               if (!context.mounted) return;
 
               Navigator.pushAndRemoveUntil(
                 context,
-
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
-
                 (route) => false,
               );
             },

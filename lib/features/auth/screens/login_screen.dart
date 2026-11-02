@@ -49,6 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const SizedBox(height: 20),
+            Image.asset('assets/images/bashsoft_logo.png', height: 120),
             const SizedBox(height: 40),
             const Text(
               "Welcome Back",
