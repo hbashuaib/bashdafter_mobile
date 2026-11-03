@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../services/product_service.dart';
 
+import 'product_detail_screen.dart';
+
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
 
@@ -71,6 +73,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                       return Card(
                         child: ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ProductDetailScreen(product: product),
+                              ),
+                            );
+                          },
+                          
                           title: Text(product['name']),
 
                           subtitle: Text(
