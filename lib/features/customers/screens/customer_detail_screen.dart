@@ -175,111 +175,190 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
-            Text('Phone: ${customer!['phone']}'),
-            const SizedBox(height: 10),
-            Text('Balance: ${customer!['balance']}'),
-            const SizedBox(height: 10),
-            Text('Address: ${customer!['address']}'),
-            const SizedBox(height: 10),
-            Text('Notes: ${customer!['notes']}'),
-            const SizedBox(height: 30),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        PurchasesScreen(customerId: widget.customerId),
-                  ),
-                );
-              },
+                  children: [
+                    Text(
+                      customer!['name'],
 
-              child: const Text('Purchases'),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.phone),
+                      title: Text(customer!['phone']),
+                    ),
+
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.account_balance_wallet),
+                      title: Text('Balance'),
+                      trailing: Text(
+                        customer!['balance'].toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.location_on),
+                      title: Text(customer!['address']),
+                    ),
+
+                    if ((customer!['notes'] ?? '').toString().isNotEmpty)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.note),
+                        title: Text(customer!['notes']),
+                      ),
+                  ],
+                ),
+              ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        PaymentsScreen(customerId: widget.customerId),
-                  ),
-                );
-              },
-
-              child: const Text('Payments'),
+            const Text(
+              'Quick Actions',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.add_shopping_cart),
+                    label: const Text('Purchase'),
 
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        CustomerStatementScreen(customerId: widget.customerId),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AddPurchaseScreen(customerId: widget.customerId),
+                        ),
+                      );
+
+                      if (result == true) {
+                        loadCustomer();
+                      }
+                    },
                   ),
-                );
-              },
+                ),
 
-              child: const Text('Statement'),
+                const SizedBox(width: 10),
+
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.payments),
+                    label: const Text('Payment'),
+
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AddPaymentScreen(customerId: widget.customerId),
+                        ),
+                      );
+
+                      if (result == true) {
+                        loadCustomer();
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 24),
 
-            ElevatedButton(
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
+            const Text(
+              'Records',
 
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        AddPaymentScreen(customerId: widget.customerId),
-                  ),
-                );
-
-                if (result == true) {
-                  loadCustomer();
-                }
-              },
-
-              child: const Text('Add Payment'),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
-            ElevatedButton(
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.shopping_bag),
+                title: const Text('Purchases'),
+                trailing: const Icon(Icons.arrow_forward_ios),
 
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        AddPurchaseScreen(customerId: widget.customerId),
-                  ),
-                );
+                onTap: () {
+                  Navigator.push(
+                    context,
 
-                if (result == true) {
-                  loadCustomer();
-                }
-              },
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          PurchasesScreen(customerId: widget.customerId),
+                    ),
+                  );
+                },
+              ),
+            ),
 
-              child: const Text('Add Purchase'),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.payments),
+                title: const Text('Payments'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+
+                onTap: () {
+                  Navigator.push(
+                    context,
+
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          PaymentsScreen(customerId: widget.customerId),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.receipt_long),
+                title: const Text('Statement'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+
+                onTap: () {
+                  Navigator.push(
+                    context,
+
+                    MaterialPageRoute(
+                      builder: (_) => CustomerStatementScreen(
+                        customerId: widget.customerId,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
