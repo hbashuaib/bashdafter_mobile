@@ -15,9 +15,7 @@ class CreatePurchaseService {
 
       data: {
         'purchase_date': DateTime.now().toIso8601String().split('T').first,
-
         'notes': notes,
-
         'customer': customerId,
       },
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/create_purchase_service.dart';
 import '../services/create_purchase_item_service.dart';
+import '../../products/services/product_service.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -16,16 +17,26 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   final quantityController = TextEditingController();
   final unitPriceController = TextEditingController();
   final notesController = TextEditingController();
+
   bool isSaving = false;
   List<Map<String, dynamic>> purchaseItems = [];
+  List<dynamic> products = [];
+  dynamic selectedProduct;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProducts();
+  }
 
   void addItem() {
-    if (itemController.text.isEmpty) {
+    if (selectedProduct == null) {
       return;
     }
 
     purchaseItems.add({
-      'item_name': itemController.text,
+      'product_id': selectedProduct['id'],
+      'item_name': selectedProduct['name'],
       'quantity': quantityController.text,
       'unit_price': unitPriceController.text,
     });
@@ -34,6 +45,14 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     quantityController.clear();
     unitPriceController.clear();
     setState(() {});
+  }
+
+  Future<void> loadProducts() async {
+    final data = await ProductService().getProducts();
+
+    setState(() {
+      products = data;
+    });
   }
 
   Future<void> savePurchase() async {
@@ -54,6 +73,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       for (final item in purchaseItems) {
         await CreatePurchaseItemService().createItem(
           purchaseId: purchaseId,
+          productId: item['product_id'],
           itemName: item['item_name'],
           quantity: item['quantity'],
           unitPrice: item['unit_price'],
@@ -86,6 +106,12 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     return total;
   }
 
+  double get lineTotal {
+    final quantity = double.tryParse(quantityController.text) ?? 0;
+    final price = double.tryParse(unitPriceController.text) ?? 0;
+    return quantity * price;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,9 +122,24 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
         child: Column(
           children: [
-            TextField(
-              controller: itemController,
-              decoration: const InputDecoration(labelText: 'Item Name'),
+            DropdownButtonFormField<dynamic>(
+              value: selectedProduct,
+              decoration: const InputDecoration(labelText: 'Product'),
+
+              items: products.map((product) {
+                return DropdownMenuItem(
+                  value: product,
+
+                  child: Text(product['name']),
+                );
+              }).toList(),
+
+              onChanged: (value) {
+                setState(() {
+                  selectedProduct = value;
+                  unitPriceController.text = value['selling_price'];
+                });
+              },
             ),
 
             const SizedBox(height: 15),
@@ -106,6 +147,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             TextField(
               controller: quantityController,
               keyboardType: TextInputType.number,
+              onChanged: (_) {
+                setState(() {});
+              },
+
               decoration: const InputDecoration(labelText: 'Quantity'),
             ),
 
@@ -114,7 +159,38 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             TextField(
               controller: unitPriceController,
               keyboardType: TextInputType.number,
+              onChanged: (_) {
+                setState(() {});
+              },
+
               decoration: const InputDecoration(labelText: 'Unit Price'),
+            ),
+
+            const SizedBox(height: 15),
+
+            Card(
+              color: Colors.green.shade50,
+
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  children: [
+                    const Text('Line Total'),
+
+                    Text(
+                      lineTotal.toStringAsFixed(2),
+
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 15),

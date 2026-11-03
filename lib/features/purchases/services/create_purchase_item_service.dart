@@ -6,11 +6,9 @@ import '../../../core/storage/token_storage.dart';
 class CreatePurchaseItemService {
   Future<void> createItem({
     required int purchaseId,
-
+    required int productId,
     required String itemName,
-
     required String quantity,
-
     required String unitPrice,
   }) async {
     final token = await TokenStorage.getAccessToken();
@@ -19,13 +17,11 @@ class CreatePurchaseItemService {
       '${ApiConstants.baseUrl}/purchase-items/',
 
       data: {
-        'item_name': itemName,
-
-        'quantity': quantity,
-
-        'unit_price': unitPrice,
-
         'purchase': purchaseId,
+        'product': productId,
+        'item_name': itemName,
+        'quantity': quantity,
+        'unit_price': unitPrice,
       },
 
       options: Options(headers: {'Authorization': 'Bearer $token'}),
