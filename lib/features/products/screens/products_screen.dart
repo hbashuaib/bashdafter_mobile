@@ -35,9 +35,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     setState(() {
       products = data;
-      filteredProducts = data;
       isLoading = false;
     });
+
+    applyFilter(activeFilter);
   }
 
   void searchProducts(String value) {
@@ -218,6 +219,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             );
 
                             if (result == true) {
+                              activeFilter = 'All';
                               await loadProducts();
                             }
                           },
