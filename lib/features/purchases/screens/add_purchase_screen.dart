@@ -6,6 +6,7 @@ import '../../products/services/product_service.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
+
   const AddPurchaseScreen({super.key, required this.customerId});
 
   @override
@@ -13,7 +14,6 @@ class AddPurchaseScreen extends StatefulWidget {
 }
 
 class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
-  final itemController = TextEditingController();
   final quantityController = TextEditingController();
   final unitPriceController = TextEditingController();
   final notesController = TextEditingController();
@@ -27,6 +27,15 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   void initState() {
     super.initState();
     loadProducts();
+    quantityController.text = '1';
+  }
+
+  Future<void> loadProducts() async {
+    final data = await ProductService().getProducts();
+
+    setState(() {
+      products = data;
+    });
   }
 
   void addItem() {
@@ -41,18 +50,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       'unit_price': unitPriceController.text,
     });
 
-    itemController.clear();
-    quantityController.clear();
+    quantityController.text = '1';
     unitPriceController.clear();
+    selectedProduct = null;
     setState(() {});
-  }
-
-  Future<void> loadProducts() async {
-    final data = await ProductService().getProducts();
-
-    setState(() {
-      products = data;
-    });
   }
 
   Future<void> savePurchase() async {
@@ -124,6 +125,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
           children: [
             DropdownButtonFormField<dynamic>(
               value: selectedProduct,
+
               decoration: const InputDecoration(labelText: 'Product'),
 
               items: products.map((product) {
@@ -137,6 +139,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               onChanged: (value) {
                 setState(() {
                   selectedProduct = value;
+
                   unitPriceController.text = value['selling_price'];
                 });
               },
@@ -147,6 +150,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             TextField(
               controller: quantityController,
               keyboardType: TextInputType.number,
+
               onChanged: (_) {
                 setState(() {});
               },
@@ -159,6 +163,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             TextField(
               controller: unitPriceController,
               keyboardType: TextInputType.number,
+
               onChanged: (_) {
                 setState(() {});
               },
@@ -185,6 +190,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
                       style: const TextStyle(
                         fontSize: 18,
+
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -197,35 +203,67 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             ElevatedButton(onPressed: addItem, child: const Text('Add Item')),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
-            Expanded(
-              child: ListView.builder(
-                itemCount: purchaseItems.length,
+            Align(
+              alignment: Alignment.centerLeft,
 
-                itemBuilder: (context, index) {
-                  final item = purchaseItems[index];
+              child: Text(
+                'Purchase Items',
 
-                  return Card(
-                    child: ListTile(
-                      title: Text(item['item_name']),
-
-                      subtitle: Text(
-                        '${item['quantity']} × ${item['unit_price']}',
-                      ),
-
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-
-                        onPressed: () {
-                          purchaseItems.removeAt(index);
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  );
-                },
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
+            ),
+
+            const SizedBox(height: 10),
+
+            SizedBox(
+              height: 220,
+
+              child: purchaseItems.isEmpty
+                  ? const Center(child: Text('No items added yet'))
+                  : ListView.builder(
+                      itemCount: purchaseItems.length,
+
+                      itemBuilder: (context, index) {
+                        final item = purchaseItems[index];
+
+                        final quantity =
+                            double.tryParse(item['quantity'].toString()) ?? 0;
+
+                        final unitPrice =
+                            double.tryParse(item['unit_price'].toString()) ?? 0;
+
+                        final total = quantity * unitPrice;
+
+                        return Card(
+                          child: ListTile(
+                            title: Text(item['item_name']),
+
+                            subtitle: Text('$quantity × $unitPrice'),
+
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+
+                              children: [
+                                Text(total.toStringAsFixed(2)),
+
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+
+                                  onPressed: () {
+                                    purchaseItems.removeAt(index);
+
+                                    setState(() {});
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
 
             TextField(
@@ -235,16 +273,44 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             const SizedBox(height: 15),
 
-            Text(
-              'Total: ${totalAmount.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Card(
+              color: Colors.blue.shade50,
+
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  children: [
+                    const Text(
+                      'Purchase Total',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    Text(
+                      totalAmount.toStringAsFixed(2),
+
+                      style: const TextStyle(
+                        fontSize: 20,
+
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 20),
 
-            ElevatedButton(
-              onPressed: isSaving ? null : savePurchase,
-              child: Text(isSaving ? 'Saving...' : 'Save Purchase'),
+            SizedBox(
+              width: double.infinity,
+
+              child: ElevatedButton(
+                onPressed: isSaving ? null : savePurchase,
+                child: Text(isSaving ? 'Saving...' : 'Save Purchase'),
+              ),
             ),
           ],
         ),
