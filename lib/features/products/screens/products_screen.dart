@@ -47,6 +47,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Products')),
 
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Add Product Screen Coming Next')),
+          );
+        },
+
+        child: const Icon(Icons.add),
+      ),
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -83,7 +93,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                             );
                           },
-                          
+
                           title: Text(product['name']),
 
                           subtitle: Text(
