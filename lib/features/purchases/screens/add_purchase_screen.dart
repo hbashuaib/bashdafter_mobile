@@ -50,10 +50,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       'unit_price': unitPriceController.text,
     });
 
-    quantityController.text = '1';
-    unitPriceController.clear();
-    selectedProduct = null;
-    setState(() {});
+    setState(() {
+      quantityController.text = '1';
+      unitPriceController.text = '';
+      selectedProduct = null;
+    });
   }
 
   Future<void> savePurchase() async {
@@ -118,10 +119,12 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Purchase')),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+
           children: [
             DropdownButtonFormField<dynamic>(
               value: selectedProduct,
@@ -201,70 +204,100 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             const SizedBox(height: 15),
 
-            ElevatedButton(onPressed: addItem, child: const Text('Add Item')),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: addItem,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Item'),
+              ),
+            ),
 
             const SizedBox(height: 20),
 
-            Align(
-              alignment: Alignment.centerLeft,
-
-              child: Text(
-                'Purchase Items',
-
-                style: Theme.of(context).textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
+            Text(
+              'Purchase Items',
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
 
-            SizedBox(
-              height: 220,
-
-              child: purchaseItems.isEmpty
-                  ? const Center(child: Text('No items added yet'))
-                  : ListView.builder(
-                      itemCount: purchaseItems.length,
-
-                      itemBuilder: (context, index) {
-                        final item = purchaseItems[index];
-
-                        final quantity =
-                            double.tryParse(item['quantity'].toString()) ?? 0;
-
-                        final unitPrice =
-                            double.tryParse(item['unit_price'].toString()) ?? 0;
-
-                        final total = quantity * unitPrice;
-
-                        return Card(
-                          child: ListTile(
-                            title: Text(item['item_name']),
-
-                            subtitle: Text('$quantity × $unitPrice'),
-
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-
-                              children: [
-                                Text(total.toStringAsFixed(2)),
-
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-
-                                  onPressed: () {
-                                    purchaseItems.removeAt(index);
-
-                                    setState(() {});
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+            if (purchaseItems.isEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Center(
+                    child: Text(
+                      'No items added yet',
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
-            ),
+                  ),
+                ),
+              )
+            else
+              ...purchaseItems.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+
+                final quantity =
+                    double.tryParse(item['quantity'].toString()) ?? 0;
+
+                final unitPrice =
+                    double.tryParse(item['unit_price'].toString()) ?? 0;
+
+                final total = quantity * unitPrice;
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 10),
+
+                  child: ListTile(
+                    title: Text(
+                      item['item_name'],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Quantity: $quantity'),
+                        Text('Unit Price: $unitPrice'),
+                      ],
+                    ),
+
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            total.toStringAsFixed(2),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+
+                          onPressed: () {
+                            purchaseItems.removeAt(index);
+
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
 
             TextField(
               controller: notesController,
