@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/product_service.dart';
 
 import 'product_detail_screen.dart';
+import 'add_product_screen.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -48,10 +49,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
       appBar: AppBar(title: const Text('Products')),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add Product Screen Coming Next')),
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddProductScreen()),
           );
+
+          if (result == true) {
+            await loadProducts();
+          }
         },
 
         child: const Icon(Icons.add),
