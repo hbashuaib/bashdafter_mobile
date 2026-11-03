@@ -4,6 +4,7 @@ import '../../features/dashboard/screens/dashboard_screen.dart';
 import '../../features/customers/screens/customers_screen.dart';
 import '../../features/reports/screens/reports_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../../features/products/screens/products_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -18,6 +19,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final pages = [
     const DashboardScreen(),
     const CustomersScreen(),
+    const ProductsScreen(),
     const ReportsScreen(),
     const SettingsScreen(),
   ];
@@ -41,10 +43,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         },
 
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard', ),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard',),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Customers'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports', ),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings', ),
+          BottomNavigationBarItem(icon: Icon(Icons.inventory_2), label: 'Products',),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports',),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings',),
         ],
       ),
     );
