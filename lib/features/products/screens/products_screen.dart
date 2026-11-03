@@ -16,6 +16,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
   List<dynamic> products = [];
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
+  String activeFilter = 'All';
+
+  int get totalProducts => products.length;
+  int get activeProducts =>
+      products.where((p) => p['is_active'] == true).length;
+  int get inactiveProducts =>
+      products.where((p) => p['is_active'] == false).length;
 
   @override
   void initState() {
@@ -40,6 +47,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
         return name.contains(value.toLowerCase());
       }).toList();
+    });
+  }
+
+  void applyFilter(String filter) {
+    setState(() {
+      activeFilter = filter;
+
+      if (filter == 'All') {
+        filteredProducts = products;
+      } else if (filter == 'Active') {
+        filteredProducts = products
+            .where((p) => p['is_active'] == true)
+            .toList();
+      } else {
+        filteredProducts = products
+            .where((p) => p['is_active'] == false)
+            .toList();
+      }
     });
   }
 
@@ -70,6 +95,62 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12),
 
+                  child: Card(
+                    color: Colors.blue.shade50,
+
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                        children: [
+                          Column(
+                            children: [
+                              const Text('Total'),
+                              Text(
+                                totalProducts.toString(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Column(
+                            children: [
+                              const Text('Active'),
+                              Text(
+                                activeProducts.toString(),
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Column(
+                            children: [
+                              const Text('Inactive'),
+                              Text(
+                                inactiveProducts.toString(),
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(12),
+
                   child: TextField(
                     onChanged: searchProducts,
 
@@ -77,6 +158,43 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       hintText: 'Search Product',
                       prefixIcon: Icon(Icons.search),
                     ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                    children: [
+                      FilterChip(
+                        label: const Text('All'),
+                        selected: activeFilter == 'All',
+
+                        onSelected: (_) {
+                          applyFilter('All');
+                        },
+                      ),
+
+                      FilterChip(
+                        label: const Text('Active'),
+                        selected: activeFilter == 'Active',
+
+                        onSelected: (_) {
+                          applyFilter('Active');
+                        },
+                      ),
+
+                      FilterChip(
+                        label: const Text('Inactive'),
+                        selected: activeFilter == 'Inactive',
+
+                        onSelected: (_) {
+                          applyFilter('Inactive');
+                        },
+                      ),
+                    ],
                   ),
                 ),
 
@@ -89,8 +207,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                       return Card(
                         child: ListTile(
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            final result = await Navigator.push(
                               context,
 
                               MaterialPageRoute(
@@ -98,12 +216,49 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     ProductDetailScreen(product: product),
                               ),
                             );
+
+                            if (result == true) {
+                              await loadProducts();
+                            }
                           },
 
                           title: Text(product['name']),
 
-                          subtitle: Text(
-                            '${product['category_name']} • ${product['unit_name']}',
+                          subtitle: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '${product['category_name']} • ${product['unit_name']}',
+                                ),
+                              ),
+
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+
+                                decoration: BoxDecoration(
+                                  color: product['is_active']
+                                      ? Colors.green.shade100
+                                      : Colors.red.shade100,
+
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+
+                                child: Text(
+                                  product['is_active'] ? 'Active' : 'Inactive',
+
+                                  style: TextStyle(
+                                    color: product['is_active']
+                                        ? Colors.green
+                                        : Colors.red,
+
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
 
                           trailing: Text(

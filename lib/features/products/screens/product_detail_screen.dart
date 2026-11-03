@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'edit_product_screen.dart';
+
 class ProductDetailScreen extends StatelessWidget {
   final Map<String, dynamic> product;
 
@@ -9,6 +11,24 @@ class ProductDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(product['name'])),
+
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+
+            MaterialPageRoute(
+              builder: (_) => EditProductScreen(product: product),
+            ),
+          );
+
+          if (result == true && context.mounted) {
+            Navigator.pop(context, true);
+          }
+        },
+      ),
 
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -32,6 +52,13 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Barcode'),
               subtitle: Text(product['barcode'] ?? '-'),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              title: const Text('Description'),
+              subtitle: Text(product['description'] ?? ''),
             ),
           ),
 

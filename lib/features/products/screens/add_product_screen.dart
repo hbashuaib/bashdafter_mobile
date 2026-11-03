@@ -51,7 +51,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       costPrice: costPriceController.text,
       sellingPrice: sellingPriceController.text,
       minimumStock: minimumStockController.text,
-      barcode: '',
+      barcode: null,
       isActive: true,
     );
 
