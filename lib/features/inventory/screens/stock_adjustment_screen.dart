@@ -4,7 +4,9 @@ import '../../products/services/product_service.dart';
 import '../services/stock_adjustment_service.dart';
 
 class StockAdjustmentScreen extends StatefulWidget {
-  const StockAdjustmentScreen({super.key});
+  final Map<String, dynamic>? product;
+
+  const StockAdjustmentScreen({super.key, this.product});
 
   @override
   State<StockAdjustmentScreen> createState() => _StockAdjustmentScreenState();
@@ -31,6 +33,12 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
     setState(() {
       products = data;
+
+      if (widget.product != null) {
+        selectedProduct = data.firstWhere(
+          (p) => p['id'] == widget.product!['id'],
+        );
+      }
     });
   }
 
@@ -92,6 +100,17 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                 });
               },
             ),
+
+            if (selectedProduct != null)
+              Card(
+                color: Colors.blue.shade50,
+
+                child: ListTile(
+                  leading: const Icon(Icons.inventory),
+                  title: const Text('Current Stock'),
+                  subtitle: Text(selectedProduct['current_stock'].toString()),
+                ),
+              ),
 
             const SizedBox(height: 15),
 
