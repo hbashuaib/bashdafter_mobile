@@ -11,43 +11,69 @@ class AddCustomerScreen extends StatefulWidget {
 
 class _AddCustomerScreenState extends State<AddCustomerScreen> {
   final nameController = TextEditingController();
-
   final phoneController = TextEditingController();
-
   final addressController = TextEditingController();
-
   final notesController = TextEditingController();
 
   bool isSaving = false;
 
   Future<void> saveCustomer() async {
+    if (nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Customer name is required')),
+      );
+
+      return;
+    }
+
+    if (phoneController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Phone number is required')));
+
+      return;
+    }
+
+    if (phoneController.text.trim().length < 7) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid phone number')),
+      );
+
+      return;
+    }
+
     setState(() {
       isSaving = true;
     });
 
     try {
       await CreateCustomerService().createCustomer(
-        name: nameController.text,
-
-        phone: phoneController.text,
-
-        address: addressController.text,
-
-        notes: notesController.text,
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        address: addressController.text.trim(),
+        notes: notesController.text.trim(),
       );
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Customer added successfully')),
+      );
+
       Navigator.pop(context, true);
     } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to save customer')));
+
       debugPrint(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      isSaving = false;
-    });
   }
 
   @override
@@ -55,21 +81,25 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Customer')),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
         child: Column(
           children: [
             TextField(
               controller: nameController,
+              textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(labelText: 'Name'),
+              textInputAction: TextInputAction.next,
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: phoneController,
+              keyboardType: TextInputType.phone,
               decoration: const InputDecoration(labelText: 'Phone'),
+              textInputAction: TextInputAction.next,
             ),
 
             const SizedBox(height: 15),
@@ -77,13 +107,22 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             TextField(
               controller: addressController,
               decoration: const InputDecoration(labelText: 'Address'),
+              textInputAction: TextInputAction.next,
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: notesController,
+              maxLines: 3,
               decoration: const InputDecoration(labelText: 'Notes'),
+              textInputAction: TextInputAction.done,
+
+              onSubmitted: (_) {
+                if (!isSaving) {
+                  saveCustomer();
+                }
+              },
             ),
 
             const SizedBox(height: 30),
@@ -91,7 +130,16 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             ElevatedButton(
               onPressed: isSaving ? null : saveCustomer,
 
-              child: Text(isSaving ? 'Saving...' : 'Save Customer'),
+              child: isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Save Customer'),
             ),
           ],
         ),

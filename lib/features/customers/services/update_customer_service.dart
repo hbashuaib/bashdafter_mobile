@@ -14,18 +14,31 @@ class UpdateCustomerService {
   }) async {
     final token = await TokenStorage.getAccessToken();
 
-    await Dio().put(
-      '${ApiConstants.baseUrl}/customers/$customerId/',
-
-      data: {
-        'name': name,
-        'phone': phone,
-        'address': address,
-        'notes': notes,
-        'is_active': isActive,
-      },
-
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    final Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
     );
+
+    try {
+      await dio.put(
+        '${ApiConstants.baseUrl}/customers/$customerId/',
+
+        data: {
+          'name': name.trim(),
+          'phone': phone.trim(),
+          'address': address.trim(),
+          'notes': notes.trim(),
+          'is_active': isActive,
+        },
+
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected customer update error');
+    }
   }
 }

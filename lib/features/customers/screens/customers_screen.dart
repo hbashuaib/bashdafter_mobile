@@ -27,8 +27,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
     setState(() {
       filteredCustomers = customers.where((customer) {
         final name = customer['name'].toString().toLowerCase();
+        final phone = customer['phone'].toString().toLowerCase();
+        final query = value.toLowerCase();
 
-        return name.contains(value.toLowerCase());
+        return name.contains(query) || phone.contains(query);
       }).toList();
     });
   }
@@ -45,18 +47,33 @@ class _CustomersScreenState extends State<CustomersScreen> {
           .where((customer) => !customer['is_active'])
           .toList();
     }
-
-    setState(() {});
   }
 
   Future<void> loadCustomers() async {
-    final data = await CustomerService().getCustomers();
+    try {
+      final data = await CustomerService().getCustomers();
 
-    setState(() {
+      if (!mounted) return;
+
       customers = data;
       applyFilter();
-      isLoading = false;
-    });
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load customers')));
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -91,11 +108,20 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12),
 
+                  child: Text(
+                    'Customers: ${filteredCustomers.length}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(12),
+
                   child: TextField(
                     onChanged: searchCustomers,
 
                     decoration: const InputDecoration(
-                      hintText: 'Search customer...',
+                      hintText: 'Search by name or phone',
 
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -114,8 +140,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         selected: currentFilter == 'all',
 
                         onSelected: (_) {
-                          currentFilter = 'all';
-                          applyFilter();
+                          setState(() {
+                            currentFilter = 'all';
+                            applyFilter();
+                          });
                         },
                       ),
 
@@ -124,8 +152,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         selected: currentFilter == 'active',
 
                         onSelected: (_) {
-                          currentFilter = 'active';
-                          applyFilter();
+                          setState(() {
+                            currentFilter = 'active';
+                            applyFilter();
+                          });
                         },
                       ),
 
@@ -134,8 +164,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         selected: currentFilter == 'inactive',
 
                         onSelected: (_) {
-                          currentFilter = 'inactive';
-                          applyFilter();
+                          setState(() {
+                            currentFilter = 'inactive';
+                            applyFilter();
+                          });
                         },
                       ),
                     ],
@@ -143,39 +175,46 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 ),
 
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredCustomers.length,
+                  child: filteredCustomers.isEmpty
+                      ? const Center(child: Text('No customers found'))
+                      : ListView.builder(
+                          itemCount: filteredCustomers.length,
 
-                    itemBuilder: (context, index) {
-                      final customer = filteredCustomers[index];
+                          itemBuilder: (context, index) {
+                            final customer = filteredCustomers[index];
 
-                      return Card(
-                        child: ListTile(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
+                            return Card(
+                              child: ListTile(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
 
-                              MaterialPageRoute(
-                                builder: (_) => CustomerDetailScreen(
-                                  customerId: customer['id'],
+                                    MaterialPageRoute(
+                                      builder: (_) => CustomerDetailScreen(
+                                        customerId: customer['id'],
+                                      ),
+                                    ),
+                                  );
+
+                                  loadCustomers();
+                                },
+
+                                title: Text(customer['name']),
+
+                                subtitle: Text(customer['phone']),
+
+                                trailing: Chip(
+                                  backgroundColor:
+                                      (customer['balance'] ?? 0) > 0
+                                      ? Colors.orange.shade100
+                                      : Colors.green.shade100,
+
+                                  label: Text(customer['balance'].toString()),
                                 ),
                               ),
                             );
-
-                            loadCustomers();
                           },
-
-                          title: Text(customer['name']),
-
-                          subtitle: Text(customer['phone']),
-
-                          trailing: Chip(
-                            label: Text(customer['balance'].toString()),
-                          ),
                         ),
-                      );
-                    },
-                  ),
                 ),
               ],
             ),

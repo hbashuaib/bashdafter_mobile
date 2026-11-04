@@ -12,18 +12,31 @@ class CreateCustomerService {
   }) async {
     final token = await TokenStorage.getAccessToken();
 
-    await Dio().post(
-      '${ApiConstants.baseUrl}/customers/',
-
-      data: {
-        'name': name,
-        'phone': phone,
-        'address': address,
-        'notes': notes,
-        'is_active': true,
-      },
-
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    final Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
     );
+
+    try {
+      await dio.post(
+        '${ApiConstants.baseUrl}/customers/',
+
+        data: {
+          'name': name.trim(),
+          'phone': phone.trim(),
+          'address': address.trim(),
+          'notes': notes.trim(),
+          'is_active': true,
+        },
+
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected customer creation error');
+    }
   }
 }
