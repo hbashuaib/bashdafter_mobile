@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/dashboard_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/screens/login_screen.dart';
+import '../../inventory/screens/inventory_menu_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -40,14 +41,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             onPressed: () async {
               final navigator = Navigator.of(context);
-
               await TokenStorage.clear();
 
               if (!mounted) return;
 
               navigator.pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
-
                 (route) => false,
               );
             },
@@ -98,8 +97,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.inventory, color: Colors.blue),
+                      title: const Text('Inventory'),
+
+                      subtitle: const Text(
+                        'Stock adjustments and inventory history',
+                      ),
+
+                      trailing: const Icon(Icons.arrow_forward_ios),
+
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const InventoryMenuScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
                   const SizedBox(height: 20),
-                  
                 ],
               ),
             ),

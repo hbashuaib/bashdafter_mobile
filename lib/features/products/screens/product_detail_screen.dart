@@ -78,6 +78,47 @@ class ProductDetailScreen extends StatelessWidget {
 
           Card(
             child: ListTile(
+              title: const Text('Current Stock'),
+              subtitle: Text(product['current_stock'].toString()),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              title: const Text('Total Sold'),
+              subtitle: Text(product['total_sold'].toString()),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              title: const Text('Stock Adjustments'),
+              subtitle: Text(product['total_adjustments'].toString()),
+            ),
+          ),
+
+          if ((double.tryParse(product['current_stock'].toString()) ?? 0) <=
+              (double.tryParse(product['minimum_stock'].toString()) ?? 0))
+            Card(
+              color: Colors.red.shade50,
+
+              child: const ListTile(
+                leading: Icon(Icons.warning, color: Colors.red),
+
+                title: Text(
+                  'LOW STOCK',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                subtitle: Text('Current stock is below minimum stock level'),
+              ),
+            ),
+
+          Card(
+            child: ListTile(
               title: const Text('Minimum Stock'),
               subtitle: Text(product['minimum_stock']),
             ),
