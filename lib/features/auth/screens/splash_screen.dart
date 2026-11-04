@@ -20,22 +20,28 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkLogin() async {
-    final token = await TokenStorage.getAccessToken();
+    try {
+      final token = await TokenStorage.getAccessToken();
+      if (!mounted) return;
 
-    debugPrint('Token: $token');
+      if (token != null && token.isNotEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      }
+    } catch (e) {
+      debugPrint('Splash Error: $e');
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (token != null && token.isNotEmpty) {
       Navigator.pushReplacement(
         context,
-
-        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
@@ -43,6 +49,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+
+          children: [
+            Image.asset('assets/images/bashsoft_logo.png', height: 120),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            const Text('Loading BashDafter...'),
+          ],
+        ),
+      ),
+    );
   }
 }

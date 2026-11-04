@@ -15,7 +15,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
+  bool isLoading = false;
+  bool obscurePassword = true;
+
   Future<void> login() async {
+    if (usernameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Username is required')));
+
+      return;
+    }
+
+    if (passwordController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Password is required')));
+
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final response = await AuthService().login(
         username: usernameController.text,
@@ -36,7 +57,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // debugPrint('Login Successful',);
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid username or password')),
+      );
+
       debugPrint('Login Failed: $e');
+    } finally {
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -74,16 +105,48 @@ class _LoginScreenState extends State<LoginScreen> {
 
             TextField(
               controller: passwordController,
-              obscureText: true,
+              obscureText: obscurePassword,
+              textInputAction: TextInputAction.done,
+
+              onSubmitted: (_) {
+                if (!isLoading) {
+                  login();
+                }
+              },
+
               decoration: InputDecoration(
                 labelText: "Password",
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  ),
+
+                  onPressed: () {
+                    setState(() {
+                      obscurePassword = !obscurePassword;
+                    });
+                  },
+                ),
               ),
             ),
 
             const SizedBox(height: 30),
 
-            ElevatedButton(onPressed: login, child: const Text("Login")),
+            ElevatedButton(
+              onPressed: isLoading ? null : login,
+
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text("Login"),
+            ),
           ],
         ),
       ),
