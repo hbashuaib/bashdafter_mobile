@@ -25,15 +25,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
   int? selectedUnit;
   bool isActive = true;
   bool isLoading = true;
+  bool isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    nameController.text = widget.product['name'] ?? '';
-    descriptionController.text = widget.product['description'] ?? '';
-    costPriceController.text = widget.product['cost_price'] ?? '';
-    sellingPriceController.text = widget.product['selling_price'] ?? '';
-    minimumStockController.text = widget.product['minimum_stock'] ?? '';
+    nameController.text = widget.product['name']?.toString() ?? '';
+    descriptionController.text = widget.product['description']?.toString() ?? '';
+    costPriceController.text = widget.product['cost_price']?.toString() ?? '';
+    sellingPriceController.text = widget.product['selling_price']?.toString() ?? '';
+    minimumStockController.text = widget.product['minimum_stock']?.toString() ?? '';
     selectedCategory = widget.product['category'];
     selectedUnit = widget.product['unit'];
     isActive = widget.product['is_active'];
@@ -41,33 +42,137 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   Future<void> loadDropdowns() async {
-    final categoryData = await CategoryService().getCategories();
-    final unitData = await UnitService().getUnits();
+    try {
+      final categoryData = await CategoryService().getCategories();
+      final unitData = await UnitService().getUnits();
 
-    setState(() {
-      categories = categoryData;
-      units = unitData;
-      isLoading = false;
-    });
+      if (!mounted) return;
+
+      setState(() {
+        categories = categoryData;
+        units = unitData;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load dropdown data')),
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> updateProduct() async {
-    await ProductService().updateProduct(
-      id: widget.product['id'],
-      shopId: widget.product['shop'],
-      categoryId: selectedCategory!,
-      unitId: selectedUnit!,
-      name: nameController.text,
-      barcode: widget.product['barcode'],
-      description: descriptionController.text,
-      costPrice: costPriceController.text,
-      sellingPrice: sellingPriceController.text,
-      minimumStock: minimumStockController.text,
-      isActive: isActive,
-    );
+    if (nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Product name is required')));
 
-    if (!mounted) return;
-    Navigator.pop(context, true);
+      return;
+    }
+
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
+
+      return;
+    }
+
+    if (selectedUnit == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Please select a unit')));
+
+      return;
+    }
+
+    final costPrice = double.tryParse(costPriceController.text.trim());
+
+    if (costPrice == null || costPrice < 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Enter a valid cost price')));
+
+      return;
+    }
+
+    final sellingPrice = double.tryParse(sellingPriceController.text.trim());
+
+    if (sellingPrice == null || sellingPrice <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid selling price')),
+      );
+
+      return;
+    }
+
+    final minimumStock = double.tryParse(minimumStockController.text.trim());
+
+    if (minimumStock == null || minimumStock < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid minimum stock')),
+      );
+
+      return;
+    }
+
+    if (sellingPrice < costPrice) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selling price cannot be less than cost price'),
+        ),
+      );
+
+      return;
+    }
+
+    setState(() {
+      isSaving = true;
+    });
+
+    try {
+      await ProductService().updateProduct(
+        id: widget.product['id'],
+        shopId: widget.product['shop'],
+        categoryId: selectedCategory!,
+        unitId: selectedUnit!,
+        name: nameController.text.trim(),
+        barcode: widget.product['barcode'],
+        description: descriptionController.text.trim(),
+        costPrice: costPriceController.text.trim(),
+        sellingPrice: sellingPriceController.text.trim(),
+        minimumStock: minimumStockController.text.trim(),
+        isActive: isActive,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Product updated successfully')),
+      );
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to update product')));
+
+      debugPrint(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
+    }
   }
 
   @override
@@ -85,6 +190,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
         children: [
           TextField(
             controller: nameController,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Product Name'),
           ),
 
@@ -132,6 +239,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           TextField(
             controller: costPriceController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Cost Price'),
           ),
 
@@ -139,6 +248,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           TextField(
             controller: sellingPriceController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Selling Price'),
           ),
 
@@ -146,6 +257,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           TextField(
             controller: minimumStockController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Minimum Stock'),
           ),
 
@@ -154,6 +267,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
           TextField(
             controller: descriptionController,
             maxLines: 3,
+            textInputAction: TextInputAction.done,
+
+            onSubmitted: (_) {
+              if (!isSaving) {
+                updateProduct();
+              }
+            },
+
             decoration: const InputDecoration(labelText: 'Description'),
           ),
 
@@ -173,8 +294,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
           const SizedBox(height: 20),
 
           ElevatedButton(
-            onPressed: updateProduct,
-            child: const Text('Save Changes'),
+            onPressed: isSaving ? null : updateProduct,
+
+            child: isSaving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text('Save Changes'),
           ),
         ],
       ),

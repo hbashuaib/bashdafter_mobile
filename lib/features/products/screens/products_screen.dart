@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/product_service.dart';
 
@@ -13,6 +14,7 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   List<dynamic> products = [];
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
@@ -31,22 +33,40 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<void> loadProducts() async {
-    final data = await ProductService().getProducts();
+    try {
+      final data = await ProductService().getProducts();
 
-    setState(() {
-      products = data;
-      isLoading = false;
-    });
+      if (!mounted) return;
 
-    applyFilter(activeFilter);
+      setState(() {
+        products = data;
+        isLoading = false;
+      });
+
+      applyFilter(activeFilter);
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load products')));
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void searchProducts(String value) {
     setState(() {
       filteredProducts = products.where((product) {
         final name = product['name'].toString().toLowerCase();
+        final category = product['category_name'].toString().toLowerCase();
+        final query = value.toLowerCase();
 
-        return name.contains(value.toLowerCase());
+        return name.contains(query) || category.contains(query);
       }).toList();
     });
   }
@@ -73,6 +93,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Products')),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -156,7 +178,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     onChanged: searchProducts,
 
                     decoration: const InputDecoration(
-                      hintText: 'Search Product',
+                      hintText: 'Search by product or category',
                       prefixIcon: Icon(Icons.search),
                     ),
                   ),
@@ -200,77 +222,85 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 ),
 
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredProducts.length,
+                  child: filteredProducts.isEmpty
+                      ? const Center(child: Text('No products found'))
+                      : ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 90),
+                          itemCount: filteredProducts.length,
 
-                    itemBuilder: (context, index) {
-                      final product = filteredProducts[index];
+                          itemBuilder: (context, index) {
+                            final product = filteredProducts[index];
 
-                      return Card(
-                        child: ListTile(
-                          onTap: () async {
-                            final result = await Navigator.push(
-                              context,
+                            return Card(
+                              child: ListTile(
+                                onTap: () async {
+                                  final result = await Navigator.push(
+                                    context,
 
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ProductDetailScreen(product: product),
-                              ),
-                            );
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          ProductDetailScreen(product: product),
+                                    ),
+                                  );
 
-                            if (result == true) {
-                              activeFilter = 'All';
-                              await loadProducts();
-                            }
-                          },
+                                  if (result == true) {
+                                    activeFilter = 'All';
+                                    await loadProducts();
+                                  }
+                                },
 
-                          title: Text(product['name']),
+                                title: Text(product['name']),
 
-                          subtitle: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${product['category_name']} • ${product['unit_name']}',
+                                subtitle: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '${product['category_name']} • ${product['unit_name']}',
+                                      ),
+                                    ),
+
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+
+                                      decoration: BoxDecoration(
+                                        color: product['is_active']
+                                            ? Colors.green.shade100
+                                            : Colors.red.shade100,
+
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+
+                                      child: Text(
+                                        product['is_active']
+                                            ? 'Active'
+                                            : 'Inactive',
+
+                                        style: TextStyle(
+                                          color: product['is_active']
+                                              ? Colors.green
+                                              : Colors.red,
+
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
 
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
+                                trailing: Text(
+                                  'YER ${currencyFormatter.format(double.tryParse(product['selling_price'].toString()) ?? 0)}',
 
-                                decoration: BoxDecoration(
-                                  color: product['is_active']
-                                      ? Colors.green.shade100
-                                      : Colors.red.shade100,
-
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-
-                                child: Text(
-                                  product['is_active'] ? 'Active' : 'Inactive',
-
-                                  style: TextStyle(
-                                    color: product['is_active']
-                                        ? Colors.green
-                                        : Colors.red,
-
-                                    fontSize: 12,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-
-                          trailing: Text(
-                            product['selling_price'],
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ],
             ),
