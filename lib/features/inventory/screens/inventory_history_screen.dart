@@ -24,12 +24,20 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
     try {
       final data = await InventoryTransactionService().getTransactions();
 
+      if (!mounted) return;
+
       setState(() {
         transactions = data;
         isLoading = false;
       });
     } catch (e) {
       debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load inventory history')),
+      );
 
       setState(() {
         isLoading = false;
@@ -69,54 +77,96 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
           ? const Center(child: CircularProgressIndicator())
           : transactions.isEmpty
           ? const Center(child: Text('No inventory transactions found'))
-          : ListView.builder(
-              itemCount: transactions.length,
+          : RefreshIndicator(
+              onRefresh: loadTransactions,
 
-              itemBuilder: (context, index) {
-                final transaction = transactions[index];
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 30),
+                itemCount: transactions.length,
 
-                final color = getTransactionColor(
-                  transaction['transaction_type'],
-                );
+                itemBuilder: (context, index) {
+                  final transaction = transactions[index];
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  final color = getTransactionColor(
+                    transaction['transaction_type'],
+                  );
 
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: color,
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
 
-                      child: Text(
-                        transaction['transaction_type'].substring(0, 1),
-                        style: const TextStyle(color: Colors.white),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: color,
+
+                        child: Text(
+                          transaction['transaction_type']
+                                      ?.toString()
+                                      .isNotEmpty ==
+                                  true
+                              ? transaction['transaction_type']
+                                    .toString()
+                                    .substring(0, 1)
+                              : '?',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+
+                      title: Text(
+                        transaction['product_name']?.toString() ??
+                            'Unknown Product',
+                      ),
+                      subtitle: Text(
+                        (transaction['reference'] ?? '')
+                                .toString()
+                                .trim()
+                                .isEmpty
+                            ? '-'
+                            : transaction['reference'].toString(),
+                      ),
+
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.15),
+
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+
+                            child: Text(
+                              transaction['transaction_type'].toString(),
+
+                              style: TextStyle(
+                                color: color,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          Text(
+                            (double.tryParse(
+                                      transaction['quantity'].toString(),
+                                    ) ??
+                                    0)
+                                .toStringAsFixed(0),
+                          ),
+                        ],
                       ),
                     ),
-
-                    title: Text(transaction['product_name']),
-                    subtitle: Text(transaction['reference']),
-
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-
-                      children: [
-                        Text(
-                          transaction['transaction_type'],
-
-                          style: TextStyle(
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        Text(transaction['quantity'].toString()),
-                      ],
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
     );
   }

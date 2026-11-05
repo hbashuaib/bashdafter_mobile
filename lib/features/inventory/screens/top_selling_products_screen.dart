@@ -25,12 +25,20 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
     try {
       final data = await TopSellingProductsService().getProducts();
 
+      if (!mounted) return;
+
       setState(() {
         products = data;
         isLoading = false;
       });
     } catch (e) {
       debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load top selling products')),
+      );
 
       setState(() {
         isLoading = false;
@@ -67,6 +75,8 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
               onRefresh: loadProducts,
 
               child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 20),
                 itemCount: products.length,
 
                 itemBuilder: (context, index) {
@@ -91,10 +101,12 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                         ),
                       ),
 
-                      title: Text(product['name']),
+                      title: Text(
+                        product['name']?.toString() ?? 'Unknown Product',
+                      ),
 
                       subtitle: Text(
-                        'Current Stock: ${product['current_stock']}',
+                        'Current Stock: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}',
                       ),
 
                       trailing: Column(
@@ -104,7 +116,11 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                           const Text('Sold', style: TextStyle(fontSize: 12)),
 
                           Text(
-                            product['total_sold'].toString(),
+                            (double.tryParse(
+                                      product['total_sold'].toString(),
+                                    ) ??
+                                    0)
+                                .toStringAsFixed(0),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

@@ -27,6 +27,8 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
     try {
       final products = await ProductService().getProducts();
 
+      if (!mounted) return;
+
       setState(() {
         lowStockProducts = products
             .where((product) => product['is_low_stock'] == true)
@@ -36,6 +38,12 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
       });
     } catch (e) {
       debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load low stock products')),
+      );
 
       setState(() {
         isLoading = false;
@@ -52,43 +60,54 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : lowStockProducts.isEmpty
           ? const Center(child: Text('No low stock products'))
-          : ListView.builder(
-              itemCount: lowStockProducts.length,
+          : RefreshIndicator(
+              onRefresh: loadProducts,
 
-              itemBuilder: (context, index) {
-                final product = lowStockProducts[index];
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 20),
+                itemCount: lowStockProducts.length,
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                itemBuilder: (context, index) {
+                  final product = lowStockProducts[index];
 
-                  child: ListTile(
-                    leading: const Icon(Icons.warning, color: Colors.orange),
-                    title: Text(product['name']),
-
-                    subtitle: Text(
-                      'Current: ${product['current_stock']}'
-                      '\nMinimum: ${product['minimum_stock']}',
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
                     ),
 
-                    trailing: const Icon(Icons.arrow_forward_ios),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.orange.shade100,
+                        child: const Icon(Icons.warning, color: Colors.orange),
+                      ),
+                      title: Text(
+                        product['name']?.toString() ?? 'Unknown Product',
+                      ),
 
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              StockAdjustmentScreen(product: product),
-                        ),
-                      );
+                      subtitle: Text(
+                        'Current: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}'
+                        '\nMinimum: ${(double.tryParse(product['minimum_stock'].toString()) ?? 0).toStringAsFixed(0)}',
+                      ),
 
-                      loadProducts();
-                    },
-                  ),
-                );
-              },
+                      trailing: const Icon(Icons.arrow_forward_ios),
+
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                StockAdjustmentScreen(product: product),
+                          ),
+                        );
+
+                        loadProducts();
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
     );
   }

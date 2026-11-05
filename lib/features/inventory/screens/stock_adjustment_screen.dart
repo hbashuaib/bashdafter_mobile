@@ -29,22 +29,74 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
   }
 
   Future<void> loadProducts() async {
-    final data = await ProductService().getProducts();
+    try {
+      final data = await ProductService().getProducts();
 
-    setState(() {
-      products = data;
+      if (!mounted) return;
 
-      if (widget.product != null) {
-        selectedProduct = data.firstWhere(
-          (p) => p['id'] == widget.product!['id'],
-        );
-      }
-    });
+      setState(() {
+        products = data;
+
+        if (widget.product != null) {
+          final matches = data.where((p) => p['id'] == widget.product!['id']);
+
+          if (matches.isNotEmpty) {
+            selectedProduct = matches.first;
+          }
+        }
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load products')));
+    }
   }
 
   Future<void> saveAdjustment() async {
     if (selectedProduct == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a product')));
+
       return;
+    }
+
+    final quantity = double.tryParse(quantityController.text.trim());
+
+    if (quantity == null || quantity <= 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Enter a valid quantity')));
+
+      return;
+    }
+
+    if (reasonController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Reason is required')));
+
+      return;
+    }
+
+    if (adjustmentType == 'OUT' || adjustmentType == 'DAMAGE') {
+      final currentStock =
+          double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
+
+      if (quantity > currentStock) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Only ${currentStock.toStringAsFixed(0)} available in stock',
+            ),
+          ),
+        );
+
+        return;
+      }
     }
 
     setState(() {
@@ -61,16 +113,26 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Stock adjustment saved successfully')),
+      );
+
       Navigator.pop(context, true);
     } catch (e) {
       debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save stock adjustment')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      isSaving = false;
-    });
   }
 
   @override
@@ -108,7 +170,13 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.inventory),
                   title: const Text('Current Stock'),
-                  subtitle: Text(selectedProduct['current_stock'].toString()),
+                  subtitle: Text(
+                    (double.tryParse(
+                              selectedProduct['current_stock'].toString(),
+                            ) ??
+                            0)
+                        .toStringAsFixed(0),
+                  ),
                 ),
               ),
 
@@ -148,7 +216,10 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
             TextField(
               controller: quantityController,
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(labelText: 'Quantity'),
             ),
 
@@ -157,6 +228,13 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
             TextField(
               controller: reasonController,
               decoration: const InputDecoration(labelText: 'Reason'),
+              textInputAction: TextInputAction.done,
+
+              onSubmitted: (_) {
+                if (!isSaving) {
+                  saveAdjustment();
+                }
+              },
             ),
 
             const SizedBox(height: 25),
