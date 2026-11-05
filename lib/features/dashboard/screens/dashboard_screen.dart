@@ -16,6 +16,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? dashboardData;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -24,6 +25,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> loadDashboard() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final data = await DashboardService().getDashboard();
 
@@ -31,6 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       setState(() {
         dashboardData = data;
+        isLoading = false;
       });
     } catch (e) {
       debugPrint(e.toString());
@@ -40,6 +46,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Failed to load dashboard')));
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -68,8 +78,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
 
-      body: dashboardData == null
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
+          : dashboardData == null
+          ? const Center(child: Text('No dashboard data available'))
           : RefreshIndicator(
               onRefresh: loadDashboard,
 
