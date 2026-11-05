@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/dashboard_service.dart';
 import '../../../core/storage/token_storage.dart';
@@ -13,6 +14,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? dashboardData;
 
   @override
@@ -22,11 +24,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> loadDashboard() async {
-    final data = await DashboardService().getDashboard();
+    try {
+      final data = await DashboardService().getDashboard();
 
-    setState(() {
-      dashboardData = data;
-    });
+      if (!mounted) return;
+
+      setState(() {
+        dashboardData = data;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load dashboard')));
+    }
   }
 
   @override
@@ -60,39 +74,74 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onRefresh: loadDashboard,
 
               child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+
                 padding: const EdgeInsets.all(20),
 
                 children: [
                   Card(
+                    color: Colors.blue.shade50,
                     child: ListTile(
+                      leading: const Icon(Icons.people, color: Colors.blue),
                       title: const Text('Customers'),
-                      trailing: Text(dashboardData!['customers'].toString()),
+                      trailing: Text(
+                        dashboardData!['customers'].toString(),
+
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
 
                   Card(
+                    color: Colors.orange.shade50,
                     child: ListTile(
+                      leading: const Icon(
+                        Icons.shopping_cart,
+                        color: Colors.orange,
+                      ),
                       title: const Text('Total Purchases'),
                       trailing: Text(
-                        dashboardData!['total_purchases'].toString(),
+                        'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_purchases'].toString()) ?? 0)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
 
                   Card(
+                    color: Colors.green.shade50,
                     child: ListTile(
+                      leading: const Icon(Icons.payments, color: Colors.green),
                       title: const Text('Total Payments'),
                       trailing: Text(
-                        dashboardData!['total_payments'].toString(),
+                        'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_payments'].toString()) ?? 0)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
 
                   Card(
+                    color: Colors.purple.shade50,
                     child: ListTile(
+                      leading: const Icon(
+                        Icons.account_balance_wallet,
+                        color: Colors.purple,
+                      ),
                       title: const Text('Balance'),
                       trailing: Text(
-                        dashboardData!['total_balance'].toString(),
+                        'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_balance'].toString()) ?? 0)}',
+
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color:
+                              (double.tryParse(
+                                        dashboardData!['total_balance']
+                                            .toString(),
+                                      ) ??
+                                      0) >
+                                  0
+                              ? Colors.orange
+                              : Colors.green,
+                        ),
                       ),
                     ),
                   ),
@@ -119,7 +168,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
