@@ -19,6 +19,31 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
   bool isSaving = false;
 
   Future<void> savePayment() async {
+    if (amountController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payment amount is required')),
+      );
+
+      return;
+    }
+
+    final amount = double.tryParse(amountController.text.trim());
+
+    if (amount == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Enter a valid amount')));
+
+      return;
+    }
+
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Amount must be greater than zero')),
+      );
+
+      return;
+    }
+
     setState(() {
       isSaving = true;
     });
@@ -26,26 +51,31 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
     try {
       await CreatePaymentService().createPayment(
         customerId: widget.customerId,
-
-        amount: amountController.text,
-
+        amount: amountController.text.trim(),
         paymentDate: DateTime.now().toIso8601String().split('T').first,
-
-        notes: notesController.text,
+        notes: notesController.text.trim(),
       );
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payment added successfully')),
+      );
+
       Navigator.pop(context, true);
     } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to save payment')));
+
       debugPrint(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      isSaving = false;
-    });
   }
 
   @override
@@ -53,14 +83,17 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Payment')),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
         child: Column(
           children: [
             TextField(
               controller: amountController,
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(labelText: 'Amount'),
             ),
 
@@ -69,14 +102,29 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
             TextField(
               controller: notesController,
               decoration: const InputDecoration(labelText: 'Notes'),
+              textInputAction: TextInputAction.done,
+
+              onSubmitted: (_) {
+                if (!isSaving) {
+                  savePayment();
+                }
+              },
             ),
 
             const SizedBox(height: 30),
 
             ElevatedButton(
               onPressed: isSaving ? null : savePayment,
-
-              child: Text(isSaving ? 'Saving...' : 'Save Payment'),
+              child: isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Save Payment'),
             ),
           ],
         ),

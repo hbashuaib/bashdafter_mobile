@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/payment_service.dart';
 
@@ -12,6 +13,7 @@ class PaymentsScreen extends StatefulWidget {
 }
 
 class _PaymentsScreenState extends State<PaymentsScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   List<dynamic> payments = [];
 
   bool isLoading = true;
@@ -23,15 +25,31 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   }
 
   Future<void> loadPayments() async {
-    final data = await PaymentService().getPayments();
+    try {
+      final data = await PaymentService().getPayments();
 
-    setState(() {
-      payments = data
-          .where((payment) => payment['customer'] == widget.customerId)
-          .toList();
+      if (!mounted) return;
 
-      isLoading = false;
-    });
+      setState(() {
+        payments = data
+            .where((payment) => payment['customer'] == widget.customerId)
+            .toList();
+
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load payments')));
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -41,7 +59,10 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
+          : payments.isEmpty
+          ? const Center(child: Text('No payments found'))
           : ListView.builder(
+              padding: const EdgeInsets.all(8),
               itemCount: payments.length,
 
               itemBuilder: (context, index) {
@@ -49,11 +70,21 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
                 return Card(
                   child: ListTile(
-                    title: Text('YER ${payment['amount']}'),
+                    title: Text(
+                      'YER ${currencyFormatter.format(double.tryParse(payment['amount'].toString()) ?? 0)}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
-                    subtitle: Text(payment['payment_date']),
+                      children: [
+                        Text(payment['payment_date']),
 
-                    trailing: const Icon(Icons.payment),
+                        if ((payment['notes'] ?? '').toString().isNotEmpty)
+                          Text(payment['notes']),
+                      ],
+                    ),
+                    trailing: Icon(Icons.payment, color: Colors.green.shade700),
                   ),
                 );
               },

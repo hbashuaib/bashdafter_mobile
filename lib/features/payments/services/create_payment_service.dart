@@ -12,20 +12,30 @@ class CreatePaymentService {
   }) async {
     final token = await TokenStorage.getAccessToken();
 
-    await Dio().post(
-      '${ApiConstants.baseUrl}/payments/',
-
-      data: {
-        'amount': amount,
-
-        'payment_date': paymentDate,
-
-        'notes': notes,
-
-        'customer': customerId,
-      },
-
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    final Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
     );
+
+    try {
+      await dio.post(
+        '${ApiConstants.baseUrl}/payments/',
+
+        data: {
+          'amount': amount.trim(),
+          'payment_date': paymentDate,
+          'notes': notes.trim(),
+          'customer': customerId,
+        },
+
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected payment creation error');
+    }
   }
 }
