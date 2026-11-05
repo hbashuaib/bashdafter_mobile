@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/customer_detail_service.dart';
 import '../services/update_customer_service.dart';
@@ -19,6 +20,7 @@ class CustomerDetailScreen extends StatefulWidget {
 }
 
 class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? customer;
 
   @override
@@ -28,11 +30,23 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   }
 
   Future<void> loadCustomer() async {
-    final data = await CustomerDetailService().getCustomer(widget.customerId);
+    try {
+      final data = await CustomerDetailService().getCustomer(widget.customerId);
 
-    setState(() {
-      customer = data;
-    });
+      if (!mounted) return;
+
+      setState(() {
+        customer = data;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load customer')));
+    }
   }
 
   Future<void> deactivateCustomer() async {
@@ -97,41 +111,57 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
     if (confirm != true) return;
 
-    await UpdateCustomerService().updateCustomer(
-      customerId: customer!['id'],
-      name: customer!['name'],
-      phone: customer!['phone'],
-      address: customer!['address'],
-      notes: customer!['notes'],
-      isActive: false,
-    );
+    try {
+      await UpdateCustomerService().updateCustomer(
+        customerId: customer!['id'],
+        name: customer!['name'],
+        phone: customer!['phone'],
+        address: customer!['address'],
+        notes: customer!['notes'],
+        isActive: false,
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Customer deactivated successfully')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Customer deactivated successfully')),
+      );
 
-    Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to deactivate customer')),
+      );
+    }
   }
 
   Future<void> reactivateCustomer() async {
-    await UpdateCustomerService().updateCustomer(
-      customerId: customer!['id'],
-      name: customer!['name'],
-      phone: customer!['phone'],
-      address: customer!['address'],
-      notes: customer!['notes'],
-      isActive: true,
-    );
+    try {
+      await UpdateCustomerService().updateCustomer(
+        customerId: customer!['id'],
+        name: customer!['name'],
+        phone: customer!['phone'],
+        address: customer!['address'],
+        notes: customer!['notes'],
+        isActive: true,
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Customer reactivated successfully')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Customer reactivated successfully')),
+      );
 
-    loadCustomer();
+      loadCustomer();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to reactivate customer')),
+      );
+    }
   }
 
   @override
@@ -212,8 +242,22 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       leading: const Icon(Icons.account_balance_wallet),
                       title: Text('Balance'),
                       trailing: Text(
-                        customer!['balance'].toString(),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        currencyFormatter.format(
+                          double.tryParse(customer!['balance'].toString()) ?? 0,
+                        ),
+
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+
+                          color:
+                              (double.tryParse(
+                                        customer!['balance'].toString(),
+                                      ) ??
+                                      0) >
+                                  0
+                              ? Colors.orange
+                              : Colors.green,
+                        ),
                       ),
                     ),
 

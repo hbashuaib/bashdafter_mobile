@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/customer_service.dart';
 import 'customer_detail_screen.dart';
@@ -12,6 +13,7 @@ class CustomersScreen extends StatefulWidget {
 }
 
 class _CustomersScreenState extends State<CustomersScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   List<dynamic> customers = [];
   List<dynamic> filteredCustomers = [];
   bool isLoading = true;
@@ -209,7 +211,14 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       ? Colors.orange.shade100
                                       : Colors.green.shade100,
 
-                                  label: Text(customer['balance'].toString()),
+                                  label: Text(
+                                    currencyFormatter.format(
+                                      double.tryParse(
+                                            customer['balance'].toString(),
+                                          ) ??
+                                          0,
+                                    ),
+                                  ),
                                 ),
                               ),
                             );
