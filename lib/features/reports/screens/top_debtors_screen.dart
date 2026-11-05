@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/reports_service.dart';
 
@@ -10,7 +11,9 @@ class TopDebtorsScreen extends StatefulWidget {
 }
 
 class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   List<dynamic> debtors = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -19,11 +22,48 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
   }
 
   Future<void> loadData() async {
-    final data = await ReportsService().getTopDebtors();
+    try {
+      setState(() {
+        isLoading = true;
+      });
 
-    setState(() {
-      debtors = data;
-    });
+      final data = await ReportsService().getTopDebtors();
+
+      if (!mounted) return;
+
+      setState(() {
+        debtors = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load top debtors')),
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Color getRankColor(int index) {
+    if (index == 0) {
+      return Colors.amber;
+    }
+
+    if (index == 1) {
+      return Colors.grey;
+    }
+
+    if (index == 2) {
+      return Colors.orange;
+    }
+
+    return Colors.blue;
   }
 
   @override
@@ -31,24 +71,48 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Top Debtors')),
 
-      body: debtors.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: debtors.length,
+          : debtors.isEmpty
+          ? const Center(child: Text('No debtors found'))
+          : RefreshIndicator(
+              onRefresh: loadData,
 
-              itemBuilder: (context, index) {
-                final debtor = debtors[index];
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 20),
+                itemCount: debtors.length,
 
-                return Card(
-                  child: ListTile(
-                    leading: CircleAvatar(child: Text('${index + 1}')),
+                itemBuilder: (context, index) {
+                  final debtor = debtors[index];
 
-                    title: Text(debtor['name']),
+                  return Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: getRankColor(index),
 
-                    trailing: Text(debtor['balance'].toString()),
-                  ),
-                );
-              },
+                        child: Text(
+                          '${index + 1}',
+
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      title: Text(
+                        debtor['name']?.toString() ?? 'Unknown Customer',
+                      ),
+
+                      trailing: Text(
+                        'YER ${currencyFormatter.format(double.tryParse(debtor['balance'].toString()) ?? 0)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
     );
   }

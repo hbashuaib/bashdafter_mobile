@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/reports_service.dart';
 
@@ -11,7 +12,9 @@ class RecentTransactionsScreen extends StatefulWidget {
 }
 
 class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   List<dynamic> transactions = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -20,11 +23,32 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   }
 
   Future<void> loadData() async {
-    final data = await ReportsService().getRecentTransactions();
+    try {
+      setState(() {
+        isLoading = true;
+      });
 
-    setState(() {
-      transactions = data;
-    });
+      final data = await ReportsService().getRecentTransactions();
+
+      if (!mounted) return;
+
+      setState(() {
+        transactions = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load transactions')),
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -32,34 +56,45 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Recent Transactions')),
 
-      body: transactions.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: transactions.length,
+          : transactions.isEmpty
+          ? const Center(child: Text('No transactions found'))
+          : RefreshIndicator(
+              onRefresh: loadData,
 
-              itemBuilder: (context, index) {
-                final item = transactions[index];
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 20),
+                itemCount: transactions.length,
 
-                final purchase = item['type'] == 'purchase';
+                itemBuilder: (context, index) {
+                  final item = transactions[index];
 
-                return Card(
-                  child: ListTile(
-                    title: Text(item['customer']),
+                  final purchase = item['type'] == 'purchase';
 
-                    subtitle: Text('${item['type']} • ${item['date']}'),
+                  return Card(
+                    child: ListTile(
+                      title: Text(
+                        item['customer']?.toString() ?? 'Unknown Customer',
+                      ),
 
-                    trailing: Text(
-                      '${purchase ? '+' : '-'}${item['amount']}',
+                      subtitle: Text(
+                        '${item['type'].toString().toUpperCase()} • ${item['date']}',
+                      ),
 
-                      style: TextStyle(
-                        color: purchase ? Colors.red : Colors.green,
+                      trailing: Text(
+                        '${purchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
 
-                        fontWeight: FontWeight.bold,
+                        style: TextStyle(
+                          color: purchase ? Colors.red : Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
     );
   }
