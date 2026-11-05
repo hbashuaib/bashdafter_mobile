@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/create_purchase_service.dart';
 import '../services/create_purchase_item_service.dart';
@@ -17,6 +18,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   final quantityController = TextEditingController();
   final unitPriceController = TextEditingController();
   final notesController = TextEditingController();
+  final currencyFormatter = NumberFormat('#,##0.00');
 
   bool isSaving = false;
   List<Map<String, dynamic>> purchaseItems = [];
@@ -31,23 +33,81 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   }
 
   Future<void> loadProducts() async {
-    final data = await ProductService().getProducts();
+    try {
+      final data = await ProductService().getProducts();
 
-    setState(() {
-      products = data;
-    });
+      if (!mounted) return;
+
+      setState(() {
+        products = data;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load products')));
+    }
   }
 
   void addItem() {
     if (selectedProduct == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a product')));
+
+      return;
+    }
+
+    final quantity = double.tryParse(quantityController.text.trim());
+
+    if (quantity == null || quantity <= 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Enter a valid quantity')));
+
+      return;
+    }
+
+    final unitPrice = double.tryParse(unitPriceController.text.trim());
+
+    if (unitPrice == null || unitPrice <= 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Enter a valid unit price')));
+
+      return;
+    }
+
+    final exists = purchaseItems.any(
+      (item) => item['product_id'] == selectedProduct['id'],
+    );
+
+    if (exists) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Product already added')));
+
+      return;
+    }
+
+    final currentStock =
+        double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
+
+    if (quantity > currentStock) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Only $currentStock available in stock')),
+      );
+
       return;
     }
 
     purchaseItems.add({
       'product_id': selectedProduct['id'],
       'item_name': selectedProduct['name'],
-      'quantity': quantityController.text,
-      'unit_price': unitPriceController.text,
+      'quantity': quantityController.text.trim(),
+      'unit_price': unitPriceController.text.trim(),
     });
 
     setState(() {
@@ -59,6 +119,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
   Future<void> savePurchase() async {
     if (purchaseItems.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Add at least one item')));
+
       return;
     }
 
@@ -69,7 +132,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     try {
       final purchaseId = await CreatePurchaseService().createPurchase(
         customerId: widget.customerId,
-        notes: notesController.text,
+        notes: notesController.text.trim(),
       );
 
       for (final item in purchaseItems) {
@@ -84,16 +147,24 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Purchase saved successfully')),
+      );
+
       Navigator.pop(context, true);
     } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to save purchase')));
+
       debugPrint(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      isSaving = false;
-    });
   }
 
   double get totalAmount {
@@ -128,7 +199,6 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
           children: [
             DropdownButtonFormField<dynamic>(
               value: selectedProduct,
-
               decoration: const InputDecoration(labelText: 'Product'),
 
               items: products.map((product) {
@@ -142,8 +212,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               onChanged: (value) {
                 setState(() {
                   selectedProduct = value;
-
-                  unitPriceController.text = value['selling_price'];
+                  unitPriceController.text = value['selling_price'].toString();
                 });
               },
             ),
@@ -152,12 +221,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             TextField(
               controller: quantityController,
-              keyboardType: TextInputType.number,
-
-              onChanged: (_) {
-                setState(() {});
-              },
-
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(labelText: 'Quantity'),
             ),
 
@@ -165,10 +232,18 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             TextField(
               controller: unitPriceController,
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+
+              textInputAction: TextInputAction.done,
 
               onChanged: (_) {
                 setState(() {});
+              },
+
+              onSubmitted: (_) {
+                addItem();
               },
 
               decoration: const InputDecoration(labelText: 'Unit Price'),
@@ -189,7 +264,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     const Text('Line Total'),
 
                     Text(
-                      lineTotal.toStringAsFixed(2),
+                      currencyFormatter.format(lineTotal),
 
                       style: const TextStyle(
                         fontSize: 18,
@@ -260,8 +335,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Quantity: $quantity'),
-                        Text('Unit Price: $unitPrice'),
+                        Text('Quantity: ${quantity.toStringAsFixed(0)}'),
+                        Text(
+                          'Unit Price: ${currencyFormatter.format(unitPrice)}',
+                        ),
                       ],
                     ),
 
@@ -279,7 +356,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            total.toStringAsFixed(2),
+                            currencyFormatter.format(total),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -322,7 +399,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     ),
 
                     Text(
-                      totalAmount.toStringAsFixed(2),
+                      currencyFormatter.format(totalAmount),
 
                       style: const TextStyle(
                         fontSize: 20,
@@ -342,7 +419,16 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
               child: ElevatedButton(
                 onPressed: isSaving ? null : savePurchase,
-                child: Text(isSaving ? 'Saving...' : 'Save Purchase'),
+                child: isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Save Purchase'),
               ),
             ),
           ],

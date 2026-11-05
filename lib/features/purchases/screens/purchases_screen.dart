@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/purchase_service.dart';
 
@@ -12,8 +13,8 @@ class PurchasesScreen extends StatefulWidget {
 }
 
 class _PurchasesScreenState extends State<PurchasesScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   List<dynamic> purchases = [];
-
   bool isLoading = true;
 
   @override
@@ -23,15 +24,31 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   }
 
   Future<void> loadPurchases() async {
-    final data = await PurchaseService().getPurchases();
+    try {
+      final data = await PurchaseService().getPurchases();
 
-    setState(() {
-      purchases = data
-          .where((purchase) => purchase['customer'] == widget.customerId)
-          .toList();
+      if (!mounted) return;
 
-      isLoading = false;
-    });
+      setState(() {
+        purchases = data
+            .where((purchase) => purchase['customer'] == widget.customerId)
+            .toList();
+
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to load purchases')));
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -41,7 +58,10 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
+          : purchases.isEmpty
+          ? const Center(child: Text('No purchases found'))
           : ListView.builder(
+              padding: const EdgeInsets.all(8),
               itemCount: purchases.length,
 
               itemBuilder: (context, index) {
@@ -49,7 +69,11 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
                 return Card(
                   child: ExpansionTile(
-                    title: Text('YER ${purchase['total_amount']}'),
+                    title: Text(
+                      'YER ${currencyFormatter.format(double.tryParse(purchase['total_amount'].toString()) ?? 0)}',
+
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
 
                     subtitle: Text(purchase['purchase_date']),
 
@@ -57,16 +81,27 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                       Padding(
                         padding: const EdgeInsets.all(16),
 
-                        child: Text(purchase['notes'] ?? ''),
+                        child: Text(
+                          (purchase['notes'] ?? '').toString().trim().isEmpty
+                              ? 'No notes'
+                              : purchase['notes'],
+                        ),
                       ),
 
                       ...(purchase['items'] as List).map(
                         (item) => ListTile(
                           title: Text(item['item_name']),
                           subtitle: Text(
-                            '${item['quantity']} x ${item['unit_price']}',
+                            '${item['quantity']} x ${currencyFormatter.format(double.tryParse(item['unit_price'].toString()) ?? 0)}',
                           ),
-                          trailing: Text(item['total_price']),
+                          trailing: Text(
+                            currencyFormatter.format(
+                              double.tryParse(item['total_price'].toString()) ??
+                                  0,
+                            ),
+
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ],

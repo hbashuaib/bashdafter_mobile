@@ -13,18 +13,31 @@ class CreatePurchaseItemService {
   }) async {
     final token = await TokenStorage.getAccessToken();
 
-    await Dio().post(
-      '${ApiConstants.baseUrl}/purchase-items/',
-
-      data: {
-        'purchase': purchaseId,
-        'product': productId,
-        'item_name': itemName,
-        'quantity': quantity,
-        'unit_price': unitPrice,
-      },
-
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    final Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
     );
+
+    try {
+      await dio.post(
+        '${ApiConstants.baseUrl}/purchase-items/',
+
+        data: {
+          'purchase': purchaseId,
+          'product': productId,
+          'item_name': itemName.trim(),
+          'quantity': quantity.trim(),
+          'unit_price': unitPrice.trim(),
+        },
+
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected purchase item creation error');
+    }
   }
 }
