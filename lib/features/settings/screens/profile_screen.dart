@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart';
 
 import '../services/profile_service.dart';
+import '../services/profile_image_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,6 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? profile;
 
   bool isLoading = true;
+  bool isUploadingImage = false;
 
   @override
   void initState() {
@@ -43,6 +47,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final image = await picker.pickImage(source: ImageSource.gallery);
+
+      if (image == null) return;
+
+      debugPrint('IMAGE PATH: ${image.path}');
+
+      setState(() {
+        isUploadingImage = true;
+      });
+
+      await ProfileImageService().uploadImage(image.path);
+      await loadProfile();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Profile image updated')));
+    } catch (e) {
+      debugPrint('IMAGE UPLOAD ERROR: $e');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to upload image')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          isUploadingImage = false;
+        });
+      }
     }
   }
 
@@ -100,12 +141,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundImage:
+                      profile!['profile_image']?.toString().isNotEmpty == true
+                      ? NetworkImage(profile!['profile_image'].toString())
+                      : null,
 
-                  child: const Icon(
-                    Icons.person,
-                    size: 55,
-                    color: Colors.white,
-                  ),
+                  child: profile!['profile_image'] == null
+                      ? const Icon(Icons.person, size: 55, color: Colors.white)
+                      : null,
                 ),
 
                 Positioned(
@@ -126,13 +169,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
 
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Profile picture feature coming soon',
+                        if (kIsWeb) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Profile image upload is currently available in Android/Desktop versions.',
+                              ),
                             ),
-                          ),
-                        );
+                          );
+
+                          return;
+                        }
+
+                        pickImage();
                       },
                     ),
                   ),
