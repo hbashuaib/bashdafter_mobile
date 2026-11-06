@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../../core/constants/api_constants.dart';
 import '../../../core/storage/token_storage.dart';
@@ -8,13 +7,31 @@ class ShopService {
   Future<Map<String, dynamic>> getShop() async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await Dio().get(
-      '${ApiConstants.baseUrl}/shops/',
-
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    final Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
     );
 
-    return response.data.first;
+    try {
+      final response = await dio.get(
+        '${ApiConstants.baseUrl}/shops/',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final data = response.data as List<dynamic>;
+
+      if (data.isEmpty) {
+        throw Exception('No shop profile found');
+      }
+
+      return data.first as Map<String, dynamic>;
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected shop loading error');
+    }
   }
 
   Future<void> updateShop({
@@ -29,22 +46,31 @@ class ShopService {
   }) async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await Dio().put(
-      '${ApiConstants.baseUrl}/shops/$id/',
-
-      data: {
-        'name': name,
-        'phone': phone,
-        'address': address,
-        'city': city,
-        'currency': currency,
-        'is_active': isActive,
-        'owner': owner,
-      },
-
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    final Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
     );
 
-    debugPrint(response.data.toString());
+    try {
+      await dio.put(
+        '${ApiConstants.baseUrl}/shops/$id/',
+        data: {
+          'name': name.trim(),
+          'phone': phone.trim(),
+          'address': address.trim(),
+          'city': city.trim(),
+          'currency': currency.trim(),
+          'is_active': isActive,
+          'owner': owner,
+        },
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected shop update error');
+    }
   }
 }

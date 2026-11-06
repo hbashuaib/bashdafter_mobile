@@ -11,21 +11,63 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Profile')),
 
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
 
         children: [
-          const Center(
-            child: CircleAvatar(
-              radius: 45,
-              child: Icon(Icons.person, size: 50),
+          Card(
+            color: Colors.blue.shade50,
+
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+
+              child: Column(
+                children: [
+                  Text(
+                    'Profile Information',
+
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+
+                  SizedBox(height: 6),
+
+                  Text('Application and user details'),
+                ],
+              ),
             ),
+          ),
+
+          Center(
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+
+              child: const Icon(Icons.person, size: 55, color: Colors.white),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          Text(
+            'Hussein Bashuaib',
+            textAlign: TextAlign.center,
+
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 6),
+
+          Text(
+            'Owner',
+            textAlign: TextAlign.center,
+
+            style: TextStyle(color: Colors.grey.shade600),
           ),
 
           const SizedBox(height: 20),
 
           Card(
             child: ListTile(
-              leading: const Icon(Icons.person),
+              leading: const Icon(Icons.person, color: Colors.blue),
               title: const Text('User'),
               subtitle: const Text('Hussein Bashuaib'),
             ),
@@ -33,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
 
           Card(
             child: ListTile(
-              leading: const Icon(Icons.store),
+              leading: const Icon(Icons.store, color: Colors.green),
               title: const Text('Application'),
               subtitle: const Text('BashDafter'),
             ),
@@ -41,7 +83,7 @@ class ProfileScreen extends StatelessWidget {
 
           Card(
             child: ListTile(
-              leading: const Icon(Icons.verified_user),
+              leading: const Icon(Icons.verified_user, color: Colors.orange),
               title: const Text('Role'),
               subtitle: const Text('Owner'),
             ),
@@ -49,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
 
           Card(
             child: ListTile(
-              leading: const Icon(Icons.color_lens),
+              leading: const Icon(Icons.color_lens, color: Colors.purple),
               title: const Text('Theme'),
               subtitle: Text(isDarkMode ? 'Dark Mode' : 'Light Mode'),
             ),
@@ -57,7 +99,7 @@ class ProfileScreen extends StatelessWidget {
 
           Card(
             child: ListTile(
-              leading: const Icon(Icons.info),
+              leading: const Icon(Icons.info, color: Colors.teal),
               title: const Text('Version'),
               subtitle: const Text('1.0.0'),
             ),
@@ -65,7 +107,7 @@ class ProfileScreen extends StatelessWidget {
 
           Card(
             child: ListTile(
-              leading: const Icon(Icons.business),
+              leading: const Icon(Icons.business, color: Colors.indigo),
               title: const Text('Company'),
               subtitle: const Text('BashSoft Digital'),
             ),
