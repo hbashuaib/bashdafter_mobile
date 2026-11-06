@@ -16,24 +16,26 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int currentIndex = 0;
 
-  final pages = [
-    const DashboardScreen(),
-    const CustomersScreen(),
-    const ProductsScreen(),
-    const ReportsScreen(),
-    const SettingsScreen(),
+  static const List<Widget> pages = [
+    DashboardScreen(),
+    CustomersScreen(),
+    ProductsScreen(),
+    ReportsScreen(),
+    SettingsScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[currentIndex],
+      body: IndexedStack(index: currentIndex, children: pages),
 
       bottomNavigationBar: BottomNavigationBar(
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        showUnselectedLabels: true,
         currentIndex: currentIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Colors.grey,        
         type: BottomNavigationBarType.fixed,
 
         onTap: (index) {
@@ -43,11 +45,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         },
 
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard',),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Customers'),
-          BottomNavigationBarItem(icon: Icon(Icons.inventory_2), label: 'Products',),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports',),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings',),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Reports',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );
