@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/constants/api_constants.dart';
-import '../../../core/storage/token_storage.dart';
+import '../../../core/api/api_client.dart';
 
 class UpdateCustomerService {
   Future<void> updateCustomer({
@@ -12,18 +11,11 @@ class UpdateCustomerService {
     required String notes,
     required bool isActive,
   }) async {
-    final token = await TokenStorage.getAccessToken();
-
-    final Dio dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+    final dio = await ApiClient.instance;
 
     try {
       await dio.put(
-        '${ApiConstants.baseUrl}/customers/$customerId/',
+        '/customers/$customerId/',
 
         data: {
           'name': name.trim(),
@@ -32,8 +24,7 @@ class UpdateCustomerService {
           'notes': notes.trim(),
           'is_active': isActive,
         },
-
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        
       );
     } on DioException {
       rethrow;

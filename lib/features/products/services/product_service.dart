@@ -1,25 +1,13 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/constants/api_constants.dart';
-import '../../../core/storage/token_storage.dart';
+import '../../../core/api/api_client.dart';
 
 class ProductService {
-  final Dio _dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
-    ),
-  );
-
   Future<List<dynamic>> getProducts() async {
-    final token = await TokenStorage.getAccessToken();
+    final dio = await ApiClient.instance;
 
     try {
-      final response = await _dio.get(
-        '${ApiConstants.baseUrl}/products/',
-
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+      final response = await dio.get('/products/');
 
       return response.data;
     } on DioException {
@@ -41,11 +29,11 @@ class ProductService {
     required String minimumStock,
     required bool isActive,
   }) async {
-    final token = await TokenStorage.getAccessToken();
+    final dio = await ApiClient.instance;
 
     try {
-      await _dio.post(
-        '${ApiConstants.baseUrl}/products/',
+      await dio.post(
+        '/products/',
 
         data: {
           'name': name.trim(),
@@ -65,8 +53,6 @@ class ProductService {
           'category': categoryId,
           'unit': unitId,
         },
-
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
     } on DioException {
       rethrow;
@@ -88,11 +74,11 @@ class ProductService {
     required String minimumStock,
     required bool isActive,
   }) async {
-    final token = await TokenStorage.getAccessToken();
+    final dio = await ApiClient.instance;
 
     try {
-      await _dio.put(
-        '${ApiConstants.baseUrl}/products/$id/',
+      await dio.put(
+        '/products/$id/',
 
         data: {
           'name': name.trim(),
@@ -111,9 +97,7 @@ class ProductService {
           'shop': shopId,
           'category': categoryId,
           'unit': unitId,
-        },
-
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        },        
       );
     } on DioException {
       rethrow;

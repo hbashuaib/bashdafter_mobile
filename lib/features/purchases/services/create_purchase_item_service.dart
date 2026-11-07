@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/constants/api_constants.dart';
-import '../../../core/storage/token_storage.dart';
+import '../../../core/api/api_client.dart';
 
 class CreatePurchaseItemService {
   Future<void> createItem({
@@ -11,18 +10,11 @@ class CreatePurchaseItemService {
     required String quantity,
     required String unitPrice,
   }) async {
-    final token = await TokenStorage.getAccessToken();
-
-    final Dio dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+    final dio = await ApiClient.instance;
 
     try {
       await dio.post(
-        '${ApiConstants.baseUrl}/purchase-items/',
+        '/purchase-items/',
 
         data: {
           'purchase': purchaseId,
@@ -31,8 +23,6 @@ class CreatePurchaseItemService {
           'quantity': quantity.trim(),
           'unit_price': unitPrice.trim(),
         },
-
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
     } on DioException {
       rethrow;

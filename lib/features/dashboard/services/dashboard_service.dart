@@ -1,25 +1,13 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/constants/api_constants.dart';
-import '../../../core/storage/token_storage.dart';
+import '../../../core/api/api_client.dart';
 
 class DashboardService {
   Future<Map<String, dynamic>> getDashboard() async {
-    final token = await TokenStorage.getAccessToken();
-
-    final Dio dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+    final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get(
-        '${ApiConstants.baseUrl}/dashboard/',
-
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+      final response = await dio.get('/dashboard/');
 
       return response.data;
     } on DioException {

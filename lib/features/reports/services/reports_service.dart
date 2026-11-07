@@ -1,23 +1,14 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/constants/api_constants.dart';
-import '../../../core/storage/token_storage.dart';
+import '../../../core/api/api_client.dart';
 
 class ReportsService {
   Future<List<dynamic>> getCustomerSummary() async {
-    final token = await TokenStorage.getAccessToken();
-
-    final Dio dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+    final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get(
-        '${ApiConstants.baseUrl}/reports/customer-summary/',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        '/reports/customer-summary/',
       );
 
       return response.data;
@@ -29,19 +20,11 @@ class ReportsService {
   }
 
   Future<List<dynamic>> getTopDebtors() async {
-    final token = await TokenStorage.getAccessToken();
-
-    final Dio dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+    final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get(
-        '${ApiConstants.baseUrl}/reports/top-debtors/',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        '/reports/top-debtors/',
       );
 
       return response.data;
@@ -53,19 +36,11 @@ class ReportsService {
   }
 
   Future<List<dynamic>> getRecentTransactions() async {
-    final token = await TokenStorage.getAccessToken();
-
-    final Dio dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+    final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get(
-        '${ApiConstants.baseUrl}/reports/recent-transactions/',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        '/reports/recent-transactions/',
       );
 
       return response.data;
