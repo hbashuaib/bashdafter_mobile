@@ -20,4 +20,10 @@ class AuthService {
       throw Exception('Unexpected login error');
     }
   }
+
+  Future<Response> getProfile() async {
+    final dio = await ApiClient.instance;
+
+    return await dio.get('/auth/profile/');
+  }
 }

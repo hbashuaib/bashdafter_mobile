@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../services/profile_service.dart';
 import '../services/profile_image_service.dart';
 
+import 'change_password_screen.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -21,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-
     loadProfile();
   }
 
@@ -232,7 +233,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ListTile(
               leading: const Icon(Icons.verified_user, color: Colors.orange),
               title: const Text('Role'),
-              subtitle: Text(profile!['role']?.toString() ?? 'User'),
+              subtitle: Text(
+                profile!['role']?.toString().replaceAll('_', ' ') ?? 'User',
+              ),
             ),
           ),
 
@@ -259,6 +262,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           Card(
             child: ListTile(
+              leading: const Icon(Icons.phone, color: Colors.green),
+              title: const Text('Phone Number'),
+              subtitle: Text(
+                (profile!['phone_number']?.toString().trim().isNotEmpty ??
+                        false)
+                    ? profile!['phone_number'].toString()
+                    : '-',
+              ),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.color_lens, color: Colors.purple),
               title: const Text('Theme'),
               subtitle: Text(isDarkMode ? 'Dark Mode' : 'Light Mode'),
@@ -278,6 +294,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.business, color: Colors.indigo),
               title: const Text('Company'),
               subtitle: const Text('BashSoft Digital'),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.lock_reset, color: Colors.indigo),
+
+              title: const Text('Change Password'),
+
+              subtitle: const Text('Update your account password'),
+
+              trailing: const Icon(Icons.arrow_forward_ios),
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ChangePasswordScreen(),
+                  ),
+                );
+              },
             ),
           ),
         ],

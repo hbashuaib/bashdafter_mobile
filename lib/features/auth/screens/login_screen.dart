@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../../core/navigation/main_navigation_screen.dart';
+import '../models/user_profile.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,20 +49,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await TokenStorage.saveTokens(access: access, refresh: refresh);
 
+      final profileResponse = await AuthService().getProfile();
+      final profile = UserProfile.fromJson(profileResponse.data);
+
+      await TokenStorage.saveProfile(profile);      
+
       if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
       );
-
-      // debugPrint('Login Successful',);
+      
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid username or password')),
-      );
-
-      debugPrint('Login Failed: $e');
+      );      
     } finally {
       if (!mounted) return;
 

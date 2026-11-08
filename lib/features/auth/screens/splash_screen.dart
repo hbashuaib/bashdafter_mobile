@@ -22,9 +22,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> checkLogin() async {
     try {
       final token = await TokenStorage.getAccessToken();
+      final profile = await TokenStorage.getProfile();
+      
       if (!mounted) return;
 
-      if (token != null && token.isNotEmpty) {
+      if (token != null && token.isNotEmpty && profile != null) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const MainNavigationScreen()),

@@ -30,9 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      final data = await DashboardService().getDashboard();
-
-      debugPrint('DASHBOARD DATA: $data');
+      final data = await DashboardService().getDashboard();      
 
       if (!mounted) return;
 

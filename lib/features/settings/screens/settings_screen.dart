@@ -4,22 +4,75 @@ import 'package:provider/provider.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../auth/models/user_profile.dart';
+import '../../users/screens/users_screen.dart';
 
 import 'about_screen.dart';
 import 'profile_screen.dart';
 import 'shop_profile_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  UserProfile? profile;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfile();
+  }
+
+  Future<void> loadProfile() async {
+    final storedProfile = await TokenStorage.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      profile = storedProfile;
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (profile == null) {
+      return const Scaffold(body: Center(child: Text('Profile not found')));
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
 
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
+          if (profile!.isOwner || profile!.isAdmin)
+            Card(
+              child: ListTile(
+                leading: const Icon(
+                  Icons.manage_accounts,
+                  color: Colors.orange,
+                ),
+                title: const Text('User Management'),
+                subtitle: const Text('Manage system users'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const UsersScreen()),
+                  );
+                },
+              ),
+            ),
+
           Card(
             color: Colors.blue.shade50,
 
@@ -113,7 +166,7 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
           ),
-          
+
           Card(
             child: ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),

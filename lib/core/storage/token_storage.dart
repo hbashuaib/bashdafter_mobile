@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../../features/auth/models/user_profile.dart';
 
 class TokenStorage {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -17,6 +21,26 @@ class TokenStorage {
 
   static Future<String?> getRefreshToken() async {
     return await _storage.read(key: 'refresh');
+  }
+
+  static Future<void> saveProfile(UserProfile profile) async {
+    await _storage.write(key: 'profile', value: jsonEncode(profile.toJson()));
+  }
+
+  static Future<UserProfile?> getProfile() async {
+    final data = await _storage.read(key: 'profile');
+
+    if (data == null) {
+      return null;
+    }
+
+    return UserProfile.fromJson(jsonDecode(data));
+  }
+
+  static Future<String?> getRole() async {
+    final profile = await getProfile();
+
+    return profile?.role;
   }
 
   static Future<void> clear() async {
