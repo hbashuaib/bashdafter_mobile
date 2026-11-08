@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/customer_service.dart';
+import '../../../core/storage/token_storage.dart';
+import '../../auth/models/user_profile.dart';
+
 import 'customer_detail_screen.dart';
 import 'add_customer_screen.dart';
+import 'inactive_customers_screen.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -18,11 +22,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
   List<dynamic> filteredCustomers = [];
   bool isLoading = true;
   String currentFilter = 'active';
+  UserProfile? currentUser;
 
   @override
   void initState() {
     super.initState();
     loadCustomers();
+    loadCurrentUser();
   }
 
   void searchCustomers(String value) {
@@ -57,10 +63,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
       if (!mounted) return;
 
-      customers = data;
-      applyFilter();
-
       setState(() {
+        customers = data;
+        applyFilter();
         isLoading = false;
       });
     } catch (e) {
@@ -78,28 +83,54 @@ class _CustomersScreenState extends State<CustomersScreen> {
     }
   }
 
+  Future<void> loadCurrentUser() async {
+    final profile = await TokenStorage.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      currentUser = profile;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: currentUser != null && !currentUser!.isCashier
+          ? FloatingActionButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddCustomerScreen()),
+                );
+
+                if (result == true) {
+                  loadCustomers();
+                }
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
+
       appBar: AppBar(
         title: const Text('Customers'),
 
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
+          if (currentUser != null &&
+              (currentUser!.isOwner || currentUser!.isAdmin))
+            IconButton(
+              icon: const Icon(Icons.restore_from_trash),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const InactiveCustomersScreen(),
+                  ),
+                );
 
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-
-                MaterialPageRoute(builder: (_) => const AddCustomerScreen()),
-              );
-
-              if (result == true) {
                 loadCustomers();
-              }
-            },
-          ),
+              },
+            ),
         ],
       ),
 
@@ -111,7 +142,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: Text(
-                    'Customers: ${filteredCustomers.length}',
+                    'Showing ${filteredCustomers.length} of ${customers.length} customers',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -177,53 +208,64 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 ),
 
                 Expanded(
-                  child: filteredCustomers.isEmpty
-                      ? const Center(child: Text('No customers found'))
-                      : ListView.builder(
-                          itemCount: filteredCustomers.length,
+                  child: RefreshIndicator(
+                    onRefresh: loadCustomers,
 
-                          itemBuilder: (context, index) {
-                            final customer = filteredCustomers[index];
+                    child: filteredCustomers.isEmpty
+                        ? ListView(
+                            children: const [
+                              SizedBox(height: 150),
+                              Center(child: Text('No customers found')),
+                            ],
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 100),
 
-                            return Card(
-                              child: ListTile(
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
+                            itemCount: filteredCustomers.length,
 
-                                    MaterialPageRoute(
-                                      builder: (_) => CustomerDetailScreen(
-                                        customerId: customer['id'],
+                            itemBuilder: (context, index) {
+                              final customer = filteredCustomers[index];
+
+                              return Card(
+                                child: ListTile(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+
+                                      MaterialPageRoute(
+                                        builder: (_) => CustomerDetailScreen(
+                                          customerId: customer['id'],
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
 
-                                  loadCustomers();
-                                },
+                                    loadCustomers();
+                                  },
 
-                                title: Text(customer['name']),
+                                  title: Text(customer['name']),
 
-                                subtitle: Text(customer['phone']),
+                                  subtitle: Text(customer['phone']),
 
-                                trailing: Chip(
-                                  backgroundColor:
-                                      (customer['balance'] ?? 0) > 0
-                                      ? Colors.orange.shade100
-                                      : Colors.green.shade100,
+                                  trailing: Chip(
+                                    backgroundColor:
+                                        (customer['balance'] ?? 0) > 0
+                                        ? Colors.orange.shade100
+                                        : Colors.green.shade100,
 
-                                  label: Text(
-                                    currencyFormatter.format(
-                                      double.tryParse(
-                                            customer['balance'].toString(),
-                                          ) ??
-                                          0,
+                                    label: Text(
+                                      currencyFormatter.format(
+                                        double.tryParse(
+                                              customer['balance'].toString(),
+                                            ) ??
+                                            0,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
+                  ),
                 ),
               ],
             ),

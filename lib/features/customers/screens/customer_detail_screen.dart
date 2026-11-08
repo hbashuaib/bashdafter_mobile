@@ -8,6 +8,9 @@ import '../../payments/screens/payments_screen.dart';
 import '../../reports/screens/customer_statement_screen.dart';
 import '../../payments/screens/add_payment_screen.dart';
 import '../../purchases/screens/add_purchase_screen.dart';
+import '../../../core/storage/token_storage.dart';
+import '../../auth/models/user_profile.dart';
+
 import 'edit_customer_screen.dart';
 
 class CustomerDetailScreen extends StatefulWidget {
@@ -22,11 +25,13 @@ class CustomerDetailScreen extends StatefulWidget {
 class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? customer;
+  UserProfile? currentUser;
 
   @override
   void initState() {
     super.initState();
     loadCustomer();
+    loadCurrentUser();
   }
 
   Future<void> loadCustomer() async {
@@ -47,6 +52,16 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Failed to load customer')));
     }
+  }
+
+  Future<void> loadCurrentUser() async {
+    final profile = await TokenStorage.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      currentUser = profile;
+    });
   }
 
   Future<void> deactivateCustomer() async {
@@ -175,33 +190,36 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         title: Text(customer!['name']),
 
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
+          if (currentUser != null && !currentUser!.isCashier)
+            IconButton(
+              icon: const Icon(Icons.edit),
 
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
 
-                MaterialPageRoute(
-                  builder: (_) => EditCustomerScreen(customer: customer!),
-                ),
-              );
+                  MaterialPageRoute(
+                    builder: (_) => EditCustomerScreen(customer: customer!),
+                  ),
+                );
 
-              if (result == true) {
-                loadCustomer();
-              }
-            },
-          ),
-
-          IconButton(
-            icon: Icon(
-              customer!['is_active'] ? Icons.person_off : Icons.person,
+                if (result == true) {
+                  loadCustomer();
+                }
+              },
             ),
 
-            onPressed: customer!['is_active']
-                ? deactivateCustomer
-                : reactivateCustomer,
-          ),
+          if (currentUser != null &&
+              (currentUser!.isOwner || currentUser!.isAdmin))
+            IconButton(
+              icon: Icon(
+                customer!['is_active'] ? Icons.person_off : Icons.person,
+              ),
+
+              onPressed: customer!['is_active']
+                  ? deactivateCustomer
+                  : reactivateCustomer,
+            ),
         ],
       ),
 
