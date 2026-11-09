@@ -97,12 +97,24 @@ class ProductService {
           'shop': shopId,
           'category': categoryId,
           'unit': unitId,
-        },        
+        },
       );
     } on DioException {
       rethrow;
     } catch (_) {
       throw Exception('Unexpected product update error');
+    }
+  }
+
+  Future<void> deleteProduct(int productId) async {
+    final dio = await ApiClient.instance;
+
+    try {
+      await dio.delete('/products/$productId/');
+    } on DioException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected product delete error');
     }
   }
 }

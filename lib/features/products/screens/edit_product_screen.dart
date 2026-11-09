@@ -276,22 +276,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
             },
 
             decoration: const InputDecoration(labelText: 'Description'),
-          ),
+          ),         
 
-          const SizedBox(height: 12),
-
-          SwitchListTile(
-            title: const Text('Active'),
-            value: isActive,
-
-            onChanged: (value) {
-              setState(() {
-                isActive = value;
-              });
-            },
-          ),
-
-          const SizedBox(height: 20),
+          const SizedBox(height: 20), 
 
           ElevatedButton(
             onPressed: isSaving ? null : updateProduct,

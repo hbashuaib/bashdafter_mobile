@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/product_service.dart';
+import '../../../core/storage/token_storage.dart';
+import '../../auth/models/user_profile.dart';
 
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
+import 'inactive_products_screen.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -19,6 +22,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
   String activeFilter = 'All';
+  UserProfile? currentUser;
 
   int get totalProducts => products.length;
   int get activeProducts =>
@@ -30,6 +34,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     loadProducts();
+    loadCurrentUser();
   }
 
   Future<void> loadProducts() async {
@@ -57,6 +62,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
         isLoading = false;
       });
     }
+  }
+
+  Future<void> loadCurrentUser() async {
+    final profile = await TokenStorage.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      currentUser = profile;
+    });
   }
 
   void searchProducts(String value) {
@@ -92,24 +107,47 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Products')),
+      appBar: AppBar(
+        title: const Text('Products'),
+
+        actions: [
+          if (currentUser != null &&
+              (currentUser!.isOwner || currentUser!.isAdmin))
+            IconButton(
+              icon: const Icon(Icons.restore_from_trash),
+
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const InactiveProductsScreen(),
+                  ),
+                );
+
+                loadProducts();
+              },
+            ),
+        ],
+      ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddProductScreen()),
-          );
+      floatingActionButton: currentUser != null && !currentUser!.isCashier
+          ? FloatingActionButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddProductScreen()),
+                );
 
-          if (result == true) {
-            await loadProducts();
-          }
-        },
+                if (result == true) {
+                  await loadProducts();
+                }
+              },
 
-        child: const Icon(Icons.add),
-      ),
+              child: const Icon(Icons.add),
+            )
+          : null,
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -221,86 +259,106 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ),
                 ),
 
+                Padding(
+                  padding: const EdgeInsets.all(12),
+
+                  child: Text(
+                    'Showing ${filteredProducts.length} of ${products.length} products',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
                 Expanded(
-                  child: filteredProducts.isEmpty
-                      ? const Center(child: Text('No products found'))
-                      : ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 90),
-                          itemCount: filteredProducts.length,
+                  child: RefreshIndicator(
+                    onRefresh: loadProducts,
 
-                          itemBuilder: (context, index) {
-                            final product = filteredProducts[index];
+                    child: filteredProducts.isEmpty
+                        ? ListView(
+                            children: const [
+                              SizedBox(height: 150),
+                              Center(child: Text('No products found')),
+                            ],
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 90),
+                            itemCount: filteredProducts.length,
+                            itemBuilder: (context, index) {
+                              final product = filteredProducts[index];
 
-                            return Card(
-                              child: ListTile(
-                                onTap: () async {
-                                  final result = await Navigator.push(
-                                    context,
+                              return Card(
+                                child: ListTile(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
+                                      context,
 
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          ProductDetailScreen(product: product),
-                                    ),
-                                  );
-
-                                  if (result == true) {
-                                    activeFilter = 'All';
-                                    await loadProducts();
-                                  }
-                                },
-
-                                title: Text(product['name']),
-
-                                subtitle: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${product['category_name']} • ${product['unit_name']}',
-                                      ),
-                                    ),
-
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-
-                                      decoration: BoxDecoration(
-                                        color: product['is_active']
-                                            ? Colors.green.shade100
-                                            : Colors.red.shade100,
-
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-
-                                      child: Text(
-                                        product['is_active']
-                                            ? 'Active'
-                                            : 'Inactive',
-
-                                        style: TextStyle(
-                                          color: product['is_active']
-                                              ? Colors.green
-                                              : Colors.red,
-
-                                          fontSize: 12,
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductDetailScreen(
+                                          product: product,
                                         ),
                                       ),
+                                    );
+
+                                    if (result == true) {
+                                      activeFilter = 'All';
+                                      await loadProducts();
+                                    }
+                                  },
+
+                                  title: Text(product['name']),
+
+                                  subtitle: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '${product['category_name']} • ${product['unit_name']}',
+                                        ),
+                                      ),
+
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+
+                                        decoration: BoxDecoration(
+                                          color: product['is_active']
+                                              ? Colors.green.shade100
+                                              : Colors.red.shade100,
+
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+
+                                        child: Text(
+                                          product['is_active']
+                                              ? 'Active'
+                                              : 'Inactive',
+
+                                          style: TextStyle(
+                                            color: product['is_active']
+                                                ? Colors.green
+                                                : Colors.red,
+
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  trailing: Text(
+                                    'YER ${currencyFormatter.format(double.tryParse(product['selling_price'].toString()) ?? 0)}',
+
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ],
-                                ),
-
-                                trailing: Text(
-                                  'YER ${currencyFormatter.format(double.tryParse(product['selling_price'].toString()) ?? 0)}',
-
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
+                  ),
                 ),
               ],
             ),

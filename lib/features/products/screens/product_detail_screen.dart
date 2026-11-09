@@ -1,38 +1,137 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/storage/token_storage.dart';
+import '../../auth/models/user_profile.dart';
+import '../services/product_service.dart';
+
 import 'edit_product_screen.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
+class ProductDetailScreen extends StatefulWidget {
   final Map<String, dynamic> product;
 
-  ProductDetailScreen({super.key, required this.product});
+  const ProductDetailScreen({super.key, required this.product});
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
+  final ProductService _productService = ProductService();
+
+  UserProfile? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCurrentUser();
+  }
+
+  Future<void> loadCurrentUser() async {
+    final profile = await TokenStorage.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      currentUser = profile;
+    });
+  }
+
+  Future<void> deactivateProduct() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Deactivate Product'),
+
+          content: Text(
+            'Are you sure you want to deactivate ${widget.product['name']}?',
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+
+              child: const Text('Cancel'),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+
+              child: const Text('Deactivate'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    try {
+      await _productService.deleteProduct(widget.product['id']);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Product deactivated successfully')),
+      );
+
+      Navigator.pop(context, true);
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to deactivate product')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(product['name']?.toString() ?? '')),
+      appBar: AppBar(
+        title: Text(widget.product['name']?.toString() ?? ''),
+
+        actions: [
+          if (currentUser != null &&
+              (currentUser!.isOwner || currentUser!.isAdmin))
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+
+              onPressed: deactivateProduct,
+            ),
+        ],
+      ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.edit),
+      floatingActionButton: currentUser != null && !currentUser!.isCashier
+          ? FloatingActionButton(
+              child: const Icon(Icons.edit),
 
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
 
-            MaterialPageRoute(
-              builder: (_) => EditProductScreen(product: product),
-            ),
-          );
+                  MaterialPageRoute(
+                    builder: (_) => EditProductScreen(product: widget.product),
+                  ),
+                );
 
-          if (result == true && context.mounted) {
-            Navigator.pop(context, true);
-          }
-        },
-      ),
+                if (result == true && context.mounted) {
+                  Navigator.pop(context, true);
+                }
+              },
+            )
+          : null,
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -41,14 +140,14 @@ class ProductDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               title: const Text('Category'),
-              subtitle: Text(product['category_name'] ?? ''),
+              subtitle: Text(widget.product['category_name'] ?? ''),
             ),
           ),
 
           Card(
             child: ListTile(
               title: const Text('Unit'),
-              subtitle: Text(product['unit_name'] ?? ''),
+              subtitle: Text(widget.product['unit_name'] ?? ''),
             ),
           ),
 
@@ -56,9 +155,9 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Barcode'),
               subtitle: Text(
-                (product['barcode'] ?? '').toString().trim().isEmpty
+                (widget.product['barcode'] ?? '').toString().trim().isEmpty
                     ? '-'
-                    : product['barcode'].toString(),
+                    : widget.product['barcode'].toString(),
               ),
             ),
           ),
@@ -67,9 +166,9 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Description'),
               subtitle: Text(
-                (product['description'] ?? '').toString().trim().isEmpty
+                (widget.product['description'] ?? '').toString().trim().isEmpty
                     ? 'No description'
-                    : product['description'],
+                    : widget.product['description'],
               ),
             ),
           ),
@@ -78,7 +177,7 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Cost Price'),
               subtitle: Text(
-                'YER ${currencyFormatter.format(double.tryParse(product['cost_price'].toString()) ?? 0)}',
+                'YER ${currencyFormatter.format(double.tryParse(widget.product['cost_price'].toString()) ?? 0)}',
               ),
             ),
           ),
@@ -87,7 +186,7 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Selling Price'),
               subtitle: Text(
-                'YER ${currencyFormatter.format(double.tryParse(product['selling_price'].toString()) ?? 0)}',
+                'YER ${currencyFormatter.format(double.tryParse(widget.product['selling_price'].toString()) ?? 0)}',
               ),
             ),
           ),
@@ -96,7 +195,8 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Current Stock'),
               subtitle: Text(
-                (double.tryParse(product['current_stock'].toString()) ?? 0)
+                (double.tryParse(widget.product['current_stock'].toString()) ??
+                        0)
                     .toStringAsFixed(0),
               ),
             ),
@@ -106,7 +206,7 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Total Sold'),
               subtitle: Text(
-                (double.tryParse(product['total_sold'].toString()) ?? 0)
+                (double.tryParse(widget.product['total_sold'].toString()) ?? 0)
                     .toStringAsFixed(0),
               ),
             ),
@@ -116,14 +216,19 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Stock Adjustments'),
               subtitle: Text(
-                (double.tryParse(product['total_adjustments'].toString()) ?? 0)
+                (double.tryParse(
+                          widget.product['total_adjustments'].toString(),
+                        ) ??
+                        0)
                     .toStringAsFixed(0),
               ),
             ),
           ),
 
-          if ((double.tryParse(product['current_stock'].toString()) ?? 0) <=
-              (double.tryParse(product['minimum_stock'].toString()) ?? 0))
+          if ((double.tryParse(widget.product['current_stock'].toString()) ??
+                  0) <=
+              (double.tryParse(widget.product['minimum_stock'].toString()) ??
+                  0))
             Card(
               color: Colors.red.shade50,
 
@@ -146,7 +251,8 @@ class ProductDetailScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Minimum Stock'),
               subtitle: Text(
-                (double.tryParse(product['minimum_stock'].toString()) ?? 0)
+                (double.tryParse(widget.product['minimum_stock'].toString()) ??
+                        0)
                     .toStringAsFixed(0),
               ),
             ),
@@ -155,7 +261,7 @@ class ProductDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               title: const Text('Has Expiry'),
-              subtitle: Text(product['has_expiry'] ? 'Yes' : 'No'),
+              subtitle: Text(widget.product['has_expiry'] ? 'Yes' : 'No'),
             ),
           ),
 
@@ -169,7 +275,7 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
 
                 decoration: BoxDecoration(
-                  color: product['is_active']
+                  color: widget.product['is_active']
                       ? Colors.green.shade100
                       : Colors.red.shade100,
 
@@ -177,10 +283,12 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
 
                 child: Text(
-                  product['is_active'] ? 'Active' : 'Inactive',
+                  widget.product['is_active'] ? 'Active' : 'Inactive',
 
                   style: TextStyle(
-                    color: product['is_active'] ? Colors.green : Colors.red,
+                    color: widget.product['is_active']
+                        ? Colors.green
+                        : Colors.red,
 
                     fontWeight: FontWeight.bold,
                   ),
