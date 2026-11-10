@@ -30,7 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      final data = await DashboardService().getDashboard();      
+      final data = await DashboardService().getDashboard();
 
       if (!mounted) return;
 
@@ -92,6 +92,104 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 children: [
                   Card(
+                    color: Colors.indigo.shade50,
+
+                    child: const Padding(
+                      padding: EdgeInsets.all(20),
+
+                      child: Row(
+                        children: [
+                          Icon(Icons.dashboard, size: 40, color: Colors.indigo),
+
+                          SizedBox(width: 16),
+
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                              children: [
+                                Text(
+                                  'Business Dashboard',
+
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                SizedBox(height: 4),
+
+                                Text(
+                                  'Monitor customers, purchases, payments and inventory',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                        children: [
+                          Column(
+                            children: [
+                              const Text('Customers'),
+
+                              Text(
+                                dashboardData!['customers'].toString(),
+
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Column(
+                            children: [
+                              const Text('Balance'),
+
+                              Text(
+                                'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_balance'].toString()) ?? 0)}',
+
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8, bottom: 8, left: 4),
+
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+
+                      child: Text(
+                        'Business Overview',
+
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Card(
                     color: Colors.blue.shade50,
                     child: ListTile(
                       leading: const Icon(Icons.people, color: Colors.blue),
@@ -132,7 +230,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   Card(
-                    color: Colors.purple.shade50,
+                    color:
+                        (double.tryParse(
+                                  dashboardData!['total_balance'].toString(),
+                                ) ??
+                                0) >
+                            0
+                        ? Colors.orange.shade50
+                        : Colors.green.shade50,
                     child: ListTile(
                       leading: const Icon(
                         Icons.account_balance_wallet,
@@ -153,6 +258,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   0
                               ? Colors.orange
                               : Colors.green,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const Padding(
+                    padding: EdgeInsets.only(top: 16, bottom: 8, left: 4),
+
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+
+                      child: Text(
+                        'Quick Actions',
+
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
