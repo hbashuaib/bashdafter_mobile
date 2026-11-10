@@ -57,10 +57,15 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
     required IconData icon,
     required Color color,
   }) {
-    return Card(      
+    return Card(
+      color: title == 'Inventory Value' ? Colors.teal.shade50 : null,
+
       child: ListTile(
         leading: Icon(icon, color: color),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: title == 'Inventory Value'
+            ? const Text('Current stock value')
+            : null,
 
         trailing: Text(
           title == 'Inventory Value'
@@ -93,6 +98,53 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                 padding: const EdgeInsets.all(20),
 
                 children: [
+                  Card(
+                    color: Colors.indigo.shade50,
+
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                        children: [
+                          Column(
+                            children: [
+                              const Text('Products'),
+
+                              Text(
+                                dashboard!['total_products'].toString(),
+
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Column(
+                            children: [
+                              const Text('Low Stock'),
+
+                              Text(
+                                dashboard!['low_stock_products'].toString(),
+
+                                style: const TextStyle(
+                                  color: Colors.orange,
+
+                                  fontSize: 20,
+
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   buildCard(
                     title: 'Total Products',
                     value: dashboard!['total_products'],

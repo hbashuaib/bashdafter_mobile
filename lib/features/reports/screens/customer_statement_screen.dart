@@ -17,6 +17,7 @@ class CustomerStatementScreen extends StatefulWidget {
 class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? statement;
+  List<dynamic> filteredTransactions = [];
   bool isLoading = true;
 
   @override
@@ -39,6 +40,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
       setState(() {
         statement = data;
+        filteredTransactions = List<dynamic>.from(data['transactions']);
         isLoading = false;
       });
     } catch (e) {
@@ -54,6 +56,24 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void searchTransactions(String value) {
+    final query = value.toLowerCase();
+
+    setState(() {
+      filteredTransactions = (statement!['transactions'] as List<dynamic>)
+          .where((item) {
+            final type = item['type'].toString().toLowerCase();
+            final date = item['date'].toString().toLowerCase();
+            final amount = item['amount'].toString().toLowerCase();
+
+            return type.contains(query) ||
+                date.contains(query) ||
+                amount.contains(query);
+          })
+          .toList();
+    });
   }
 
   @override
@@ -118,17 +138,71 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
           children: [
             Card(
               color: Colors.blue.shade50,
-              child: ListTile(
-                title: const Text('Current Balance'),
-                trailing: Text(
-                  'YER ${currencyFormatter.format(double.tryParse(statement!['balance'].toString()) ?? 0)}',
 
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                  children: [
+                    Column(
+                      children: [
+                        const Text('Transactions'),
+
+                        Text(
+                          transactions.length.toString(),
+
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Column(
+                      children: [
+                        const Text('Balance'),
+
+                        Text(
+                          'YER ${currencyFormatter.format(double.tryParse(statement!['balance'].toString()) ?? 0)}',
+
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
+
+            TextField(
+              onChanged: searchTransactions,
+
+              decoration: const InputDecoration(
+                hintText: 'Search transactions',
+
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            Center(
+              child: Text(
+                'Showing ${filteredTransactions.length} of ${transactions.length} transactions',
+
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            const SizedBox(height: 12),
 
             Expanded(
               child: RefreshIndicator(
@@ -137,16 +211,16 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.only(bottom: 20),
-                  itemCount: transactions.length,
+                  itemCount: filteredTransactions.length,
 
                   itemBuilder: (context, index) {
-                    final item = transactions[index];
+                    final item = filteredTransactions[index];
                     final isPurchase = item['type'] == 'purchase';
 
                     return Card(
                       child: ListTile(
-                        title: Text(item['date']),
-                        subtitle: Text(item['type'].toString().toUpperCase()),
+                        title: Text(item['type'].toString().toUpperCase()),
+                        subtitle: Text(item['date']),
 
                         trailing: Text(
                           '${isPurchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',

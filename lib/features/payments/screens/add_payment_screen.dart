@@ -94,7 +94,41 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 decimal: true,
               ),
               textInputAction: TextInputAction.next,
+
+              onChanged: (_) {
+                setState(() {});
+              },
+
               decoration: const InputDecoration(labelText: 'Amount'),
+            ),
+
+            const SizedBox(height: 15),
+
+            Card(
+              color: Colors.green.shade50,
+
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  children: [
+                    const Text('Payment Amount'),
+
+                    Text(
+                      amountController.text.isEmpty
+                          ? '0'
+                          : amountController.text,
+
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 15),

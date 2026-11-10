@@ -1,13 +1,39 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/storage/token_storage.dart';
+import '../../auth/models/user_profile.dart';
+
 import 'inventory_history_screen.dart';
 import 'stock_adjustment_screen.dart';
 import 'low_stock_products_screen.dart';
 import 'inventory_dashboard_screen.dart';
 import 'top_selling_products_screen.dart';
 
-class InventoryMenuScreen extends StatelessWidget {
+class InventoryMenuScreen extends StatefulWidget {
   const InventoryMenuScreen({super.key});
+
+  @override
+  State<InventoryMenuScreen> createState() => _InventoryMenuScreenState();
+}
+
+class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
+  UserProfile? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCurrentUser();
+  }
+
+  Future<void> loadCurrentUser() async {
+    final profile = await TokenStorage.getProfile();
+
+    if (!mounted) return;
+
+    setState(() {
+      currentUser = profile;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +49,47 @@ class InventoryMenuScreen extends StatelessWidget {
             child: const Padding(
               padding: EdgeInsets.all(16),
 
-              child: Column(
+              child: Row(
                 children: [
-                  Text(
-                    'Inventory Management',
+                  Icon(Icons.inventory_2, size: 40, color: Colors.blue),
 
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  SizedBox(width: 16),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Text(
+                          'Inventory Management',
+
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        SizedBox(height: 8),
+
+                        Text('Manage stock operations and inventory reports'),
+                      ],
+                    ),
                   ),
-
-                  SizedBox(height: 8),
-
-                  Text('Manage stock operations and inventory reports'),
                 ],
+              ),
+            ),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 8, left: 8),
+
+            child: Align(
+              alignment: Alignment.centerLeft,
+
+              child: Text(
+                'Inventory Functions',
+
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -42,11 +97,8 @@ class InventoryMenuScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.dashboard, color: Colors.blue),
-
               title: const Text('Inventory Dashboard'),
-
               subtitle: const Text('Inventory statistics and summary'),
-
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -54,6 +106,27 @@ class InventoryMenuScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) => const InventoryDashboardScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.orange.shade100,
+                child: const Icon(Icons.warning, color: Colors.orange),
+              ),
+              title: const Text('Low Stock Products'),
+              subtitle: const Text('Products requiring replenishment'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LowStockProductsScreen(),
                   ),
                 );
               },
@@ -84,11 +157,8 @@ class InventoryMenuScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.history, color: Colors.purple),
-
               title: const Text('Inventory History'),
-
               subtitle: const Text('All inventory transactions'),
-
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -102,47 +172,26 @@ class InventoryMenuScreen extends StatelessWidget {
             ),
           ),
 
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.inventory, color: Colors.green),
+          if (currentUser != null && !currentUser!.isCashier)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.inventory, color: Colors.green),
+                title: const Text('Stock Adjustments'),
+                subtitle: const Text('Increase or decrease stock'),
+                trailing: const Icon(Icons.arrow_forward_ios),
 
-              title: const Text('Stock Adjustments'),
-
-              subtitle: const Text('Increase or decrease stock'),
-
-              trailing: const Icon(Icons.arrow_forward_ios),
-
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const StockAdjustmentScreen(),
-                  ),
-                );
-              },
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StockAdjustmentScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
 
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.warning, color: Colors.orange),
-
-              title: const Text('Low Stock Products'),
-
-              subtitle: const Text('Products requiring replenishment'),
-
-              trailing: const Icon(Icons.arrow_forward_ios),
-
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LowStockProductsScreen(),
-                  ),
-                );
-              },
-            ),
-          ),
+          
         ],
       ),
     );

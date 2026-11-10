@@ -12,7 +12,7 @@ class TopSellingProductsScreen extends StatefulWidget {
 
 class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
   List<dynamic> products = [];
-
+  List<dynamic> filteredProducts = [];
   bool isLoading = true;
 
   @override
@@ -29,6 +29,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
       setState(() {
         products = data;
+        filteredProducts = data;
         isLoading = false;
       });
     } catch (e) {
@@ -62,6 +63,18 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
     return Colors.blue;
   }
 
+  void searchProducts(String value) {
+    final query = value.toLowerCase();
+
+    setState(() {
+      filteredProducts = products.where((product) {
+        final name = product['name'].toString().toLowerCase();
+
+        return name.contains(query);
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,69 +82,161 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : products.isEmpty
-          ? const Center(child: Text('No sales found'))
-          : RefreshIndicator(
-              onRefresh: loadProducts,
+          : Column(
+              children: [
+                Card(
+                  margin: const EdgeInsets.all(12),
 
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 20),
-                itemCount: products.length,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
 
-                itemBuilder: (context, index) {
-                  final product = products[index];
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      children: [
+                        Column(
+                          children: [
+                            const Text('Products'),
+
+                            Text(
+                              products.length.toString(),
+
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Column(
+                          children: [
+                            const Text('Top Seller'),
+
+                            SizedBox(
+                              width: 100,
+
+                              child: Text(
+                                products.isEmpty
+                                    ? '-'
+                                    : products.first['name'].toString(),
+
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+                  ),
+                ),
 
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: getRankColor(index),
+                Padding(
+                  padding: const EdgeInsets.all(12),
 
-                        child: Text(
-                          '#${index + 1}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                  child: TextField(
+                    onChanged: searchProducts,
+
+                    decoration: const InputDecoration(
+                      hintText: 'Search product',
+
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+
+                  child: Center(
+                    child: Text(
+                      'Showing ${filteredProducts.length} of ${products.length} products',
+
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: products.isEmpty
+                      ? ListView(
+                          children: const [
+                            SizedBox(height: 150),
+
+                            Center(child: Text('No sales found')),
+                          ],
+                        )
+                      : RefreshIndicator(
+                          onRefresh: loadProducts,
+
+                          child: ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+
+                            padding: const EdgeInsets.only(bottom: 20),
+
+                            itemCount: filteredProducts.length,
+
+                            itemBuilder: (context, index) {
+                              final product = filteredProducts[index];
+
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: getRankColor(index),
+
+                                    child: Text(
+                                      '#${index + 1}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+
+                                  title: Text(
+                                    product['name']?.toString() ??
+                                        'Unknown Product',
+                                  ),
+
+                                  subtitle: Text(
+                                    'Current Stock: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}',
+                                  ),
+
+                                  trailing: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+
+                                    children: [
+                                      const Text(
+                                        'Sold',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+
+                                      Text(
+                                        (double.tryParse(
+                                                  product['total_sold']
+                                                      .toString(),
+                                                ) ??
+                                                0)
+                                            .toStringAsFixed(0),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      ),
-
-                      title: Text(
-                        product['name']?.toString() ?? 'Unknown Product',
-                      ),
-
-                      subtitle: Text(
-                        'Current Stock: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}',
-                      ),
-
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: [
-                          const Text('Sold', style: TextStyle(fontSize: 12)),
-
-                          Text(
-                            (double.tryParse(
-                                      product['total_sold'].toString(),
-                                    ) ??
-                                    0)
-                                .toStringAsFixed(0),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                ),
+              ],
             ),
     );
   }
