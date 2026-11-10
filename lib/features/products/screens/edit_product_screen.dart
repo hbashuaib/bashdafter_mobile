@@ -4,6 +4,8 @@ import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
 
+import 'barcode_scanner_screen.dart';
+
 class EditProductScreen extends StatefulWidget {
   final Map<String, dynamic> product;
   const EditProductScreen({super.key, required this.product});
@@ -14,6 +16,7 @@ class EditProductScreen extends StatefulWidget {
 
 class _EditProductScreenState extends State<EditProductScreen> {
   final nameController = TextEditingController();
+  final barcodeController = TextEditingController();
   final descriptionController = TextEditingController();
   final costPriceController = TextEditingController();
   final sellingPriceController = TextEditingController();
@@ -31,10 +34,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void initState() {
     super.initState();
     nameController.text = widget.product['name']?.toString() ?? '';
-    descriptionController.text = widget.product['description']?.toString() ?? '';
+    barcodeController.text = widget.product['barcode']?.toString() ?? '';
+    descriptionController.text =
+        widget.product['description']?.toString() ?? '';
     costPriceController.text = widget.product['cost_price']?.toString() ?? '';
-    sellingPriceController.text = widget.product['selling_price']?.toString() ?? '';
-    minimumStockController.text = widget.product['minimum_stock']?.toString() ?? '';
+    sellingPriceController.text =
+        widget.product['selling_price']?.toString() ?? '';
+    minimumStockController.text =
+        widget.product['minimum_stock']?.toString() ?? '';
     selectedCategory = widget.product['category'];
     selectedUnit = widget.product['unit'];
     isActive = widget.product['is_active'];
@@ -143,7 +150,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),
-        barcode: widget.product['barcode'],
+        barcode: barcodeController.text.trim().isEmpty
+            ? null
+            : barcodeController.text.trim(),
+
         description: descriptionController.text.trim(),
         costPrice: costPriceController.text.trim(),
         sellingPrice: sellingPriceController.text.trim(),
@@ -193,6 +203,36 @@ class _EditProductScreenState extends State<EditProductScreen> {
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Product Name'),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
+            controller: barcodeController,
+            keyboardType: TextInputType.number,
+
+            decoration: InputDecoration(
+              labelText: 'Barcode',
+
+              prefixIcon: const Icon(Icons.qr_code),
+
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.camera_alt),
+
+                onPressed: () async {
+                  final barcode = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BarcodeScannerScreen(),
+                    ),
+                  );
+
+                  if (barcode != null) {
+                    barcodeController.text = barcode.toString();
+                  }
+                },
+              ),
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -276,9 +316,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
             },
 
             decoration: const InputDecoration(labelText: 'Description'),
-          ),         
+          ),
 
-          const SizedBox(height: 20), 
+          const SizedBox(height: 20),
 
           ElevatedButton(
             onPressed: isSaving ? null : updateProduct,

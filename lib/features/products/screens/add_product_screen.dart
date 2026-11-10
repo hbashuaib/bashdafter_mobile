@@ -4,6 +4,8 @@ import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
 
+import 'barcode_scanner_screen.dart';
+
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
 
@@ -13,6 +15,7 @@ class AddProductScreen extends StatefulWidget {
 
 class _AddProductScreenState extends State<AddProductScreen> {
   final nameController = TextEditingController();
+  final barcodeController = TextEditingController();
   final descriptionController = TextEditingController();
   final costPriceController = TextEditingController();
   final sellingPriceController = TextEditingController();
@@ -137,7 +140,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
         costPrice: costPriceController.text.trim(),
         sellingPrice: sellingPriceController.text.trim(),
         minimumStock: minimumStockController.text.trim(),
-        barcode: null,
+        barcode: barcodeController.text.trim().isEmpty
+            ? null
+            : barcodeController.text.trim(),
         isActive: true,
       );
 
@@ -181,6 +186,36 @@ class _AddProductScreenState extends State<AddProductScreen> {
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Product Name'),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
+            controller: barcodeController,
+            keyboardType: TextInputType.number,
+
+            decoration: InputDecoration(
+              labelText: 'Barcode',
+
+              prefixIcon: const Icon(Icons.qr_code),
+
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.camera_alt),
+
+                onPressed: () async {
+                  final barcode = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BarcodeScannerScreen(),
+                    ),
+                  );
+
+                  if (barcode != null) {
+                    barcodeController.text = barcode.toString();
+                  }
+                },
+              ),
+            ),
           ),
 
           const SizedBox(height: 12),

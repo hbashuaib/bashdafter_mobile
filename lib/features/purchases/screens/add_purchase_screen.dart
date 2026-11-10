@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../services/create_purchase_service.dart';
 import '../services/create_purchase_item_service.dart';
 import '../../products/services/product_service.dart';
+import '../../products/services/barcode_lookup_service.dart';
+import '../../products/screens/barcode_scanner_screen.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -197,6 +199,72 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
 
           children: [
+            SizedBox(
+              width: double.infinity,
+
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.qr_code_scanner),
+                label: const Text('Scan Product Barcode'),
+
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+
+                  final barcode = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BarcodeScannerScreen(),
+                    ),
+                  );
+
+                  if (!mounted) {
+                    return;
+                  }
+
+                  if (barcode == null) {
+                    return;
+                  }
+
+                  try {
+                    final product = await BarcodeLookupService()
+                        .findProductByBarcode(barcode.toString());
+                    final selected = products.firstWhere(
+                      (p) => p['id'] == product['id'],
+                      orElse: () => product,
+                    );
+
+                    if (!mounted) {
+                      return;
+                    }
+
+                    setState(() {
+                      selectedProduct = selected;
+
+                      unitPriceController.text = selected['selling_price']
+                          .toString();
+                    });
+
+                    if (!mounted) {
+                      return;
+                    }
+
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(product['name'])),
+                    );
+                  } catch (_) {
+                    if (!mounted) {
+                      return;
+                    }                   
+
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Product not found')),
+                    );
+                  }
+                },
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
             DropdownButtonFormField<dynamic>(
               value: selectedProduct,
               decoration: const InputDecoration(labelText: 'Product'),
