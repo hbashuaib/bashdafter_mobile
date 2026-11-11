@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
+import '../../products/screens/expiring_products_screen.dart';
 
 import 'inventory_history_screen.dart';
 import 'stock_adjustment_screen.dart';
@@ -133,10 +134,7 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
 
           Card(
             child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.orange.shade100,
-                child: const Icon(Icons.warning, color: Colors.orange),
-              ),
+              leading: const Icon(Icons.warning, color: Colors.orange),
               title: const Text('Low Stock Products'),
               subtitle: const Text('Products requiring replenishment'),
               trailing: const Icon(Icons.arrow_forward_ios),
@@ -154,12 +152,27 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
 
           Card(
             child: ListTile(
+              leading: const Icon(Icons.calendar_month, color: Colors.orange),
+              title: const Text('Expiring Products'),
+              subtitle: const Text('Products expiring soon'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ExpiringProductsScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.emoji_events, color: Colors.amber),
-
               title: const Text('Top Selling Products'),
-
               subtitle: const Text('Best performing products'),
-
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {

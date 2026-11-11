@@ -58,7 +58,11 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
     required Color color,
   }) {
     return Card(
-      color: title == 'Inventory Value' ? Colors.teal.shade50 : null,
+      color: title == 'Inventory Value'
+          ? Colors.teal.shade50
+          : title == 'Expiring Products'
+          ? Colors.red.shade50
+          : null,
 
       child: ListTile(
         leading: Icon(icon, color: color),
@@ -74,7 +78,11 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: title == 'Inventory Value' ? Colors.teal.shade700 : null,
+            color: title == 'Inventory Value'
+                ? Colors.teal.shade700
+                : title == 'Expiring Products'
+                ? Colors.red.shade700
+                : null,
           ),
         ),
       ),
@@ -132,9 +140,23 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
                                 style: const TextStyle(
                                   color: Colors.orange,
-
                                   fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
 
+                          Column(
+                            children: [
+                              const Text('Expiring'),
+
+                              Text(
+                                dashboard!['expiring_products'].toString(),
+
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -157,6 +179,13 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     value: dashboard!['low_stock_products'],
                     icon: Icons.warning,
                     color: Colors.orange,
+                  ),
+
+                  buildCard(
+                    title: 'Expiring Products',
+                    value: dashboard!['expiring_products'],
+                    icon: Icons.calendar_month,
+                    color: Colors.red,
                   ),
 
                   buildCard(

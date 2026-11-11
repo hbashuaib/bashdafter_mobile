@@ -28,6 +28,8 @@ class ProductService {
     required String sellingPrice,
     required String minimumStock,
     required bool isActive,
+    required bool hasExpiry,
+    String? expiryDate,
   }) async {
     final dio = await ApiClient.instance;
 
@@ -46,8 +48,8 @@ class ProductService {
           'cost_price': costPrice.trim(),
           'selling_price': sellingPrice.trim(),
           'minimum_stock': minimumStock.trim(),
-          'has_expiry': false,
-          'expiry_date': null,
+          'has_expiry': hasExpiry,
+          'expiry_date': expiryDate,
           'is_active': isActive,
           'shop': shopId,
           'category': categoryId,
@@ -73,6 +75,8 @@ class ProductService {
     required String sellingPrice,
     required String minimumStock,
     required bool isActive,
+    required bool hasExpiry,
+    String? expiryDate,
   }) async {
     final dio = await ApiClient.instance;
 
@@ -91,8 +95,8 @@ class ProductService {
           'cost_price': costPrice.trim(),
           'selling_price': sellingPrice.trim(),
           'minimum_stock': minimumStock.trim(),
-          'has_expiry': false,
-          'expiry_date': null,
+          'has_expiry': hasExpiry,
+          'expiry_date': expiryDate,
           'is_active': isActive,
           'shop': shopId,
           'category': categoryId,
@@ -118,3 +122,5 @@ class ProductService {
     }
   }
 }
+
+

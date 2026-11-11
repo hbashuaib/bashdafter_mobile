@@ -26,9 +26,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   List<dynamic> units = [];
   int? selectedCategory;
   int? selectedUnit;
+  DateTime? expiryDate;
   bool isActive = true;
   bool isLoading = true;
   bool isSaving = false;
+  bool hasExpiry = false;
 
   @override
   void initState() {
@@ -45,6 +47,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     selectedCategory = widget.product['category'];
     selectedUnit = widget.product['unit'];
     isActive = widget.product['is_active'];
+    hasExpiry = widget.product['has_expiry'] ?? false;
+
+    if (widget.product['expiry_date'] != null) {
+      expiryDate = DateTime.tryParse(widget.product['expiry_date'].toString());
+    }
+
     loadDropdowns();
   }
 
@@ -129,6 +137,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
 
+    if (hasExpiry && expiryDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an expiry date')),
+      );
+
+      return;
+    }
+
     if (sellingPrice < costPrice) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -159,6 +175,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
         sellingPrice: sellingPriceController.text.trim(),
         minimumStock: minimumStockController.text.trim(),
         isActive: isActive,
+        hasExpiry: hasExpiry,
+        expiryDate: expiryDate?.toIso8601String().split('T').first,
       );
 
       if (!mounted) return;
@@ -301,6 +319,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Minimum Stock'),
           ),
+
+          const SizedBox(height: 12),
+
+          SwitchListTile(
+            title: const Text('Has Expiry Date'),
+            value: hasExpiry,
+
+            onChanged: (value) {
+              setState(() {
+                hasExpiry = value;
+
+                if (!value) {
+                  expiryDate = null;
+                }
+              });
+            },
+          ),
+
+          if (hasExpiry)
+            ListTile(
+              leading: const Icon(Icons.calendar_month),
+
+              title: Text(
+                expiryDate == null
+                    ? 'Select Expiry Date'
+                    : expiryDate!.toString().split(' ').first,
+              ),
+
+              onTap: () async {
+                final selected = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2100),
+                  initialDate: expiryDate ?? DateTime.now(),
+                );
+
+                if (selected != null) {
+                  setState(() {
+                    expiryDate = selected;
+                  });
+                }
+              },
+            ),
 
           const SizedBox(height: 12),
 

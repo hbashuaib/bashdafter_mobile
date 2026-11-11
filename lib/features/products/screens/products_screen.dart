@@ -8,6 +8,7 @@ import '../../auth/models/user_profile.dart';
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
 import 'inactive_products_screen.dart';
+import 'barcode_scanner_screen.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -18,6 +19,7 @@ class ProductsScreen extends StatefulWidget {
 
 class _ProductsScreenState extends State<ProductsScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> products = [];
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
@@ -35,6 +37,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
     super.initState();
     loadProducts();
     loadCurrentUser();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   Future<void> loadProducts() async {
@@ -75,13 +83,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   void searchProducts(String value) {
+    final query = value.toLowerCase().trim();
+
     setState(() {
       filteredProducts = products.where((product) {
         final name = product['name'].toString().toLowerCase();
         final category = product['category_name'].toString().toLowerCase();
-        final query = value.toLowerCase();
+        final barcode = (product['barcode'] ?? '').toString().toLowerCase();
 
-        return name.contains(query) || category.contains(query);
+        return name.contains(query) ||
+            category.contains(query) ||
+            barcode.contains(query);
       }).toList();
     });
   }
@@ -213,11 +225,43 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: TextField(
+                    controller: searchController,
                     onChanged: searchProducts,
 
-                    decoration: const InputDecoration(
-                      hintText: 'Search by product or category',
-                      prefixIcon: Icon(Icons.search),
+                    decoration: InputDecoration(
+                      hintText: 'Search by name, category, or barcode',
+                      prefixIcon: const Icon(Icons.search),
+
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.qr_code_scanner),
+
+                        onPressed: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+
+                          final barcode = await Navigator.push(
+                            context,
+
+                            MaterialPageRoute(
+                              builder: (_) => const BarcodeScannerScreen(),
+                            ),
+                          );
+
+                          if (!mounted || barcode == null) {
+                            return;
+                          }
+
+                          searchController.text = barcode.toString();
+                          searchProducts(barcode.toString());
+
+                          if (filteredProducts.isEmpty) {
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                content: Text('Product not found'),
+                              ),
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -306,44 +350,26 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                                   title: Text(product['name']),
 
-                                  subtitle: Row(
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          '${product['category_name']} • ${product['unit_name']}',
-                                        ),
+                                      Text(
+                                        '${product['category_name']} • ${product['unit_name']}',
                                       ),
 
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-
-                                        decoration: BoxDecoration(
-                                          color: product['is_active']
-                                              ? Colors.green.shade100
-                                              : Colors.red.shade100,
-
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-
-                                        child: Text(
-                                          product['is_active']
-                                              ? 'Active'
-                                              : 'Inactive',
-
+                                      if ((product['barcode'] ?? '')
+                                          .toString()
+                                          .trim()
+                                          .isNotEmpty)
+                                        Text(
+                                          'Barcode: ${product['barcode']}',
                                           style: TextStyle(
-                                            color: product['is_active']
-                                                ? Colors.green
-                                                : Colors.red,
-
+                                            color: Colors.grey.shade600,
                                             fontSize: 12,
                                           ),
                                         ),
-                                      ),
                                     ],
                                   ),
 

@@ -264,6 +264,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               subtitle: Text(widget.product['has_expiry'] ? 'Yes' : 'No'),
             ),
           ),
+          if (widget.product['has_expiry'] == true)
+            Card(
+              child: ListTile(
+                title: const Text('Expiry Date'),
+
+                subtitle: Text(
+                  widget.product['expiry_date']?.toString() ?? '-',
+                ),
+              ),
+            ),
+          if (widget.product['has_expiry'] == true &&
+              widget.product['expiry_date'] != null)
+            Builder(
+              builder: (_) {
+                final expiryDate = DateTime.parse(
+                  widget.product['expiry_date'],
+                );
+
+                final remaining = expiryDate.difference(DateTime.now()).inDays;
+
+                Color cardColor;
+                Color textColor;
+                String status;
+
+                if (remaining < 0) {
+                  cardColor = Colors.red.shade50;
+                  textColor = Colors.red.shade900;
+                  status = 'EXPIRED';
+                } else if (remaining <= 30) {
+                  cardColor = Colors.orange.shade50;
+                  textColor = Colors.orange.shade900;
+                  status = 'Expires in $remaining days';
+                } else {
+                  cardColor = Colors.green.shade50;
+                  textColor = Colors.green.shade900;
+                  status = '$remaining days remaining';
+                }
+
+                return Card(
+                  color: cardColor,
+
+                  child: ListTile(
+                    leading: Icon(Icons.calendar_month, color: textColor),
+
+                    title: Text(
+                      status,
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
 
           Card(
             child: ListTile(
