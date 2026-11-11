@@ -8,6 +8,7 @@ import 'stock_adjustment_screen.dart';
 import 'low_stock_products_screen.dart';
 import 'inventory_dashboard_screen.dart';
 import 'top_selling_products_screen.dart';
+import 'inventory_lookup_screen.dart';
 
 class InventoryMenuScreen extends StatefulWidget {
   const InventoryMenuScreen({super.key});
@@ -114,6 +115,24 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
 
           Card(
             child: ListTile(
+              leading: const Icon(Icons.qr_code_scanner, color: Colors.indigo),
+              title: const Text('Inventory Lookup'),
+              subtitle: const Text('Scan barcode and check stock'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const InventoryLookupScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          Card(
+            child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.orange.shade100,
                 child: const Icon(Icons.warning, color: Colors.orange),
@@ -190,8 +209,6 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
                 },
               ),
             ),
-
-          
         ],
       ),
     );

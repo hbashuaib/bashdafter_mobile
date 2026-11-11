@@ -145,23 +145,35 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
         child: Column(
           children: [
-            DropdownButtonFormField<dynamic>(
-              value: selectedProduct,
-              decoration: const InputDecoration(labelText: 'Product'),
+            if (widget.product == null)
+              DropdownButtonFormField<dynamic>(
+                value: selectedProduct,
+                decoration: const InputDecoration(labelText: 'Product'),
 
-              items: products.map((product) {
-                return DropdownMenuItem(
-                  value: product,
-                  child: Text(product['name']),
-                );
-              }).toList(),
+                items: products.map((product) {
+                  return DropdownMenuItem(
+                    value: product,
+                    child: Text(product['name']),
+                  );
+                }).toList(),
 
-              onChanged: (value) {
-                setState(() {
-                  selectedProduct = value;
-                });
-              },
-            ),
+                onChanged: (value) {
+                  setState(() {
+                    selectedProduct = value;
+                  });
+                },
+              ),
+
+            if (widget.product != null)
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.inventory_2),
+
+                  title: Text(selectedProduct?['name'] ?? ''),
+
+                  subtitle: const Text('Selected from barcode lookup'),
+                ),
+              ),
 
             if (selectedProduct != null)
               Card(

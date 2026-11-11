@@ -76,6 +76,22 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     });
   }
 
+  List<double> calculateRunningBalances() {
+    double runningBalance = 0;
+
+    return filteredTransactions.map<double>((item) {
+      final amount = double.tryParse(item['amount'].toString()) ?? 0;
+
+      if (item['type'] == 'purchase') {
+        runningBalance += amount;
+      } else {
+        runningBalance -= amount;
+      }
+
+      return runningBalance;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -91,6 +107,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     }
 
     final transactions = statement!['transactions'] as List<dynamic>;
+    final runningBalances = calculateRunningBalances();
 
     return Scaffold(
       appBar: AppBar(
@@ -137,7 +154,10 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
           children: [
             Card(
-              color: Colors.blue.shade50,
+              color:
+                  (double.tryParse(statement!['balance'].toString()) ?? 0) > 0
+                  ? Colors.red.shade50
+                  : Colors.green.shade50,
 
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -168,9 +188,18 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                         Text(
                           'YER ${currencyFormatter.format(double.tryParse(statement!['balance'].toString()) ?? 0)}',
 
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
+
+                            color:
+                                (double.tryParse(
+                                          statement!['balance'].toString(),
+                                        ) ??
+                                        0) >
+                                    0
+                                ? Colors.red
+                                : Colors.green,
                           ),
                         ),
                       ],
@@ -215,6 +244,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                   itemBuilder: (context, index) {
                     final item = filteredTransactions[index];
+                    final runningBalance = runningBalances[index];
                     final isPurchase = item['type'] == 'purchase';
 
                     return Card(
@@ -222,12 +252,32 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                         title: Text(item['type'].toString().toUpperCase()),
                         subtitle: Text(item['date']),
 
-                        trailing: Text(
-                          '${isPurchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
-                          style: TextStyle(
-                            color: isPurchase ? Colors.red : Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+
+                          children: [
+                            Text(
+                              '${isPurchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
+
+                              style: TextStyle(
+                                color: isPurchase ? Colors.red : Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            Text(
+                              'Bal: ${currencyFormatter.format(runningBalance)}',
+
+                              style: TextStyle(
+                                fontSize: 12,
+
+                                color: runningBalance > 0
+                                    ? Colors.red
+                                    : Colors.green,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );

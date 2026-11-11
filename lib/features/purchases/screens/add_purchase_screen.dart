@@ -22,6 +22,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   final notesController = TextEditingController();
   final currencyFormatter = NumberFormat('#,##0.00');
 
+  final FocusNode quantityFocusNode = FocusNode();
+
   bool isSaving = false;
   List<Map<String, dynamic>> purchaseItems = [];
   List<dynamic> products = [];
@@ -32,6 +34,17 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     super.initState();
     loadProducts();
     quantityController.text = '1';
+  }
+
+  @override
+  void dispose() {
+    quantityFocusNode.dispose();
+
+    quantityController.dispose();
+    unitPriceController.dispose();
+    notesController.dispose();
+
+    super.dispose();
   }
 
   Future<void> loadProducts() async {
@@ -117,6 +130,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       unitPriceController.text = '';
       selectedProduct = null;
     });
+
+    FocusScope.of(context).unfocus();
   }
 
   Future<void> savePurchase() async {
@@ -238,10 +253,13 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
                     setState(() {
                       selectedProduct = selected;
+                      quantityController.text = '1';
 
                       unitPriceController.text = selected['selling_price']
                           .toString();
                     });
+
+                    quantityFocusNode.requestFocus();
 
                     if (!mounted) {
                       return;
@@ -253,7 +271,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   } catch (_) {
                     if (!mounted) {
                       return;
-                    }                   
+                    }
 
                     messenger.showSnackBar(
                       const SnackBar(content: Text('Product not found')),
@@ -288,11 +306,15 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             const SizedBox(height: 15),
 
             TextField(
+              focusNode: quantityFocusNode,
               controller: quantityController,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
               textInputAction: TextInputAction.next,
+              onSubmitted: (_) {
+                addItem();
+              },
               decoration: const InputDecoration(labelText: 'Quantity'),
             ),
 
