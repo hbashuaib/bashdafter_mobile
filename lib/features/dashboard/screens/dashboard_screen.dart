@@ -5,6 +5,7 @@ import '../services/dashboard_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../inventory/screens/inventory_menu_screen.dart';
+import '../../voice/screens/voice_recorder_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -296,6 +297,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => const InventoryMenuScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  Card(
+                    color: Colors.red.shade50,
+
+                    child: ListTile(
+                      leading: const Icon(Icons.mic, color: Colors.red),
+                      title: const Text('Voice Entry'),
+                      subtitle: const Text('Record customer transactions'),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const VoiceRecorderScreen(),
                           ),
                         );
                       },
