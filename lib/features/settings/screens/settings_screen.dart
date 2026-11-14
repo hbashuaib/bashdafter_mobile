@@ -6,6 +6,8 @@ import '../../auth/screens/login_screen.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../auth/models/user_profile.dart';
 import '../../users/screens/users_screen.dart';
+import '../../products/screens/categories_screen.dart';
+import '../../products/screens/units_screen.dart';
 
 import 'about_screen.dart';
 import 'profile_screen.dart';
@@ -68,6 +70,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const UsersScreen()),
+                  );
+                },
+              ),
+            ),
+
+          if (profile!.isOwner || profile!.isAdmin)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.category, color: Colors.purple),
+                trailing: const Icon(Icons.arrow_forward_ios),
+
+                title: const Text('Product Categories'),
+
+                subtitle: const Text('Manage product categories'),
+
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                  );
+                },
+              ),
+            ),
+
+          if (profile!.isOwner || profile!.isAdmin)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.straighten, color: Colors.teal),
+                trailing: const Icon(Icons.arrow_forward_ios),
+
+                title: const Text('Product Units'),
+
+                subtitle: const Text('Manage product units'),
+
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const UnitsScreen()),
                   );
                 },
               ),

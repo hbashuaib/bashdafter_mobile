@@ -7,6 +7,10 @@ import 'package:speech_to_text/speech_to_text.dart' as speech;
 import 'dart:io';
 
 import '../../customers/services/customer_service.dart';
+import '../../products/services/product_service.dart';
+import '../../purchases/services/create_purchase_service.dart';
+import '../../purchases/services/create_purchase_item_service.dart';
+import '../models/voice_purchase_item.dart';
 
 class VoiceRecorderScreen extends StatefulWidget {
   const VoiceRecorderScreen({super.key});
@@ -23,12 +27,15 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
   bool isLoadingCustomers = true;
   bool speechEnabled = false;
   bool isListening = false;
+  bool isSavingPurchase = false;
   String? audioPath;
   String? fileName;
   String recognizedText = '';
   DateTime? recordingStartedAt;
   Duration? recordingDuration;
   List<dynamic> customers = [];
+  List<dynamic> products = [];
+  List<VoicePurchaseItem> parsedItems = [];
   Map<String, dynamic>? selectedCustomer;
 
   Future<void> loadCustomers() async {
@@ -49,6 +56,20 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       setState(() {
         isLoadingCustomers = false;
       });
+    }
+  }
+
+  Future<void> loadProducts() async {
+    try {
+      final result = await ProductService().getProducts();
+
+      if (!mounted) return;
+
+      setState(() {
+        products = result;
+      });
+    } catch (e) {
+      debugPrint('Load Products Error: $e');
     }
   }
 
@@ -104,6 +125,11 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
               }
             });
           },
+
+          listenOptions: speech.SpeechListenOptions(
+            listenFor: const Duration(minutes: 2),
+            pauseFor: const Duration(seconds: 15),
+          ),
         );
       }
 
@@ -135,6 +161,9 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       isRecording = false;
       isListening = false;
     });
+
+    parseTranscript();
+    matchProducts();
   }
 
   Future<void> playRecording() async {
@@ -166,10 +195,280 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
         .replaceAll(RegExp(r'[^a-z0-9_]'), '');
   }
 
+  String normalizeNumbers(String text) {
+    return text
+        .replaceAll('one', '1')
+        .replaceAll('two', '2')
+        .replaceAll('three', '3')
+        .replaceAll('four', '4')
+        .replaceAll('five', '5')
+        .replaceAll('six', '6')
+        .replaceAll('seven', '7')
+        .replaceAll('eight', '8')
+        .replaceAll('nine', '9')
+        .replaceAll('ten', '10');
+  }
+
+  String normalizeProductName(String value) {
+    value = value.toLowerCase().trim();
+
+    if (value.endsWith('s') && value.length > 2) {
+      value = value.substring(0, value.length - 1);
+    }
+
+    return value;
+  }
+
+  List<dynamic> getSuggestedProducts(String productName) {
+    final search = normalizeProductName(productName);
+
+    return products
+        .where((product) {
+          final name = normalizeProductName(product['name'].toString());
+
+          return name.contains(search) ||
+              search.contains(name) ||
+              name.startsWith(search.isNotEmpty ? search[0] : '');
+        })
+        .take(5)
+        .toList();
+  }
+
+  void parseTranscript() {
+    parsedItems.clear();
+    final normalized = normalizeNumbers(recognizedText.toLowerCase());
+    final words = normalized.split(' ');
+
+    for (int i = 0; i < words.length - 1; i++) {
+      final quantity = int.tryParse(words[i]);
+
+      if (quantity != null) {
+        final productName = words[i + 1];
+
+        parsedItems.add(
+          VoicePurchaseItem(quantity: quantity, productName: productName),
+        );
+      }
+    }
+
+    setState(() {});
+  }
+
+  void matchProducts() {
+    for (final item in parsedItems) {
+      final search = normalizeProductName(item.productName);
+
+      final matches = products.where((product) {
+        final productName = normalizeProductName(product['name'].toString());
+
+        return productName.contains(search);
+      }).toList();
+
+      if (matches.isEmpty) {
+        item.matchedProduct = null;
+        item.candidateProducts = [];
+      } else if (matches.length == 1) {
+        item.matchedProduct = matches.first;
+        item.candidateProducts = [];
+      } else {
+        item.matchedProduct = null;
+        item.candidateProducts = matches;
+      }
+    }
+
+    setState(() {});
+  }
+
+  void showPurchaseDraft() {
+    showDialog(
+      context: context,
+
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Purchase Draft'),
+
+          content: SizedBox(
+            width: double.maxFinite,
+
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+                  Text('Customer: ${selectedCustomer?['name']}'),
+
+                  const SizedBox(height: 16),
+
+                  ...parsedItems
+                      .where((item) => item.matchedProduct != null)
+                      .map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+
+                          child: Text(
+                            '${item.matchedProduct!['name']} x ${item.quantity}',
+                          ),
+                        ),
+                      ),
+
+                  const Divider(),
+
+                  Text(
+                    'Total: YER ${voicePurchaseTotal.toStringAsFixed(0)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+
+              child: const Text('Cancel'),
+            ),
+
+            ElevatedButton.icon(
+              onPressed: isSavingPurchase ? null : saveVoicePurchase,
+
+              icon: const Icon(Icons.save),
+
+              label: Text(isSavingPurchase ? 'Saving...' : 'Confirm Purchase'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> saveVoicePurchase() async {
+    if (selectedCustomer == null) {
+      return;
+    }
+
+    final validItems = parsedItems
+        .where((item) => item.matchedProduct != null)
+        .toList();
+
+    if (validItems.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No valid products found')));
+
+      return;
+    }
+
+    setState(() {
+      isSavingPurchase = true;
+    });
+
+    try {
+      final purchaseId = await CreatePurchaseService().createPurchase(
+        customerId: selectedCustomer!['id'],
+        notes: 'Created from Voice Purchase',
+      );
+
+      for (final item in validItems) {
+        await CreatePurchaseItemService().createItem(
+          purchaseId: purchaseId,
+          productId: item.matchedProduct!['id'],
+          itemName: item.matchedProduct!['name'],
+          quantity: item.quantity.toString(),
+          unitPrice: item.matchedProduct!['selling_price'].toString(),
+        );
+      }
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+
+      setState(() {
+        recognizedText = '';
+        parsedItems.clear();
+        audioPath = null;
+        fileName = null;
+        recordingDuration = null;
+        isSavingPurchase = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Voice Purchase Saved Successfully')),
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to save purchase')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSavingPurchase = false;
+        });
+      }
+    }
+  }
+
+  double get voicePurchaseTotal {
+    double total = 0;
+
+    for (final item in parsedItems) {
+      if (item.matchedProduct != null) {
+        final price =
+            double.tryParse(item.matchedProduct!['selling_price'].toString()) ??
+            0;
+
+        total += price * item.quantity;
+      }
+    }
+
+    return total;
+  }
+
+  double itemTotal(VoicePurchaseItem item) {
+    if (item.matchedProduct == null) {
+      return 0;
+    }
+
+    final price =
+        double.tryParse(item.matchedProduct!['selling_price'].toString()) ?? 0;
+
+    return price * item.quantity;
+  }
+
+  bool hasInsufficientStock(VoicePurchaseItem item) {
+    if (item.matchedProduct == null) {
+      return false;
+    }
+
+    final stock =
+        double.tryParse(item.matchedProduct!['current_stock'].toString()) ?? 0;
+
+    return item.quantity > stock;
+  }
+
+  bool get canCreatePurchase {
+    if (voicePurchaseTotal <= 0) {
+      return false;
+    }
+
+    if (parsedItems.any((item) => hasInsufficientStock(item))) {
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
     loadCustomers();
+    loadProducts();
     initializeSpeech();
   }
 
@@ -413,6 +712,293 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                         Text(recognizedText),
                       ],
                     ),
+                  ),
+                ),
+
+                if (parsedItems.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    'Detected Items',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Card(
+                    child: Column(
+                      children: parsedItems.map((item) {
+                        return ListTile(
+                          leading: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+
+                                builder: (_) {
+                                  return AlertDialog(
+                                    title: const Text('Remove Item'),
+
+                                    content: Text(
+                                      'Remove ${item.productName}?',
+                                    ),
+
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context, false);
+                                        },
+
+                                        child: const Text('Cancel'),
+                                      ),
+
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context, true);
+                                        },
+
+                                        child: const Text('Remove'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (confirm == true) {
+                                setState(() {
+                                  parsedItems.remove(item);
+                                });
+                              }
+                            },
+                          ),
+                          title: Text(
+                            item.matchedProduct?['name'] ?? item.productName,
+                          ),
+
+                          subtitle: item.matchedProduct != null
+                              ? Text(
+                                  'Price: YER ${item.matchedProduct!['selling_price']}'
+                                  '\nStock: ${item.matchedProduct!['current_stock']}'
+                                  '${hasInsufficientStock(item) ? '\n⚠ Insufficient Stock' : ''}',
+                                  style: TextStyle(
+                                    color: hasInsufficientStock(item)
+                                        ? Colors.red
+                                        : null,
+                                  ),
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                                  children: [
+                                    Text(
+                                      item.candidateProducts.isNotEmpty
+                                          ? 'Multiple products found for "${item.productName}". Please select one:'
+                                          : 'Product Not Found. Suggested products:',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    Builder(
+                                      builder: (_) {
+                                        final suggestions =
+                                            item.candidateProducts.isNotEmpty
+                                            ? item.candidateProducts
+                                            : getSuggestedProducts(
+                                                item.productName,
+                                              );
+
+                                        if (suggestions.isEmpty) {
+                                          return const SizedBox();
+                                        }
+
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+
+                                          children: [
+                                            const SizedBox(height: 8),
+
+                                            ...suggestions.map((product) {
+                                              return Card(
+                                                margin: const EdgeInsets.only(
+                                                  bottom: 4,
+                                                ),
+
+                                                child: ListTile(
+                                                  dense: true,
+
+                                                  title: Text(product['name']),
+
+                                                  subtitle: Text(
+                                                    'Stock: ${product['current_stock']}'
+                                                    ' | Price: YER ${product['selling_price']}',
+                                                  ),
+
+                                                  onTap: () {
+                                                    setState(() {
+                                                      item.matchedProduct =
+                                                          product;
+                                                    });
+                                                  },
+                                                ),
+                                              );
+                                            }),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+
+                          trailing: SizedBox(
+                            width: 120,
+
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove),
+
+                                  onPressed: () {
+                                    if (item.quantity <= 1) return;
+
+                                    setState(() {
+                                      item.quantity--;
+                                    });
+                                  },
+                                ),
+
+                                Text('${item.quantity}'),
+
+                                IconButton(
+                                  icon: const Icon(Icons.add),
+
+                                  onPressed: () {
+                                    setState(() {
+                                      item.quantity++;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 20),
+
+                Card(
+                  color: Colors.green.shade50,
+
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        const Text(
+                          'Purchase Summary',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const Divider(),
+
+                        Text(
+                          'Customer: ${selectedCustomer?['name'] ?? ''}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        ...parsedItems
+                            .where((item) => item.matchedProduct != null)
+                            .map((item) {
+                              final price =
+                                  double.tryParse(
+                                    item.matchedProduct!['selling_price']
+                                        .toString(),
+                                  ) ??
+                                  0;
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(item.matchedProduct!['name']),
+                                    ),
+
+                                    Text(
+                                      '${item.quantity} × ${price.toStringAsFixed(0)}',
+                                    ),
+
+                                    const SizedBox(width: 12),
+
+                                    Text(
+                                      itemTotal(item).toStringAsFixed(0),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+
+                        const Divider(),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                            const Text(
+                              'Total',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            Text(
+                              'YER ${voicePurchaseTotal.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.save),
+                    label: const Text('Create Purchase'),
+                    onPressed: canCreatePurchase ? showPurchaseDraft : null,
                   ),
                 ),
               ],
