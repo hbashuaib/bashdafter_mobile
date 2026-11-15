@@ -66,9 +66,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         selectedFontSize: 12,
         unselectedFontSize: 12,
         showUnselectedLabels: true,
+        enableFeedback: true,
         currentIndex: currentIndex,
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
         type: BottomNavigationBarType.fixed,
 
         onTap: (index) {

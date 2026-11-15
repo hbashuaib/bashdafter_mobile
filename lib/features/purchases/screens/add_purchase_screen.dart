@@ -6,6 +6,7 @@ import '../services/create_purchase_item_service.dart';
 import '../../products/services/product_service.dart';
 import '../../products/services/barcode_lookup_service.dart';
 import '../../products/screens/barcode_scanner_screen.dart';
+import '../../../core/theme/app_colors.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -311,6 +312,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
+              autocorrect: false,
+              enableSuggestions: false,
               textInputAction: TextInputAction.next,
               onSubmitted: (_) {
                 addItem();
@@ -325,7 +328,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
-
+              autocorrect: false,
+              enableSuggestions: false,
               textInputAction: TextInputAction.done,
 
               onChanged: (_) {
@@ -342,7 +346,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             const SizedBox(height: 15),
 
             Card(
-              color: Colors.green.shade50,
+              color: AppColors.cardTint(context, Colors.green.shade50),
 
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -395,7 +399,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   child: Center(
                     child: Text(
                       'No items added yet',
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -442,7 +448,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade100,
+                            color: AppColors.cardTint(
+                              context,
+                              Colors.green.shade100,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -474,7 +483,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             const SizedBox(height: 15),
 
             Card(
-              color: Colors.blue.shade50,
+              color: AppColors.cardTint(context, Colors.blue.shade50),
 
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -521,6 +530,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     : const Text('Save Purchase'),
               ),
             ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),

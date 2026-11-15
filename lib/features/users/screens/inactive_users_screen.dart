@@ -114,36 +114,50 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Inactive Users')),
-      body: RefreshIndicator(
-        onRefresh: loadUsers,
-        child: ListView.builder(
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            final user = users[index];
+      body: users.isEmpty
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 150),
 
-            return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: Text(
-                    user.username.isNotEmpty
-                        ? user.username.substring(0, 1).toUpperCase()
-                        : '?',
-                  ),
-                ),
-                title: Text(user.username),
-                subtitle: Text(user.role),
-                trailing: IconButton(
-                  icon: const Icon(Icons.restore, color: Colors.green),
-                  onPressed: () {
-                    showRestoreConfirmation(user);
-                  },
-                ),
+                Center(child: Text('No inactive users found')),
+              ],
+            )
+          : RefreshIndicator(
+              onRefresh: loadUsers,
+
+              child: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 100),
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          user.username.isNotEmpty
+                              ? user.username.substring(0, 1).toUpperCase()
+                              : '?',
+                        ),
+                      ),
+                      title: Text(user.username),
+                      subtitle: Text(user.role.replaceAll('_', ' ')),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.restore, color: Colors.green),
+                        onPressed: () {
+                          showRestoreConfirmation(user);
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }

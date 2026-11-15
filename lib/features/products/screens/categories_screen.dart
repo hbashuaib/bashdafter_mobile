@@ -281,6 +281,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           : categories.isEmpty
           ? const Center(child: Text('No categories found'))
           : ListView.builder(
+              padding: const EdgeInsets.only(bottom: 100),
               itemCount: categories.length,
 
               itemBuilder: (context, index) {
@@ -289,7 +290,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 return Card(
                   child: ListTile(
                     title: Text(category['name']),
-                    subtitle: Text(category['description'] ?? ''),
+                    subtitle:
+                        (category['description'] ?? '')
+                            .toString()
+                            .trim()
+                            .isEmpty
+                        ? null
+                        : Text(category['description']),
 
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

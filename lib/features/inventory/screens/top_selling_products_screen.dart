@@ -158,7 +158,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                 ),
 
                 Expanded(
-                  child: products.isEmpty
+                  child: filteredProducts.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -171,13 +171,24 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                           child: ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-
-                            padding: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.only(bottom: 100),
 
                             itemCount: filteredProducts.length,
 
                             itemBuilder: (context, index) {
                               final product = filteredProducts[index];
+
+                              final currentStock =
+                                  double.tryParse(
+                                    product['current_stock'].toString(),
+                                  ) ??
+                                  0;
+
+                              final totalSold =
+                                  double.tryParse(
+                                    product['total_sold'].toString(),
+                                  ) ??
+                                  0;
 
                               return Card(
                                 margin: const EdgeInsets.symmetric(
@@ -204,7 +215,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                                   ),
 
                                   subtitle: Text(
-                                    'Current Stock: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}',
+                                    'Current Stock: ${currentStock.toStringAsFixed(0)}',
                                   ),
 
                                   trailing: Column(
@@ -217,12 +228,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                                       ),
 
                                       Text(
-                                        (double.tryParse(
-                                                  product['total_sold']
-                                                      .toString(),
-                                                ) ??
-                                                0)
-                                            .toStringAsFixed(0),
+                                        totalSold.toStringAsFixed(0),
                                         style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,

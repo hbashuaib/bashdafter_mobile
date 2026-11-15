@@ -156,7 +156,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                 ),
 
                 Expanded(
-                  child: debtors.isEmpty
+                  child: filteredDebtors.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -169,11 +169,16 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
 
                           child: ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.only(bottom: 100),
                             itemCount: filteredDebtors.length,
 
                             itemBuilder: (context, index) {
                               final debtor = filteredDebtors[index];
+                              final balance =
+                                  double.tryParse(
+                                    debtor['balance'].toString(),
+                                  ) ??
+                                  0;
 
                               return Card(
                                 child: ListTile(
@@ -196,7 +201,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                                   ),
 
                                   trailing: Text(
-                                    'YER ${currencyFormatter.format(double.tryParse(debtor['balance'].toString()) ?? 0)}',
+                                    'YER ${currencyFormatter.format(balance)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),

@@ -65,12 +65,20 @@ class _LoginScreenState extends State<LoginScreen> {
         const SnackBar(content: Text('Invalid username or password')),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -98,6 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextField(
                 controller: usernameController,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
+                enableSuggestions: false,
                 decoration: InputDecoration(
                   labelText: "Username",
                   border: OutlineInputBorder(),
@@ -110,6 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: passwordController,
                 obscureText: obscurePassword,
                 textInputAction: TextInputAction.done,
+                autocorrect: false,
+                enableSuggestions: false,
 
                 onSubmitted: (_) {
                   if (!isLoading) {

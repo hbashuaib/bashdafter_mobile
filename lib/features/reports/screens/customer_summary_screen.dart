@@ -52,6 +52,14 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
     }
   }
 
+  double get totalOutstandingBalance {
+    return customers.fold(
+      0.0,
+      (sum, customer) =>
+          sum + (double.tryParse(customer['balance'].toString()) ?? 0),
+    );
+  }
+
   void searchCustomers(String value) {
     final query = value.toLowerCase();
 
@@ -106,7 +114,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                             const Text('Outstanding'),
 
                             Text(
-                              'YER ${currencyFormatter.format(customers.fold(0.0, (sum, customer) => sum + (double.tryParse(customer['balance'].toString()) ?? 0)))}',
+                              'YER ${currencyFormatter.format(totalOutstandingBalance)}',
 
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -142,7 +150,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                 ),
 
                 Expanded(
-                  child: customers.isEmpty
+                  child: filteredCustomers.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -155,11 +163,16 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
 
                           child: ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.only(bottom: 100),
                             itemCount: filteredCustomers.length,
 
                             itemBuilder: (context, index) {
                               final customer = filteredCustomers[index];
+                              final balance =
+                                  double.tryParse(
+                                    customer['balance'].toString(),
+                                  ) ??
+                                  0;
 
                               return Card(
                                 child: ListTile(
@@ -173,7 +186,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                                   ),
 
                                   trailing: Text(
-                                    'YER ${currencyFormatter.format(double.tryParse(customer['balance'].toString()) ?? 0)}',
+                                    'YER ${currencyFormatter.format(balance)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),

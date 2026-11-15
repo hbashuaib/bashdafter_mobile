@@ -4,6 +4,8 @@ import 'customer_summary_screen.dart';
 import 'top_debtors_screen.dart';
 import 'recent_transactions_screen.dart';
 
+import '../../../core/theme/app_colors.dart';
+
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
 
@@ -13,11 +15,11 @@ class ReportsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Reports')),
 
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
 
         children: [
           Card(
-            color: Colors.blue.shade50,
+            color: AppColors.cardTint(context, Colors.blue.shade50),
 
             child: const Padding(
               padding: EdgeInsets.all(16),
@@ -97,8 +99,6 @@ class ReportsScreen extends StatelessWidget {
               },
             ),
           ),
-
-          const SizedBox(height: 24),
         ],
       ),
     );

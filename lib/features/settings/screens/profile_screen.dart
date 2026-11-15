@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../services/profile_service.dart';
 import '../services/profile_image_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'change_password_screen.dart';
 
@@ -111,11 +112,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(title: const Text('Profile')),
 
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
 
         children: [
           Card(
-            color: Colors.blue.shade50,
+            color: AppColors.cardTint(context, Colors.blue.shade50),
 
             child: const Padding(
               padding: EdgeInsets.all(16),
@@ -160,31 +161,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     radius: 16,
                     backgroundColor: Colors.blue,
 
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-
-                      icon: const Icon(
-                        Icons.camera_alt,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-
-                      onPressed: () {
-                        if (kIsWeb) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Profile image upload is currently available in Android/Desktop versions.',
-                              ),
+                    child: isUploadingImage
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
                             ),
-                          );
+                          )
+                        : IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              Icons.camera_alt,
+                              size: 16,
+                              color: Colors.white,
+                            ),
 
-                          return;
-                        }
+                            onPressed: () {
+                              if (kIsWeb) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Profile image upload is currently available in Android/Desktop versions.',
+                                    ),
+                                  ),
+                                );
 
-                        pickImage();
-                      },
-                    ),
+                                return;
+                              }
+
+                              pickImage();
+                            },
+                          ),
                   ),
                 ),
               ],

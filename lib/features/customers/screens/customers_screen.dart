@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/customer_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'customer_detail_screen.dart';
 import 'add_customer_screen.dart';
@@ -247,10 +248,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                   subtitle: Text(customer['phone']),
 
                                   trailing: Chip(
-                                    backgroundColor:
-                                        (customer['balance'] ?? 0) > 0
-                                        ? Colors.orange.shade100
-                                        : Colors.green.shade100,
+                                    backgroundColor: AppColors.cardTint(
+                                      context,
+                                      (customer['balance'] ?? 0) > 0
+                                          ? Colors.orange.shade100
+                                          : Colors.green.shade100,
+                                    ),
 
                                     label: Text(
                                       currencyFormatter.format(

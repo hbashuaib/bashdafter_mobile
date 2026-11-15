@@ -77,6 +77,15 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Customer')),
@@ -98,6 +107,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             TextField(
               controller: phoneController,
               keyboardType: TextInputType.phone,
+              autocorrect: false,
+              enableSuggestions: false,
               decoration: const InputDecoration(labelText: 'Phone'),
               textInputAction: TextInputAction.next,
             ),
@@ -127,20 +138,26 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
             const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: isSaving ? null : saveCustomer,
+            SizedBox(
+              width: double.infinity,
 
-              child: isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Save Customer'),
+              child: ElevatedButton(
+                onPressed: isSaving ? null : saveCustomer,
+
+                child: isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Save Customer'),
+              ),
             ),
+
+            const SizedBox(height: 80),
           ],
         ),
       ),

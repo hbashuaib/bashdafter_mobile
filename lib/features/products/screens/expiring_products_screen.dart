@@ -51,14 +51,33 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : products.isEmpty
-          ? const Center(child: Text('No expiring products'))
+          ? const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 48),
+
+                  SizedBox(height: 12),
+
+                  Text('No expiring products'),
+                ],
+              ),
+            )
           : ListView.builder(
+              padding: const EdgeInsets.only(bottom: 100),
               itemCount: products.length,
 
               itemBuilder: (context, index) {
                 final product = products[index];
                 final expiryDate = DateTime.parse(product['expiry_date']);
-                final days = expiryDate.difference(DateTime.now()).inDays;
+                final today = DateTime.now();
+
+                final days =
+                    DateTime(expiryDate.year, expiryDate.month, expiryDate.day)
+                        .difference(
+                          DateTime(today.year, today.month, today.day),
+                        )
+                        .inDays;
 
                 Color color;
 

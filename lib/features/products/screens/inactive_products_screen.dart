@@ -119,6 +119,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
                 ],
               )
             : ListView.builder(
+                padding: const EdgeInsets.only(bottom: 100),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
@@ -137,7 +138,9 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
                         ),
                       ),
                       title: Text(product['name'].toString()),
-                      subtitle: Text(product['category_name'].toString()),
+                      subtitle: Text(
+                        (product['category_name'] ?? 'No Category').toString(),
+                      ),
                       trailing: IconButton(
                         icon: const Icon(Icons.restore, color: Colors.green),
                         onPressed: () {

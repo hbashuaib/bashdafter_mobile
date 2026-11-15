@@ -11,6 +11,7 @@ import '../../products/services/product_service.dart';
 import '../../purchases/services/create_purchase_service.dart';
 import '../../purchases/services/create_purchase_item_service.dart';
 import '../models/voice_purchase_item.dart';
+import '../../../core/theme/app_colors.dart';
 
 class VoiceRecorderScreen extends StatefulWidget {
   const VoiceRecorderScreen({super.key});
@@ -497,6 +498,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
     await _speech.listen(
       onResult: (result) {
+        if (!mounted) return;
+        
         setState(() {
           recognizedText = result.recognizedWords;
 
@@ -667,6 +670,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                       audioPath = null;
                       fileName = null;
                       recordingDuration = null;
+                      recognizedText = '';
+                      parsedItems.clear();
                     });
                   },
                 ),
@@ -897,7 +902,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 const SizedBox(height: 20),
 
                 Card(
-                  color: Colors.green.shade50,
+                  color: AppColors.cardTint(context, Colors.green.shade50),
 
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -1001,6 +1006,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                     onPressed: canCreatePurchase ? showPurchaseDraft : null,
                   ),
                 ),
+
+                const SizedBox(height: 100),
               ],
             ],
           ),

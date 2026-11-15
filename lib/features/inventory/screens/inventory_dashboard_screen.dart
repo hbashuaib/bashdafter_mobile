@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/inventory_dashboard_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 class InventoryDashboardScreen extends StatefulWidget {
   const InventoryDashboardScreen({super.key});
@@ -59,9 +60,9 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
   }) {
     return Card(
       color: title == 'Inventory Value'
-          ? Colors.teal.shade50
+          ? AppColors.cardTint(context, Colors.teal.shade50)
           : title == 'Expiring Products'
-          ? Colors.red.shade50
+          ? AppColors.cardTint(context, Colors.red.shade50)
           : null,
 
       child: ListTile(
@@ -103,11 +104,11 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
 
                 children: [
                   Card(
-                    color: Colors.indigo.shade50,
+                    color: AppColors.cardTint(context, Colors.indigo.shade50),
 
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -207,9 +208,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     value: dashboard!['inventory_value'],
                     icon: Icons.payments,
                     color: Colors.teal,
-                  ),
-
-                  const SizedBox(height: 20),
+                  ),                  
                 ],
               ),
             ),

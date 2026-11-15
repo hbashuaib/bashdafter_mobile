@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../products/services/product_service.dart';
 import '../services/stock_adjustment_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 class StockAdjustmentScreen extends StatefulWidget {
   final Map<String, dynamic>? product;
@@ -136,11 +137,23 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
   }
 
   @override
+  void dispose() {
+    quantityController.dispose();
+    reasonController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final currentStock = selectedProduct == null
+        ? 0.0
+        : double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Stock Adjustment')),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
 
         child: Column(
@@ -177,18 +190,12 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
             if (selectedProduct != null)
               Card(
-                color: Colors.blue.shade50,
+                color: AppColors.cardTint(context, Colors.blue.shade50),
 
                 child: ListTile(
                   leading: const Icon(Icons.inventory),
                   title: const Text('Current Stock'),
-                  subtitle: Text(
-                    (double.tryParse(
-                              selectedProduct['current_stock'].toString(),
-                            ) ??
-                            0)
-                        .toStringAsFixed(0),
-                  ),
+                  subtitle: Text(currentStock.toStringAsFixed(0)),
                 ),
               ),
 
@@ -231,6 +238,8 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
+              autocorrect: false,
+              enableSuggestions: false,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(labelText: 'Quantity'),
             ),
@@ -259,6 +268,8 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                 child: Text(isSaving ? 'Saving...' : 'Save Adjustment'),
               ),
             ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),

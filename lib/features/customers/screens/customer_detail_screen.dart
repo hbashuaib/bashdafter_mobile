@@ -181,6 +181,11 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final customerBalance =
+        double.tryParse(customer?['balance']?.toString() ?? '0') ?? 0;
+
+    final hasBalance = customerBalance > 0;
+
     if (customer == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -260,21 +265,12 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       leading: const Icon(Icons.account_balance_wallet),
                       title: Text('Balance'),
                       trailing: Text(
-                        currencyFormatter.format(
-                          double.tryParse(customer!['balance'].toString()) ?? 0,
-                        ),
+                        currencyFormatter.format(customerBalance),
 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
 
-                          color:
-                              (double.tryParse(
-                                        customer!['balance'].toString(),
-                                      ) ??
-                                      0) >
-                                  0
-                              ? Colors.orange
-                              : Colors.green,
+                          color: hasBalance ? Colors.orange : Colors.green,
                         ),
                       ),
                     ),
@@ -422,6 +418,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 },
               ),
             ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),

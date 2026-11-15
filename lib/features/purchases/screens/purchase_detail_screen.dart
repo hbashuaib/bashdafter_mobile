@@ -10,14 +10,17 @@ class PurchaseDetailScreen extends StatelessWidget {
 
   String buildWhatsAppMessage() {
     final buffer = StringBuffer();
-    buffer.writeln('🧾 ${purchase['shop_name'] ?? 'Shop'}');   
-    buffer.writeln('Purchase Receipt');
+    final totalAmount =
+        double.tryParse(purchase['total_amount'].toString()) ?? 0;
+
+    buffer.writeln('🧾 ${purchase['shop_name'] ?? 'Shop'}');
+    buffer.writeln('Purchase Receipt Statement');
     buffer.writeln('');
 
     if (purchase['customer_name'] != null) {
       buffer.writeln('Customer: ${purchase['customer_name']}');
-    }    
-    
+    }
+
     buffer.writeln('Date: ${purchase['purchase_date']}');
     buffer.writeln('');
     buffer.writeln('Items:');
@@ -33,7 +36,7 @@ class PurchaseDetailScreen extends StatelessWidget {
 
     buffer.writeln(
       'Total Amount: '
-      'YER ${currencyFormatter.format(double.tryParse(purchase['total_amount'].toString()) ?? 0)}',
+      'YER ${currencyFormatter.format(totalAmount)}',
     );
 
     buffer.writeln('');
@@ -44,6 +47,9 @@ class PurchaseDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final totalAmount =
+        double.tryParse(purchase['total_amount'].toString()) ?? 0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Purchase Details'),
@@ -62,7 +68,7 @@ class PurchaseDetailScreen extends StatelessWidget {
       ),
 
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
           Card(
             child: ListTile(
@@ -74,9 +80,7 @@ class PurchaseDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               title: const Text('Total Amount'),
-              subtitle: Text(
-                'YER ${currencyFormatter.format(double.tryParse(purchase['total_amount'].toString()) ?? 0)}',
-              ),
+              subtitle: Text('YER ${currencyFormatter.format(totalAmount)}'),
             ),
           ),
 
@@ -100,22 +104,26 @@ class PurchaseDetailScreen extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          ...(purchase['items'] as List).map(
-            (item) => Card(
+          ...((purchase['items'] as List? ?? [])).map((item) {
+            final unitPrice =
+                double.tryParse(item['unit_price'].toString()) ?? 0;
+
+            final totalPrice =
+                double.tryParse(item['total_price'].toString()) ?? 0;
+
+            return Card(
               child: ListTile(
                 title: Text(item['item_name']),
                 subtitle: Text(
-                  '${item['quantity']} x ${currencyFormatter.format(double.tryParse(item['unit_price'].toString()) ?? 0)}',
+                  '${item['quantity']} x ${currencyFormatter.format(unitPrice)}',
                 ),
                 trailing: Text(
-                  currencyFormatter.format(
-                    double.tryParse(item['total_price'].toString()) ?? 0,
-                  ),
+                  currencyFormatter.format(totalPrice),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

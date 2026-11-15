@@ -119,7 +119,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                 ),
 
                 Expanded(
-                  child: transactions.isEmpty
+                  child: filteredTransactions.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -134,7 +134,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
 
                           child: ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 30),
+                            padding: const EdgeInsets.only(bottom: 100),
                             itemCount: filteredTransactions.length,
 
                             itemBuilder: (context, index) {

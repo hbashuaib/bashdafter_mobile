@@ -15,8 +15,7 @@ class VoicePurchaseScreen extends StatefulWidget {
 class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
   final SpeechRecognitionService _speechRecognition =
       SpeechRecognitionService.instance;
-  final TextEditingController _transcriptController =
-      TextEditingController();
+  final TextEditingController _transcriptController = TextEditingController();
 
   bool _speechInitializing = false;
   bool _speechAvailable = false;
@@ -76,8 +75,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
         setState(() {
           _speechInitializing = false;
           _speechAvailable = false;
-          _speechError =
-              'Speech recognition is unavailable. Check the Android speech service and microphone permission.';
+          _speechError = 'Speech recognition is unavailable. Check the Android speech service and microphone permission.';
         });
         return;
       }
@@ -197,18 +195,18 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
     final statusMessage = !_isAndroid
         ? 'Android voice purchase input is enabled in this step.'
         : _speechInitializing
-            ? 'Preparing speech recognition...'
-            : _isListening
-                ? 'Listening. Say the customer and purchase details.'
-                : _speechAvailable
-                    ? 'Speak in English. Selected language: $_englishLocaleId.'
-                    : 'Speech recognition is not ready.';
+        ? 'Preparing speech recognition...'
+        : _isListening
+        ? 'Listening. Say the customer and purchase details.'
+        : _speechAvailable
+        ? 'Speak in English. Selected language: $_englishLocaleId.'
+        : 'Speech recognition is not ready.';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Voice Purchase')),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -222,9 +220,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
                 const SizedBox(height: 8),
                 Text(
                   _speechError!,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],
               const SizedBox(height: 12),
@@ -232,15 +228,20 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: _speechInitializing ||
+                      onPressed:
+                          _speechInitializing ||
                               (!_speechAvailable && !_isListening)
                           ? null
                           : _isListening
-                              ? _stopListening
-                              : _startListening,
+                          ? _stopListening
+                          : _startListening,
                       icon: Icon(_isListening ? Icons.stop : Icons.mic),
                       label: Text(
-                        _isListening ? 'Stop listening' : 'Start speaking',
+                        _speechInitializing
+                            ? 'Preparing...'
+                            : _isListening
+                            ? 'Stop listening'
+                            : 'Start speaking',
                       ),
                     ),
                   ),
@@ -256,6 +257,11 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
               Expanded(
                 child: TextField(
                   controller: _transcriptController,
+
+                  onChanged: (_) {
+                    setState(() {});
+                  },
+
                   readOnly: _isListening,
                   expands: true,
                   minLines: null,

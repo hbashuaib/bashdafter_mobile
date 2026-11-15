@@ -54,9 +54,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to load shop profile')),
-      );
-
-      if (!mounted) return;
+      );      
 
       setState(() {
         isLoading = false;
@@ -141,11 +139,12 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
       appBar: AppBar(title: const Text('Shop Profile')),
 
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
 
         children: [
           TextField(
             controller: nameController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Shop Name'),
           ),
 
@@ -154,6 +153,9 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
           TextField(
             controller: phoneController,
             keyboardType: TextInputType.phone,
+            autocorrect: false,
+            enableSuggestions: false,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Phone'),
           ),
 
@@ -161,6 +163,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
           TextField(
             controller: addressController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Address'),
           ),
 
@@ -168,6 +171,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
           TextField(
             controller: cityController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'City'),
           ),
 
@@ -176,7 +180,13 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
           TextField(
             controller: currencyController,
             textCapitalization: TextCapitalization.characters,
+            textInputAction: TextInputAction.done,
             decoration: const InputDecoration(labelText: 'Currency'),
+            onSubmitted: (_) {
+              if (!isSaving) {
+                saveShop();
+              }
+            },
           ),
 
           const SizedBox(height: 15),

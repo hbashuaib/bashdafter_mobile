@@ -8,6 +8,7 @@ import '../../auth/models/user_profile.dart';
 import '../../users/screens/users_screen.dart';
 import '../../products/screens/categories_screen.dart';
 import '../../products/screens/units_screen.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'about_screen.dart';
 import 'profile_screen.dart';
@@ -55,7 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(title: const Text('Settings')),
 
       body: ListView(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
         children: [
           if (profile!.isOwner || profile!.isAdmin)
             Card(
@@ -114,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
 
           Card(
-            color: Colors.blue.shade50,
+            color: AppColors.cardTint(context, Colors.blue.shade50),
 
             child: const Padding(
               padding: EdgeInsets.all(16),
@@ -258,8 +259,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
           ),
-
-          const SizedBox(height: 20),
         ],
       ),
     );

@@ -11,6 +11,7 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('About')),
 
       body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 100),
         child: Center(
           child: Card(
             margin: const EdgeInsets.all(20),
@@ -37,7 +38,7 @@ class AboutScreen extends StatelessWidget {
                     'Version 1.0.0',
 
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -76,7 +77,9 @@ class AboutScreen extends StatelessWidget {
 
                   Text(
                     '© 2026 BashSoft Digital',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
                   ),
                 ],
               ),

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/product_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
@@ -169,7 +170,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: Card(
-                    color: Colors.blue.shade50,
+                    color: AppColors.cardTint(context, Colors.blue.shade50),
 
                     child: Padding(
                       padding: const EdgeInsets.all(12),
@@ -366,7 +367,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         Text(
                                           'Barcode: ${product['barcode']}',
                                           style: TextStyle(
-                                            color: Colors.grey.shade600,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
                                             fontSize: 12,
                                           ),
                                         ),

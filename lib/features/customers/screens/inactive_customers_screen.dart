@@ -124,6 +124,7 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
                 ],
               )
             : ListView.builder(
+                padding: const EdgeInsets.only(bottom: 100),
                 itemCount: customers.length,
                 itemBuilder: (context, index) {
                   final customer = customers[index];

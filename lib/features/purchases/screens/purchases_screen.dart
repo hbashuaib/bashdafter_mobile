@@ -85,6 +85,14 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     return total / purchases.length;
   }
 
+  double get totalPurchasesAmount {
+    return purchases.fold(
+      0.0,
+      (sum, purchase) =>
+          sum + (double.tryParse(purchase['total_amount'].toString()) ?? 0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +128,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                           children: [
                             const Text('Total'),
                             Text(
-                              'YER ${currencyFormatter.format(purchases.fold(0.0, (sum, purchase) => sum + (double.tryParse(purchase['total_amount'].toString()) ?? 0)))}',
+                              'YER ${currencyFormatter.format(totalPurchasesAmount)}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -172,7 +180,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                 ),
 
                 Expanded(
-                  child: purchases.isEmpty
+                  child: filteredPurchases.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -195,6 +203,11 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
                             itemBuilder: (context, index) {
                               final purchase = filteredPurchases[index];
+                              final totalAmount =
+                                  double.tryParse(
+                                    purchase['total_amount'].toString(),
+                                  ) ??
+                                  0;
 
                               return Card(
                                 child: ListTile(
@@ -209,7 +222,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                     );
                                   },
                                   title: Text(
-                                    'YER ${currencyFormatter.format(double.tryParse(purchase['total_amount'].toString()) ?? 0)}',
+                                    'YER ${currencyFormatter.format(totalAmount)}',
 
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,

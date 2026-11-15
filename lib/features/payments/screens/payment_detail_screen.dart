@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/theme/app_colors.dart';
+
 class PaymentDetailScreen extends StatelessWidget {
   final Map<String, dynamic> payment;
   final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
@@ -10,8 +12,10 @@ class PaymentDetailScreen extends StatelessWidget {
 
   String buildWhatsAppMessage() {
     final buffer = StringBuffer();
+    final amount = double.tryParse(payment['amount'].toString()) ?? 0;
+
     buffer.writeln('💰 ${payment['shop_name'] ?? 'Shop'}');
-    buffer.writeln('Payment Receipt');
+    buffer.writeln('Payment Receipt Statement');
     buffer.writeln('');
 
     if (payment['customer_name'] != null) {
@@ -22,7 +26,7 @@ class PaymentDetailScreen extends StatelessWidget {
     buffer.writeln('');
     buffer.writeln('Payment Amount:');
     buffer.writeln(
-      'YER ${currencyFormatter.format(double.tryParse(payment['amount'].toString()) ?? 0)}',
+      'YER ${currencyFormatter.format(amount)}',
     );
 
     if ((payment['notes'] ?? '').toString().trim().isNotEmpty) {
@@ -40,6 +44,8 @@ class PaymentDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final amount = double.tryParse(payment['amount'].toString()) ?? 0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Payment Details'),
@@ -58,11 +64,11 @@ class PaymentDetailScreen extends StatelessWidget {
       ),
 
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
 
         children: [
           Card(
-            color: Colors.green.shade50,
+            color: AppColors.cardTint(context, Colors.green.shade50),
 
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -83,8 +89,9 @@ class PaymentDetailScreen extends StatelessWidget {
           ),
 
           const SizedBox(height: 10),
+
           Card(
-            color: Colors.green.shade50,
+            color: AppColors.cardTint(context, Colors.green.shade50),
 
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -96,7 +103,7 @@ class PaymentDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   Text(
-                    'YER ${currencyFormatter.format(double.tryParse(payment['amount'].toString()) ?? 0)}',
+                    'YER ${currencyFormatter.format(amount)}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

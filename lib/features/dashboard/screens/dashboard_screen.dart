@@ -6,6 +6,7 @@ import '../../../core/storage/token_storage.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../inventory/screens/inventory_menu_screen.dart';
 import '../../voice/screens/voice_recorder_screen.dart';
+import '../../../core/theme/app_colors.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -56,6 +57,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final totalBalance =
+        double.tryParse(dashboardData?['total_balance']?.toString() ?? '0') ??
+        0;
+
+    final hasBalance = totalBalance > 0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
@@ -93,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 children: [
                   Card(
-                    color: Colors.indigo.shade50,
+                    color: AppColors.cardTint(context, Colors.indigo.shade50),
 
                     child: const Padding(
                       padding: EdgeInsets.all(20),
@@ -159,7 +166,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               const Text('Balance'),
 
                               Text(
-                                'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_balance'].toString()) ?? 0)}',
+                                'YER ${currencyFormatter.format(totalBalance)}',
 
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -191,7 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   Card(
-                    color: Colors.blue.shade50,
+                    color: AppColors.cardTint(context, Colors.blue.shade50),
                     child: ListTile(
                       leading: const Icon(Icons.people, color: Colors.blue),
                       title: const Text('Customers'),
@@ -204,7 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   Card(
-                    color: Colors.orange.shade50,
+                    color: AppColors.cardTint(context, Colors.orange.shade50),
                     child: ListTile(
                       leading: const Icon(
                         Icons.shopping_cart,
@@ -219,7 +226,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   Card(
-                    color: Colors.green.shade50,
+                    color: AppColors.cardTint(context, Colors.green.shade50),
                     child: ListTile(
                       leading: const Icon(Icons.payments, color: Colors.green),
                       title: const Text('Total Payments'),
@@ -231,14 +238,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   Card(
-                    color:
-                        (double.tryParse(
-                                  dashboardData!['total_balance'].toString(),
-                                ) ??
-                                0) >
-                            0
-                        ? Colors.orange.shade50
-                        : Colors.green.shade50,
+                    color: AppColors.cardTint(
+                      context,
+                      hasBalance ? Colors.orange.shade50 : Colors.green.shade50,
+                    ),
+
                     child: ListTile(
                       leading: const Icon(
                         Icons.account_balance_wallet,
@@ -246,19 +250,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       title: const Text('Balance'),
                       trailing: Text(
-                        'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_balance'].toString()) ?? 0)}',
+                        'YER ${currencyFormatter.format(totalBalance)}',
 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color:
-                              (double.tryParse(
-                                        dashboardData!['total_balance']
-                                            .toString(),
-                                      ) ??
-                                      0) >
-                                  0
-                              ? Colors.orange
-                              : Colors.green,
+                          color: hasBalance ? Colors.orange : Colors.green,
                         ),
                       ),
                     ),
@@ -304,7 +300,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                   Card(
-                    color: Colors.red.shade50,
+                    color: AppColors.cardTint(context, Colors.red.shade50),
 
                     child: ListTile(
                       leading: const Icon(Icons.mic, color: Colors.red),
@@ -323,7 +319,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 140),
                 ],
               ),
             ),

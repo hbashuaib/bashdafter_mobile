@@ -71,6 +71,12 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
     });
   }
 
+  int get purchaseCount =>
+      transactions.where((t) => t['type'] == 'purchase').length;
+
+  int get paymentCount =>
+      transactions.where((t) => t['type'] == 'payment').length;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,10 +115,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                             const Text('Purchases'),
 
                             Text(
-                              transactions
-                                  .where((t) => t['type'] == 'purchase')
-                                  .length
-                                  .toString(),
+                              purchaseCount.toString(),
 
                               style: const TextStyle(
                                 color: Colors.red,
@@ -127,10 +130,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                             const Text('Payments'),
 
                             Text(
-                              transactions
-                                  .where((t) => t['type'] == 'payment')
-                                  .length
-                                  .toString(),
+                              paymentCount.toString(),
 
                               style: const TextStyle(
                                 color: Colors.green,
@@ -167,7 +167,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                 ),
 
                 Expanded(
-                  child: transactions.isEmpty
+                  child: filteredTransactions.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -180,7 +180,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
                           child: ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.only(bottom: 100),
                             itemCount: filteredTransactions.length,
 
                             itemBuilder: (context, index) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../../products/screens/expiring_products_screen.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'inventory_history_screen.dart';
 import 'stock_adjustment_screen.dart';
@@ -43,10 +44,10 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
       appBar: AppBar(title: const Text('Inventory')),
 
       body: ListView(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
         children: [
           Card(
-            color: Colors.blue.shade50,
+            color: AppColors.cardTint(context, Colors.blue.shade50),
 
             child: const Padding(
               padding: EdgeInsets.all(16),

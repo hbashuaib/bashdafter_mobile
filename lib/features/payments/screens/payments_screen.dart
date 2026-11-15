@@ -85,6 +85,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     return total / payments.length;
   }
 
+  double get totalPaymentsAmount {
+    return payments.fold(
+      0.0,
+      (sum, payment) =>
+          sum + (double.tryParse(payment['amount'].toString()) ?? 0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +124,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                           children: [
                             const Text('Total'),
                             Text(
-                              'YER ${currencyFormatter.format(payments.fold(0.0, (sum, payment) => sum + (double.tryParse(payment['amount'].toString()) ?? 0)))}',
+                              'YER ${currencyFormatter.format(totalPaymentsAmount)}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -162,7 +170,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 ),
 
                 Expanded(
-                  child: payments.isEmpty
+                  child: filteredPayments.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -172,11 +180,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                       : RefreshIndicator(
                           onRefresh: loadPayments,
                           child: ListView.builder(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 100),
                             itemCount: filteredPayments.length,
 
                             itemBuilder: (context, index) {
                               final payment = filteredPayments[index];
+                              final amount =
+                                  double.tryParse(
+                                    payment['amount'].toString(),
+                                  ) ??
+                                  0;
 
                               return Card(
                                 child: ListTile(
@@ -192,7 +205,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                   },
 
                                   title: Text(
-                                    'YER ${currencyFormatter.format(double.tryParse(payment['amount'].toString()) ?? 0)}',
+                                    'YER ${currencyFormatter.format(amount)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),

@@ -92,11 +92,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(errorMessage)));
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -105,7 +105,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Change Password')),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
         child: Column(
@@ -113,10 +113,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             TextField(
               controller: oldPasswordController,
               obscureText: obscureOldPassword,
-
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: 'Current Password',
-
                 border: const OutlineInputBorder(),
 
                 suffixIcon: IconButton(
@@ -139,7 +138,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             TextField(
               controller: newPasswordController,
               obscureText: obscureNewPassword,
-
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: 'New Password',
 
@@ -164,9 +163,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
             TextField(
               controller: confirmPasswordController,
-
               obscureText: obscureConfirmPassword,
-
+              textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
 
@@ -185,6 +183,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   },
                 ),
               ),
+
+              onSubmitted: (_) {
+                if (!isLoading) {
+                  changePassword();
+                }
+              },
             ),
 
             const SizedBox(height: 30),
@@ -196,10 +200,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 onPressed: isLoading ? null : changePassword,
 
                 child: isLoading
-                    ? const CircularProgressIndicator()
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Text('Change Password'),
               ),
             ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../products/services/product_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -132,7 +133,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                 ),
 
                 Expanded(
-                  child: lowStockProducts.isEmpty
+                  child: filteredProducts.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 150),
@@ -145,9 +146,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
 
                           child: ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-
-                            padding: const EdgeInsets.only(bottom: 20),
-
+                            padding: const EdgeInsets.only(bottom: 100),
                             itemCount: filteredProducts.length,
 
                             itemBuilder: (context, index) {
@@ -161,7 +160,10 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
 
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: Colors.orange.shade100,
+                                    backgroundColor: AppColors.cardTint(
+                                      context,
+                                      Colors.orange.shade100,
+                                    ),
                                     child: const Icon(
                                       Icons.warning,
                                       color: Colors.orange,

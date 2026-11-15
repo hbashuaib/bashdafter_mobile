@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       final token = await TokenStorage.getAccessToken();
       final profile = await TokenStorage.getProfile();
-      
+
       if (!mounted) return;
 
       if (token != null && token.isNotEmpty && profile != null) {
@@ -61,7 +61,10 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 20),
             const CircularProgressIndicator(),
             const SizedBox(height: 20),
-            const Text('Loading BashDafter...'),
+            const Text(
+              'Loading BashDafter...',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),

@@ -280,6 +280,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
           : units.isEmpty
           ? const Center(child: Text('No units found'))
           : ListView.builder(
+              padding: const EdgeInsets.only(bottom: 100),
               itemCount: units.length,
 
               itemBuilder: (context, index) {
@@ -289,7 +290,10 @@ class _UnitsScreenState extends State<UnitsScreen> {
                   child: ListTile(
                     title: Text(unit['name']),
 
-                    subtitle: Text(unit['description'] ?? ''),
+                    subtitle:
+                        (unit['description'] ?? '').toString().trim().isEmpty
+                        ? null
+                        : Text(unit['description']),
 
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

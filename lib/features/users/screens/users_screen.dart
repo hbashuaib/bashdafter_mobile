@@ -111,12 +111,14 @@ class _UsersScreenState extends State<UsersScreen> {
 
           content: TextField(
             controller: controller,
+            obscureText: true,
             decoration: const InputDecoration(labelText: 'New Password'),
           ),
 
           actions: [
             TextButton(
               onPressed: () {
+                controller.dispose();
                 Navigator.pop(dialogContext);
               },
 
@@ -127,7 +129,7 @@ class _UsersScreenState extends State<UsersScreen> {
               onPressed: () async {
                 final password = controller.text.trim();
 
-                if (controller.text.trim().length < 6) {
+                if (password.length < 6) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Password must be at least 6 characters'),
@@ -137,7 +139,9 @@ class _UsersScreenState extends State<UsersScreen> {
                   return;
                 }
 
-                Navigator.pop(dialogContext);
+                controller.dispose();
+
+                Navigator.pop(dialogContext, true);
                 await resetPassword(user, password);
               },
 
@@ -312,56 +316,68 @@ class _UsersScreenState extends State<UsersScreen> {
             ),
           ),
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: loadUsers,
-              child: ListView.builder(
-                padding: const EdgeInsets.only(bottom: 100),
-                itemCount: filteredUsers.length,
-                itemBuilder: (context, index) {
-                  final user = filteredUsers[index];
+            child: filteredUsers.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(height: 150),
+                      Center(child: Text('No users found')),
+                    ],
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadUsers,
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        showUserActions(user);
-                      },
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 100),
+                      itemCount: filteredUsers.length,
+                      itemBuilder: (context, index) {
+                        final user = filteredUsers[index];
 
-                      leading: CircleAvatar(
-                        child: Text(
-                          user.username.isNotEmpty
-                              ? user.username.substring(0, 1).toUpperCase()
-                              : '?',
-                        ),
-                      ),
-                      title: Text(user.username),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(user.role.replaceAll('_', ' ')),
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          child: ListTile(
+                            onTap: () {
+                              showUserActions(user);
+                            },
 
-                          if (user.email != null && user.email!.isNotEmpty)
-                            Text(
-                              user.email!,
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 12,
+                            leading: CircleAvatar(
+                              child: Text(
+                                user.username.isNotEmpty
+                                    ? user.username
+                                          .substring(0, 1)
+                                          .toUpperCase()
+                                    : '?',
                               ),
                             ),
-                        ],
-                      ),
-                      trailing: Icon(
-                        user.isActive ? Icons.check_circle : Icons.cancel,
-                        color: user.isActive ? Colors.green : Colors.red,
-                      ),
+                            title: Text(user.username),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(user.role.replaceAll('_', ' ')),
+
+                                if (user.email != null &&
+                                    user.email!.isNotEmpty)
+                                  Text(
+                                    user.email!,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            trailing: Icon(
+                              user.isActive ? Icons.check_circle : Icons.cancel,
+                              color: user.isActive ? Colors.green : Colors.red,
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
           ),
         ],
       ),

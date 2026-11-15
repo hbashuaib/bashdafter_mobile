@@ -28,7 +28,12 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             return;
           }
 
-          scanned = true;
+          setState(() {
+            scanned = true;
+          });
+
+          if (!mounted) return;
+
           Navigator.pop(context, barcode);
         },
       ),

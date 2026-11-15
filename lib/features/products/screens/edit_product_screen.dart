@@ -204,6 +204,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    barcodeController.dispose();
+    descriptionController.dispose();
+    costPriceController.dispose();
+    sellingPriceController.dispose();
+    minimumStockController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -228,6 +239,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           TextField(
             controller: barcodeController,
             keyboardType: TextInputType.number,
+            autocorrect: false,
+            enableSuggestions: false,
 
             decoration: InputDecoration(
               labelText: 'Barcode',
@@ -298,6 +311,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           TextField(
             controller: costPriceController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            autocorrect: false,
+            enableSuggestions: false,
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Cost Price'),
           ),
@@ -307,6 +322,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           TextField(
             controller: sellingPriceController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            autocorrect: false,
+            enableSuggestions: false,
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Selling Price'),
           ),
@@ -316,6 +333,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           TextField(
             controller: minimumStockController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            autocorrect: false,
+            enableSuggestions: false,
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Minimum Stock'),
           ),
@@ -381,20 +400,26 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           const SizedBox(height: 20),
 
-          ElevatedButton(
-            onPressed: isSaving ? null : updateProduct,
+          SizedBox(
+            width: double.infinity,
 
-            child: isSaving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text('Save Changes'),
+            child: ElevatedButton(
+              onPressed: isSaving ? null : updateProduct,
+
+              child: isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Save Changes'),
+            ),
           ),
+
+          const SizedBox(height: 100),
         ],
       ),
     );

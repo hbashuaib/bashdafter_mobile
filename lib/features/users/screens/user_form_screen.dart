@@ -129,11 +129,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
         ),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -146,6 +146,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
         children: [
           TextField(
             controller: usernameController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Username',
               border: OutlineInputBorder(),
@@ -156,6 +157,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: firstNameController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'First Name',
               border: OutlineInputBorder(),
@@ -166,6 +168,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: lastNameController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Last Name',
               border: OutlineInputBorder(),
@@ -176,6 +179,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: emailController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Email',
               border: OutlineInputBorder(),
@@ -186,6 +190,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: phoneController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Phone Number',
               border: OutlineInputBorder(),
@@ -198,6 +203,9 @@ class _UserFormScreenState extends State<UserFormScreen> {
             TextField(
               controller: passwordController,
               obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
@@ -232,12 +240,19 @@ class _UserFormScreenState extends State<UserFormScreen> {
             child: ElevatedButton(
               onPressed: isLoading ? null : saveUser,
               child: isLoading
-                  ? const CircularProgressIndicator()
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : Text(widget.isEdit ? 'Save Changes' : 'Create User'),
             ),
           ),
 
-          const SizedBox(height: 50),
+          const SizedBox(height: 100),
         ],
       ),
     );

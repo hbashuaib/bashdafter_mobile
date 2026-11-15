@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../products/services/barcode_lookup_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -63,10 +64,20 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentStock = product == null
+        ? 0.0
+        : double.tryParse(product!['current_stock'].toString()) ?? 0;
+
+    final minimumStock = product == null
+        ? 0.0
+        : double.tryParse(product!['minimum_stock'].toString()) ?? 0;
+
+    final isLowStock = currentStock <= minimumStock;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Inventory Lookup')),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
 
         child: Column(
@@ -83,7 +94,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
             if (isLoading) const Center(child: CircularProgressIndicator()),
 
-            if (product != null)
+            if (product != null) ...[
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -116,30 +127,21 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                         ),
 
                         decoration: BoxDecoration(
-                          color:
-                              (double.tryParse(
-                                        product!['current_stock'].toString(),
-                                      ) ??
-                                      0) <=
-                                  (double.tryParse(
-                                        product!['minimum_stock'].toString(),
-                                      ) ??
-                                      0)
-                              ? Colors.red.shade100
-                              : Colors.green.shade100,
+                          color: AppColors.cardTint(
+                            context,
+                            isLowStock
+                                ? Colors.red.shade100
+                                : Colors.green.shade100,
+                          ),
                         ),
 
                         child: Text(
-                          (double.tryParse(
-                                        product!['current_stock'].toString(),
-                                      ) ??
-                                      0) <=
-                                  (double.tryParse(
-                                        product!['minimum_stock'].toString(),
-                                      ) ??
-                                      0)
-                              ? 'LOW STOCK'
-                              : 'IN STOCK',
+                          isLowStock ? 'LOW STOCK' : 'IN STOCK',
+
+                          style: TextStyle(
+                            color: isLowStock ? Colors.red : Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
 
@@ -150,7 +152,6 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.inventory),
-
                           label: const Text('Adjust Stock'),
 
                           onPressed: () async {
@@ -207,6 +208,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 100),
+            ],
           ],
         ),
       ),

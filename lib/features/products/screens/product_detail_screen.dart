@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../services/product_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'edit_product_screen.dart';
 
@@ -96,6 +97,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentStock =
+        double.tryParse(widget.product['current_stock'].toString()) ?? 0;
+
+    final minimumStock =
+        double.tryParse(widget.product['minimum_stock'].toString()) ?? 0;
+
+    final isLowStock = currentStock <= minimumStock;
+
+    final costPrice =
+        double.tryParse(widget.product['cost_price'].toString()) ?? 0;
+
+    final sellingPrice =
+        double.tryParse(widget.product['selling_price'].toString()) ?? 0;
+
+    final totalSold =
+        double.tryParse(widget.product['total_sold'].toString()) ?? 0;
+
+    final totalAdjustments =
+        double.tryParse(widget.product['total_adjustments'].toString()) ?? 0;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.product['name']?.toString() ?? ''),
@@ -176,61 +197,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Card(
             child: ListTile(
               title: const Text('Cost Price'),
-              subtitle: Text(
-                'YER ${currencyFormatter.format(double.tryParse(widget.product['cost_price'].toString()) ?? 0)}',
-              ),
+              subtitle: Text('YER ${currencyFormatter.format(costPrice)}'),
             ),
           ),
 
           Card(
             child: ListTile(
               title: const Text('Selling Price'),
-              subtitle: Text(
-                'YER ${currencyFormatter.format(double.tryParse(widget.product['selling_price'].toString()) ?? 0)}',
-              ),
+              subtitle: Text('YER ${currencyFormatter.format(sellingPrice)}'),
             ),
           ),
 
           Card(
             child: ListTile(
               title: const Text('Current Stock'),
-              subtitle: Text(
-                (double.tryParse(widget.product['current_stock'].toString()) ??
-                        0)
-                    .toStringAsFixed(0),
-              ),
+              subtitle: Text(currentStock.toStringAsFixed(0)),
             ),
           ),
 
           Card(
             child: ListTile(
               title: const Text('Total Sold'),
-              subtitle: Text(
-                (double.tryParse(widget.product['total_sold'].toString()) ?? 0)
-                    .toStringAsFixed(0),
-              ),
+              subtitle: Text(totalSold.toStringAsFixed(0)),
             ),
           ),
 
           Card(
             child: ListTile(
               title: const Text('Stock Adjustments'),
-              subtitle: Text(
-                (double.tryParse(
-                          widget.product['total_adjustments'].toString(),
-                        ) ??
-                        0)
-                    .toStringAsFixed(0),
-              ),
+              subtitle: Text(totalAdjustments.toStringAsFixed(0)),
             ),
           ),
 
-          if ((double.tryParse(widget.product['current_stock'].toString()) ??
-                  0) <=
-              (double.tryParse(widget.product['minimum_stock'].toString()) ??
-                  0))
+          if (isLowStock)
             Card(
-              color: Colors.red.shade50,
+              color: AppColors.cardTint(context, Colors.red.shade50),
 
               child: const ListTile(
                 leading: Icon(Icons.warning, color: Colors.red),
@@ -250,11 +251,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Card(
             child: ListTile(
               title: const Text('Minimum Stock'),
-              subtitle: Text(
-                (double.tryParse(widget.product['minimum_stock'].toString()) ??
-                        0)
-                    .toStringAsFixed(0),
-              ),
+              subtitle: Text(minimumStock.toStringAsFixed(0)),
             ),
           ),
 
@@ -303,7 +300,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 }
 
                 return Card(
-                  color: cardColor,
+                  color: AppColors.cardTint(context, cardColor),
 
                   child: ListTile(
                     leading: Icon(Icons.calendar_month, color: textColor),
@@ -331,9 +328,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
 
                 decoration: BoxDecoration(
-                  color: widget.product['is_active']
-                      ? Colors.green.shade100
-                      : Colors.red.shade100,
+                  color: AppColors.cardTint(
+                    context,
+                    widget.product['is_active']
+                        ? Colors.green.shade100
+                        : Colors.red.shade100,
+                  ),
 
                   borderRadius: BorderRadius.circular(12),
                 ),

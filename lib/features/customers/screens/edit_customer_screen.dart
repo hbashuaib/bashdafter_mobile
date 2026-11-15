@@ -91,6 +91,16 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    notesController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Customer')),
@@ -112,6 +122,8 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
             TextField(
               controller: phoneController,
               keyboardType: TextInputType.phone,
+              autocorrect: false,
+              enableSuggestions: false,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(labelText: 'Phone'),
             ),
@@ -156,20 +168,26 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
 
             const SizedBox(height: 20),
 
-            ElevatedButton(
-              onPressed: isSaving ? null : saveChanges,
+            SizedBox(
+              width: double.infinity,
 
-              child: isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Save Changes'),
+              child: ElevatedButton(
+                onPressed: isSaving ? null : saveChanges,
+
+                child: isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Save Changes'),
+              ),
             ),
+
+            const SizedBox(height: 80),
           ],
         ),
       ),

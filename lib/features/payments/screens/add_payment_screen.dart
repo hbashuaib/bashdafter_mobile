@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../services/create_payment_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 class AddPaymentScreen extends StatefulWidget {
   final int customerId;
@@ -12,8 +14,8 @@ class AddPaymentScreen extends StatefulWidget {
 }
 
 class _AddPaymentScreenState extends State<AddPaymentScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   final amountController = TextEditingController();
-
   final notesController = TextEditingController();
 
   bool isSaving = false;
@@ -79,6 +81,13 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
   }
 
   @override
+  void dispose() {
+    amountController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Payment')),
@@ -93,6 +102,8 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
+              autocorrect: false,
+              enableSuggestions: false,
               textInputAction: TextInputAction.next,
 
               onChanged: (_) {
@@ -105,7 +116,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
             const SizedBox(height: 15),
 
             Card(
-              color: Colors.green.shade50,
+              color: AppColors.cardTint(context, Colors.green.shade50),
 
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -114,12 +125,12 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                   children: [
-                    const Text('Payment Amount'),
+                    const Text('Payment Preview'),
 
                     Text(
-                      amountController.text.isEmpty
-                          ? '0'
-                          : amountController.text,
+                      currencyFormatter.format(
+                        double.tryParse(amountController.text) ?? 0,
+                      ),
 
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
@@ -147,19 +158,24 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
 
             const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: isSaving ? null : savePayment,
-              child: isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Save Payment'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isSaving ? null : savePayment,
+                child: isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Save Payment'),
+              ),
             ),
+
+            const SizedBox(height: 100),
           ],
         ),
       ),

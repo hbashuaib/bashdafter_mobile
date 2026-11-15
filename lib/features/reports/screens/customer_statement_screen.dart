@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../services/customer_statement_service.dart';
 import '../services/customer_statement_pdf_service.dart';
+import '../../../core/theme/app_colors.dart';
 
 import 'package:share_plus/share_plus.dart';
 
@@ -96,6 +97,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
   String buildWhatsAppStatement() {
     final buffer = StringBuffer();
+    final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
 
     buffer.writeln('📋 ${statement!['shop_name']}');
     buffer.writeln('📋 Customer Statement');
@@ -108,7 +110,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     buffer.writeln('Current Balance:');
 
     buffer.writeln(
-      'YER ${currencyFormatter.format(double.tryParse(statement!['balance'].toString()) ?? 0)}',
+      'YER ${currencyFormatter.format(balance)}',
     );
 
     buffer.writeln('');
@@ -133,6 +135,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
+
     if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -203,10 +207,12 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
           children: [
             Card(
-              color:
-                  (double.tryParse(statement!['balance'].toString()) ?? 0) > 0
-                  ? Colors.red.shade50
-                  : Colors.green.shade50,
+              color: AppColors.cardTint(
+                context,
+                balance > 0
+                    ? Colors.red.shade50
+                    : Colors.green.shade50,
+              ),
 
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -235,7 +241,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                         const Text('Balance'),
 
                         Text(
-                          'YER ${currencyFormatter.format(double.tryParse(statement!['balance'].toString()) ?? 0)}',
+                          'YER ${currencyFormatter.format(balance)}',
 
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -288,7 +294,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.only(bottom: 100),
                   itemCount: filteredTransactions.length,
 
                   itemBuilder: (context, index) {
