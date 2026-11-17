@@ -25,6 +25,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
   String activeFilter = 'All';
+  String searchQuery = '';
   UserProfile? currentUser;
 
   int get totalProducts => products.length;
@@ -57,7 +58,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         isLoading = false;
       });
 
-      applyFilter(activeFilter);
+      applyFilters();
     } catch (e) {
       debugPrint(e.toString());
 
@@ -83,37 +84,30 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  void searchProducts(String value) {
-    final query = value.toLowerCase().trim();
+  void applyFilters() {
+    final query = searchQuery.toLowerCase().trim();
 
     setState(() {
       filteredProducts = products.where((product) {
         final name = product['name'].toString().toLowerCase();
+
         final category = product['category_name'].toString().toLowerCase();
+
         final barcode = (product['barcode'] ?? '').toString().toLowerCase();
 
-        return name.contains(query) ||
+        final matchesSearch =
+            name.contains(query) ||
             category.contains(query) ||
             barcode.contains(query);
+
+        final matchesFilter = activeFilter == 'All'
+            ? true
+            : activeFilter == 'Active'
+            ? product['is_active'] == true
+            : product['is_active'] == false;
+
+        return matchesSearch && matchesFilter;
       }).toList();
-    });
-  }
-
-  void applyFilter(String filter) {
-    setState(() {
-      activeFilter = filter;
-
-      if (filter == 'All') {
-        filteredProducts = products;
-      } else if (filter == 'Active') {
-        filteredProducts = products
-            .where((p) => p['is_active'] == true)
-            .toList();
-      } else {
-        filteredProducts = products
-            .where((p) => p['is_active'] == false)
-            .toList();
-      }
     });
   }
 
@@ -227,7 +221,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                   child: TextField(
                     controller: searchController,
-                    onChanged: searchProducts,
+                    onChanged: (value) {
+                      searchQuery = value;
+                      applyFilters();
+                    },
 
                     decoration: InputDecoration(
                       hintText: 'Search by name, category, or barcode',
@@ -252,7 +249,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           }
 
                           searchController.text = barcode.toString();
-                          searchProducts(barcode.toString());
+                          searchQuery = barcode.toString();
+                          applyFilters();
 
                           if (filteredProducts.isEmpty) {
                             messenger.showSnackBar(
@@ -279,7 +277,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         selected: activeFilter == 'All',
 
                         onSelected: (_) {
-                          applyFilter('All');
+                          activeFilter = 'All';
+                          applyFilters();
                         },
                       ),
 
@@ -288,7 +287,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         selected: activeFilter == 'Active',
 
                         onSelected: (_) {
-                          applyFilter('Active');
+                          activeFilter = 'Active';
+                          applyFilters();
                         },
                       ),
 
@@ -297,7 +297,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         selected: activeFilter == 'Inactive',
 
                         onSelected: (_) {
-                          applyFilter('Inactive');
+                          activeFilter = 'Inactive';
+                          applyFilters();
                         },
                       ),
                     ],
