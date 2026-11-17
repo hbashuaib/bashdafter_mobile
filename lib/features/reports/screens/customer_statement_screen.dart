@@ -126,8 +126,6 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
-
     if (isLoading) {
       return const AppLoadingScaffold(message: 'Loading statement...');
     }
@@ -144,6 +142,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
       );
     }
 
+    final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
     final transactions = statement!['transactions'] as List<dynamic>;
 
     return Scaffold(
