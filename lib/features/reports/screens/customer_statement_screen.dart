@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../services/customer_statement_service.dart';
 import '../services/customer_statement_pdf_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 import 'package:share_plus/share_plus.dart';
 
@@ -19,7 +21,8 @@ class CustomerStatementScreen extends StatefulWidget {
 
 class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
-  Map<String, dynamic>? statement;  
+  final searchController = TextEditingController();
+  Map<String, dynamic>? statement;
   List<dynamic> filteredTransactions = [];
   bool isLoading = true;
 
@@ -45,7 +48,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
         statement = data;
         filteredTransactions = List<dynamic>.from(data['transactions']);
         isLoading = false;
-      });      
+      });
     } catch (e) {
       debugPrint(e.toString());
 
@@ -62,7 +65,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   }
 
   void searchTransactions(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredTransactions = (statement!['transactions'] as List<dynamic>)
@@ -77,7 +80,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
           })
           .toList();
     });
-  }  
+  }
 
   String buildWhatsAppStatement() {
     final buffer = StringBuffer();
@@ -116,18 +119,28 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
 
     if (isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const AppLoadingScaffold(message: 'Loading statement...');
     }
 
     if (statement == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Customer Statement')),
 
-        body: const Center(child: Text('No statement available')),
+        body: AppRefreshableEmptyState(
+          message: 'No statement available',
+          icon: Icons.receipt_long_outlined,
+          onRefresh: loadStatement,
+        ),
       );
     }
 
@@ -246,12 +259,28 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
             const SizedBox(height: 20),
 
             TextField(
-              onChanged: searchTransactions,
+              controller: searchController,
 
-              decoration: const InputDecoration(
+              onChanged: (value) {
+                searchTransactions(value);
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
                 hintText: 'Search transactions',
+                prefixIcon: const Icon(Icons.search),
 
-                prefixIcon: Icon(Icons.search),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchTransactions('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
               ),
             ),
 
@@ -271,56 +300,68 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
               child: RefreshIndicator(
                 onRefresh: loadStatement,
 
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 100),
-                  itemCount: filteredTransactions.length,
+                child: filteredTransactions.isEmpty
+                    ? AppRefreshableEmptyState(
+                        message: 'No transactions found',
+                        icon: Icons.receipt_long_outlined,
+                        onRefresh: loadStatement,
+                      )
+                    : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemCount: filteredTransactions.length,
 
-                  itemBuilder: (context, index) {
-                    final item = filteredTransactions[index];
-                    
-                    final runningBalance =
-                        double.tryParse(item['running_balance'].toString()) ??
-                        0;
-                        
-                    final isPurchase = item['type'] == 'purchase';
+                        itemBuilder: (context, index) {
+                          final item = filteredTransactions[index];
 
-                    return Card(
-                      child: ListTile(
-                        title: Text(item['type'].toString().toUpperCase()),
-                        subtitle: Text(item['date']),
+                          final runningBalance =
+                              double.tryParse(
+                                item['running_balance'].toString(),
+                              ) ??
+                              0;
 
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          final isPurchase = item['type'] == 'purchase';
 
-                          children: [
-                            Text(
-                              '${isPurchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
+                          return Card(
+                            child: ListTile(
+                              title: Text(
+                                item['type'].toString().toUpperCase(),
+                              ),
+                              subtitle: Text(item['date']),
 
-                              style: TextStyle(
-                                color: isPurchase ? Colors.red : Colors.green,
-                                fontWeight: FontWeight.bold,
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+
+                                children: [
+                                  Text(
+                                    '${isPurchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
+
+                                    style: TextStyle(
+                                      color: isPurchase
+                                          ? Colors.red
+                                          : Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+
+                                  Text(
+                                    'Bal: ${currencyFormatter.format(runningBalance)}',
+
+                                    style: TextStyle(
+                                      fontSize: 12,
+
+                                      color: runningBalance > 0
+                                          ? Colors.red
+                                          : Colors.green,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-
-                            Text(
-                              'Bal: ${currencyFormatter.format(runningBalance)}',
-
-                              style: TextStyle(
-                                fontSize: 12,
-
-                                color: runningBalance > 0
-                                    ? Colors.red
-                                    : Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           ],

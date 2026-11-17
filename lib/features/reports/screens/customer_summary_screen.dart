@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/reports_service.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 class CustomerSummaryScreen extends StatefulWidget {
   const CustomerSummaryScreen({super.key});
@@ -12,6 +14,7 @@ class CustomerSummaryScreen extends StatefulWidget {
 
 class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> customers = [];
   List<dynamic> filteredCustomers = [];
   bool isLoading = true;
@@ -61,7 +64,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
   }
 
   void searchCustomers(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredCustomers = customers.where((customer) {
@@ -77,128 +80,149 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(message: 'Loading customer summary...');
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Customer Summary')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Customers'),
+                children: [
+                  Column(
+                    children: [
+                      const Text('Customers'),
 
-                            Text(
-                              customers.length.toString(),
+                      Text(
+                        customers.length.toString(),
 
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Column(
-                          children: [
-                            const Text('Outstanding'),
-
-                            Text(
-                              'YER ${currencyFormatter.format(totalOutstandingBalance)}',
-
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                  Column(
+                    children: [
+                      const Text('Outstanding'),
 
-                  child: TextField(
-                    onChanged: searchCustomers,
+                      Text(
+                        'YER ${currencyFormatter.format(totalOutstandingBalance)}',
 
-                    decoration: const InputDecoration(
-                      hintText: 'Search customer',
-
-                      prefixIcon: Icon(Icons.search),
-                    ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
-
-                Center(
-                  child: Text(
-                    'Showing ${filteredCustomers.length} of ${customers.length} customers',
-
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                Expanded(
-                  child: filteredCustomers.isEmpty
-                      ? ListView(
-                          children: const [
-                            SizedBox(height: 150),
-
-                            Center(child: Text('No customers found')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadData,
-
-                          child: ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 100),
-                            itemCount: filteredCustomers.length,
-
-                            itemBuilder: (context, index) {
-                              final customer = filteredCustomers[index];
-                              final balance =
-                                  double.tryParse(
-                                    customer['balance'].toString(),
-                                  ) ??
-                                  0;
-
-                              return Card(
-                                child: ListTile(
-                                  title: Text(
-                                    customer['name']?.toString() ??
-                                        'Unknown Customer',
-                                  ),
-
-                                  subtitle: Text(
-                                    customer['phone']?.toString() ?? '-',
-                                  ),
-
-                                  trailing: Text(
-                                    'YER ${currencyFormatter.format(balance)}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                ),
-              ],
+                ],
+              ),
             ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: TextField(
+              controller: searchController,
+
+              onChanged: (value) {
+                searchCustomers(value);
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
+                hintText: 'Search customer',
+
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchCustomers('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: Center(
+              child: Text(
+                'Showing ${filteredCustomers.length} of ${customers.length} customers',
+
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredCustomers.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No customers found',
+                    icon: Icons.people_outline,
+                    onRefresh: loadData,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadData,
+
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 100),
+                      itemCount: filteredCustomers.length,
+
+                      itemBuilder: (context, index) {
+                        final customer = filteredCustomers[index];
+                        final balance =
+                            double.tryParse(customer['balance'].toString()) ??
+                            0;
+
+                        return Card(
+                          child: ListTile(
+                            title: Text(
+                              customer['name']?.toString() ??
+                                  'Unknown Customer',
+                            ),
+
+                            subtitle: Text(
+                              customer['phone']?.toString() ?? '-',
+                            ),
+
+                            trailing: Text(
+                              'YER ${currencyFormatter.format(balance)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../services/top_selling_products_service.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 class TopSellingProductsScreen extends StatefulWidget {
   const TopSellingProductsScreen({super.key});
@@ -84,190 +86,187 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(
+        message: 'Loading top selling products...',
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Top Selling Products')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Products'),
+                children: [
+                  Column(
+                    children: [
+                      const Text('Products'),
 
-                            Text(
-                              products.length.toString(),
+                      Text(
+                        products.length.toString(),
 
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+
+                  Column(
+                    children: [
+                      const Text('Top Seller'),
+
+                      SizedBox(
+                        width: 100,
+
+                        child: Text(
+                          products.isEmpty
+                              ? '-'
+                              : products.first['name'].toString(),
+
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
 
-                        Column(
-                          children: [
-                            const Text('Top Seller'),
+          Padding(
+            padding: const EdgeInsets.all(12),
 
-                            SizedBox(
-                              width: 100,
+            child: TextField(
+              controller: searchController,
+
+              onChanged: (value) {
+                searchProducts(value);
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
+                hintText: 'Search product',
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchProducts('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+
+            child: Center(
+              child: Text(
+                'Showing ${filteredProducts.length} of ${products.length} products',
+
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredProducts.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No sales found',
+                    icon: Icons.leaderboard_outlined,
+                    onRefresh: loadProducts,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadProducts,
+
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 100),
+
+                      itemCount: filteredProducts.length,
+
+                      itemBuilder: (context, index) {
+                        final product = filteredProducts[index];
+                        final rank = product['rank'] ?? 0;
+
+                        final currentStock =
+                            double.tryParse(
+                              product['current_stock'].toString(),
+                            ) ??
+                            0;
+
+                        final totalSold =
+                            double.tryParse(product['total_sold'].toString()) ??
+                            0;
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: getRankColor(rank),
 
                               child: Text(
-                                products.isEmpty
-                                    ? '-'
-                                    : products.first['name'].toString(),
-
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
+                                '#$rank',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                            title: Text(
+                              product['name']?.toString() ?? 'Unknown Product',
+                            ),
 
-                  child: TextField(
-                    controller: searchController,
+                            subtitle: Text(
+                              'Current Stock: ${currentStock.toStringAsFixed(0)}',
+                            ),
 
-                    onChanged: (value) {
-                      searchProducts(value);
-                      setState(() {});
-                    },
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
 
-                    decoration: InputDecoration(
-                      hintText: 'Search product',
-                      prefixIcon: const Icon(Icons.search),
-
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-
-                              onPressed: () {
-                                searchController.clear();
-                                searchProducts('');
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-
-                  child: Center(
-                    child: Text(
-                      'Showing ${filteredProducts.length} of ${products.length} products',
-
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-
-                Expanded(
-                  child: filteredProducts.isEmpty
-                      ? ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          children: const [
-                            SizedBox(height: 150),
-                            Center(child: Text('No sales found')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadProducts,
-
-                          child: ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 100),
-
-                            itemCount: filteredProducts.length,
-
-                            itemBuilder: (context, index) {
-                              final product = filteredProducts[index];
-                              final rank = product['rank'] ?? 0;
-
-                              final currentStock =
-                                  double.tryParse(
-                                    product['current_stock'].toString(),
-                                  ) ??
-                                  0;
-
-                              final totalSold =
-                                  double.tryParse(
-                                    product['total_sold'].toString(),
-                                  ) ??
-                                  0;
-
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
+                              children: [
+                                const Text(
+                                  'Sold',
+                                  style: TextStyle(fontSize: 12),
                                 ),
 
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: getRankColor(rank),
-
-                                    child: Text(
-                                      '#$rank',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-
-                                  title: Text(
-                                    product['name']?.toString() ??
-                                        'Unknown Product',
-                                  ),
-
-                                  subtitle: Text(
-                                    'Current Stock: ${currentStock.toStringAsFixed(0)}',
-                                  ),
-
-                                  trailing: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-
-                                    children: [
-                                      const Text(
-                                        'Sold',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-
-                                      Text(
-                                        totalSold.toStringAsFixed(0),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                Text(
+                                  totalSold.toStringAsFixed(0),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              );
-                            },
+                              ],
+                            ),
                           ),
-                        ),
-                ),
-              ],
-            ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -5,6 +5,8 @@ import '../services/customer_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 import 'customer_detail_screen.dart';
 import 'add_customer_screen.dart';
@@ -19,6 +21,7 @@ class CustomersScreen extends StatefulWidget {
 
 class _CustomersScreenState extends State<CustomersScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> customers = [];
   List<dynamic> filteredCustomers = [];
   bool isLoading = true;
@@ -31,7 +34,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
     super.initState();
     loadCustomers();
     loadCurrentUser();
-  }  
+  }
 
   void applyFilters() {
     final query = searchQuery.toLowerCase().trim();
@@ -91,7 +94,17 @@ class _CustomersScreenState extends State<CustomersScreen> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(message: 'Loading customers...');
+    }
+
     return Scaffold(
       floatingActionButton: currentUser != null && !currentUser!.isCashier
           ? FloatingActionButton(
@@ -131,146 +144,156 @@ class _CustomersScreenState extends State<CustomersScreen> {
         ],
       ),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: Center(
+              child: Text(
+                'Showing ${filteredCustomers.length} of ${customers.length} customers',
+
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: TextField(
+              controller: searchController,
+
+              onChanged: (value) {
+                searchQuery = value;
+                applyFilters();
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
+                hintText: 'Search by name or phone',
+
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchQuery = '';
+                          applyFilters();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+
+            child: Wrap(
+              spacing: 8,
+
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                ChoiceChip(
+                  label: const Text('All'),
+                  selected: currentFilter == 'all',
 
-                  child: Text(
-                    'Showing ${filteredCustomers.length} of ${customers.length} customers',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  onSelected: (_) {
+                    currentFilter = 'all';
+                    applyFilters();
+                  },
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                ChoiceChip(
+                  label: const Text('Active'),
+                  selected: currentFilter == 'active',
 
-                  child: TextField(
-                    onChanged: (value) {
-                      searchQuery = value;
-                      applyFilters();
-                    },
-
-                    decoration: const InputDecoration(
-                      hintText: 'Search by name or phone',
-
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                  ),
+                  onSelected: (_) {
+                    currentFilter = 'active';
+                    applyFilters();
+                  },
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                ChoiceChip(
+                  label: const Text('Inactive'),
+                  selected: currentFilter == 'inactive',
 
-                  child: Wrap(
-                    spacing: 8,
-
-                    children: [
-                      ChoiceChip(
-                        label: const Text('All'),
-                        selected: currentFilter == 'all',
-
-                        onSelected: (_) {
-                          setState(() {
-                            currentFilter = 'all';
-                            applyFilters();
-                          });
-                        },
-                      ),
-
-                      ChoiceChip(
-                        label: const Text('Active'),
-                        selected: currentFilter == 'active',
-
-                        onSelected: (_) {
-                          setState(() {
-                            currentFilter = 'active';
-                            applyFilters();
-                          });
-                        },
-                      ),
-
-                      ChoiceChip(
-                        label: const Text('Inactive'),
-                        selected: currentFilter == 'inactive',
-
-                        onSelected: (_) {
-                          setState(() {
-                            currentFilter = 'inactive';
-                            applyFilters();
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: loadCustomers,
-
-                    child: filteredCustomers.isEmpty
-                        ? ListView(
-                            children: const [
-                              SizedBox(height: 150),
-                              Center(child: Text('No customers found')),
-                            ],
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.only(bottom: 100),
-
-                            itemCount: filteredCustomers.length,
-
-                            itemBuilder: (context, index) {
-                              final customer = filteredCustomers[index];
-
-                              return Card(
-                                child: ListTile(
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-
-                                      MaterialPageRoute(
-                                        builder: (_) => CustomerDetailScreen(
-                                          customerId: customer['id'],
-                                        ),
-                                      ),
-                                    );
-
-                                    loadCustomers();
-                                  },
-
-                                  title: Text(customer['name']),
-
-                                  subtitle: Text(customer['phone']),
-
-                                  trailing: Chip(
-                                    backgroundColor: AppColors.cardTint(
-                                      context,
-                                      (customer['balance'] ?? 0) > 0
-                                          ? Colors.orange.shade100
-                                          : Colors.green.shade100,
-                                    ),
-
-                                    label: Text(
-                                      currencyFormatter.format(
-                                        double.tryParse(
-                                              customer['balance'].toString(),
-                                            ) ??
-                                            0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
+                  onSelected: (_) {
+                    currentFilter = 'inactive';
+                    applyFilters();
+                  },
                 ),
               ],
             ),
+          ),
+
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: loadCustomers,
+
+              child: filteredCustomers.isEmpty
+                  ? AppRefreshableEmptyState(
+                      message: 'No customers found',
+                      icon: Icons.people_outline,
+                      onRefresh: loadCustomers,
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 100),
+
+                      itemCount: filteredCustomers.length,
+
+                      itemBuilder: (context, index) {
+                        final customer = filteredCustomers[index];
+
+                        return Card(
+                          child: ListTile(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+
+                                MaterialPageRoute(
+                                  builder: (_) => CustomerDetailScreen(
+                                    customerId: customer['id'],
+                                  ),
+                                ),
+                              );
+
+                              loadCustomers();
+                            },
+
+                            title: Text(customer['name']),
+
+                            subtitle: Text(customer['phone']),
+
+                            trailing: Chip(
+                              backgroundColor: AppColors.cardTint(
+                                context,
+                                (customer['balance'] ?? 0) > 0
+                                    ? Colors.orange.shade100
+                                    : Colors.green.shade100,
+                              ),
+
+                              label: Text(
+                                currencyFormatter.format(
+                                  double.tryParse(
+                                        customer['balance'].toString(),
+                                      ) ??
+                                      0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

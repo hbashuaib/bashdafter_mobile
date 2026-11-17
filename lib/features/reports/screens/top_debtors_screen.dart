@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/reports_service.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 class TopDebtorsScreen extends StatefulWidget {
   const TopDebtorsScreen({super.key});
@@ -12,6 +14,7 @@ class TopDebtorsScreen extends StatefulWidget {
 
 class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> debtors = [];
   List<dynamic> filteredDebtors = [];
   bool isLoading = true;
@@ -52,16 +55,16 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
     }
   }
 
-  Color getRankColor(int index) {
-    if (index == 0) {
+  Color getRankColor(int rank) {
+    if (rank == 1) {
       return Colors.amber;
     }
 
-    if (index == 1) {
+    if (rank == 2) {
       return Colors.grey;
     }
 
-    if (index == 2) {
+    if (rank == 3) {
       return Colors.orange;
     }
 
@@ -69,7 +72,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
   }
 
   void searchDebtors(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredDebtors = debtors.where((debtor) {
@@ -81,139 +84,158 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(message: 'Loading top debtors...');
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Top Debtors')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Debtors'),
+                children: [
+                  Column(
+                    children: [
+                      const Text('Debtors'),
 
-                            Text(
-                              debtors.length.toString(),
+                      Text(
+                        debtors.length.toString(),
 
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Column(
-                          children: [
-                            const Text('Highest Debt'),
-
-                            Text(
-                              debtors.isEmpty
-                                  ? 'YER 0'
-                                  : 'YER ${currencyFormatter.format(double.tryParse(debtors.first['balance'].toString()) ?? 0)}',
-
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                  Column(
+                    children: [
+                      const Text('Highest Debt'),
 
-                  child: TextField(
-                    onChanged: searchDebtors,
+                      Text(
+                        debtors.isEmpty
+                            ? 'YER 0'
+                            : 'YER ${currencyFormatter.format(double.tryParse(debtors.first['balance'].toString()) ?? 0)}',
 
-                    decoration: const InputDecoration(
-                      hintText: 'Search debtor',
-
-                      prefixIcon: Icon(Icons.search),
-                    ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
-
-                Center(
-                  child: Text(
-                    'Showing ${filteredDebtors.length} of ${debtors.length} debtors',
-
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                Expanded(
-                  child: filteredDebtors.isEmpty
-                      ? ListView(
-                          children: const [
-                            SizedBox(height: 150),
-
-                            Center(child: Text('No debtors found')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadData,
-
-                          child: ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 100),
-                            itemCount: filteredDebtors.length,
-
-                            itemBuilder: (context, index) {
-                              final debtor = filteredDebtors[index];
-                              final balance =
-                                  double.tryParse(
-                                    debtor['balance'].toString(),
-                                  ) ??
-                                  0;
-
-                              return Card(
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: getRankColor(index),
-
-                                    child: Text(
-                                      '${index + 1}',
-
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-
-                                  title: Text(
-                                    debtor['name']?.toString() ??
-                                        'Unknown Customer',
-                                  ),
-
-                                  trailing: Text(
-                                    'YER ${currencyFormatter.format(balance)}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                ),
-              ],
+                ],
+              ),
             ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: TextField(
+              controller: searchController,
+
+              onChanged: (value) {
+                searchDebtors(value);
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
+                hintText: 'Search debtor',
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchDebtors('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: Center(
+              child: Text(
+                'Showing ${filteredDebtors.length} of ${debtors.length} debtors',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredDebtors.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No debtors found',
+                    icon: Icons.account_balance_wallet_outlined,
+                    onRefresh: loadData,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadData,
+
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 100),
+                      itemCount: filteredDebtors.length,
+
+                      itemBuilder: (context, index) {
+                        final debtor = filteredDebtors[index];
+                        final rank = debtor['rank'] ?? 0;
+
+                        final balance =
+                            double.tryParse(debtor['balance'].toString()) ?? 0;
+
+                        return Card(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: getRankColor(rank),
+
+                              child: Text(
+                                '$rank',
+
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+
+                            title: Text(
+                              debtor['name']?.toString() ?? 'Unknown Customer',
+                            ),
+
+                            trailing: Text(
+                              'YER ${currencyFormatter.format(balance)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

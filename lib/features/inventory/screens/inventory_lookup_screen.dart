@@ -93,12 +93,31 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
             ElevatedButton.icon(
               onPressed: isLoading ? null : scanBarcode,
               icon: const Icon(Icons.qr_code_scanner),
-              label: Text(isLoading ? 'Searching...' : 'Scan Product'),
+              label: isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Scan Product'),
             ),
 
             const SizedBox(height: 20),
 
-            if (isLoading) const Center(child: CircularProgressIndicator()),
+            if (isLoading)
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 12),
+                    Text('Searching product...'),
+                  ],
+                ),
+              ),
 
             if (product != null) ...[
               Card(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/reports_service.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 class RecentTransactionsScreen extends StatefulWidget {
   const RecentTransactionsScreen({super.key});
@@ -13,6 +15,7 @@ class RecentTransactionsScreen extends StatefulWidget {
 
 class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> transactions = [];
   List<dynamic> filteredTransactions = [];
   bool isLoading = true;
@@ -54,7 +57,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   }
 
   void searchTransactions(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredTransactions = transactions.where((item) {
@@ -71,6 +74,12 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   int get purchaseCount =>
       transactions.where((t) => t['type'] == 'purchase').length;
 
@@ -79,143 +88,161 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(
+        message: 'Loading recent transactions...',
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Recent Transactions')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Transactions'),
+                children: [
+                  Column(
+                    children: [
+                      const Text('Transactions'),
 
-                            Text(
-                              transactions.length.toString(),
+                      Text(
+                        transactions.length.toString(),
 
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Column(
-                          children: [
-                            const Text('Purchases'),
-
-                            Text(
-                              purchaseCount.toString(),
-
-                              style: const TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Column(
-                          children: [
-                            const Text('Payments'),
-
-                            Text(
-                              paymentCount.toString(),
-
-                              style: const TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                  Column(
+                    children: [
+                      const Text('Purchases'),
 
-                  child: TextField(
-                    onChanged: searchTransactions,
+                      Text(
+                        purchaseCount.toString(),
 
-                    decoration: const InputDecoration(
-                      hintText: 'Search transactions',
-
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                  ),
-                ),
-
-                Center(
-                  child: Text(
-                    'Showing ${filteredTransactions.length} of ${transactions.length} transactions',
-
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                Expanded(
-                  child: filteredTransactions.isEmpty
-                      ? ListView(
-                          children: const [
-                            SizedBox(height: 150),
-
-                            Center(child: Text('No transactions found')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadData,
-
-                          child: ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 100),
-                            itemCount: filteredTransactions.length,
-
-                            itemBuilder: (context, index) {
-                              final item = filteredTransactions[index];
-                              final purchase = item['type'] == 'purchase';
-
-                              return Card(
-                                child: ListTile(
-                                  title: Text(
-                                    item['customer']?.toString() ??
-                                        'Unknown Customer',
-                                  ),
-
-                                  subtitle: Text(
-                                    '${item['type'].toString().toUpperCase()} • ${item['date']}',
-                                  ),
-
-                                  trailing: Text(
-                                    '${purchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
-
-                                    style: TextStyle(
-                                      color: purchase
-                                          ? Colors.red
-                                          : Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
                         ),
-                ),
-              ],
+                      ),
+                    ],
+                  ),
+
+                  Column(
+                    children: [
+                      const Text('Payments'),
+
+                      Text(
+                        paymentCount.toString(),
+
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: TextField(
+              controller: searchController,
+
+              onChanged: (value) {
+                searchTransactions(value);
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
+                hintText: 'Search transactions',
+
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchTransactions('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: Center(
+              child: Text(
+                'Showing ${filteredTransactions.length} of ${transactions.length} transactions',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredTransactions.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No transactions found',
+                    icon: Icons.receipt_long_outlined,
+                    onRefresh: loadData,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadData,
+
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 100),
+                      itemCount: filteredTransactions.length,
+
+                      itemBuilder: (context, index) {
+                        final item = filteredTransactions[index];
+                        final purchase = item['type'] == 'purchase';
+
+                        return Card(
+                          child: ListTile(
+                            title: Text(
+                              item['customer']?.toString() ??
+                                  'Unknown Customer',
+                            ),
+
+                            subtitle: Text(
+                              '${item['type'].toString().toUpperCase()} • ${item['date']}',
+                            ),
+
+                            trailing: Text(
+                              '${purchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
+
+                              style: TextStyle(
+                                color: purchase ? Colors.red : Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

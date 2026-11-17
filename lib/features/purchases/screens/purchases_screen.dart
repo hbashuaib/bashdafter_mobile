@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/purchase_service.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 import 'purchase_detail_screen.dart';
 
@@ -102,168 +104,165 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(message: 'Loading purchases...');
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Purchases')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Purchases'),
-                            Text(
-                              purchases.length.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Column(
-                          children: [
-                            const Text('Total'),
-                            Text(
-                              'YER ${currencyFormatter.format(totalPurchasesAmount)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Column(
-                          children: [
-                            const Text('Average'),
-
-                            Text(
-                              'YER ${currencyFormatter.format(averagePurchase)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                children: [
+                  Column(
+                    children: [
+                      const Text('Purchases'),
+                      Text(
+                        purchases.length.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
-
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      searchPurchases(value);
-                      setState(() {});
-                    },
-
-                    decoration: InputDecoration(
-                      hintText: 'Search by date, notes or amount',
-                      prefixIcon: const Icon(Icons.search),
-
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-
-                              onPressed: () {
-                                searchController.clear();
-                                searchPurchases('');
-
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                    ),
+                  Column(
+                    children: [
+                      const Text('Total'),
+                      Text(
+                        'YER ${currencyFormatter.format(totalPurchasesAmount)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  Column(
+                    children: [
+                      const Text('Average'),
 
-                  child: Center(
-                    child: Text(
-                      'Showing ${filteredPurchases.length} of ${purchases.length} purchases',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                      Text(
+                        'YER ${currencyFormatter.format(averagePurchase)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
+                ],
+              ),
+            ),
+          ),
 
-                Expanded(
-                  child: filteredPurchases.isEmpty
-                      ? ListView(
-                          children: const [
-                            SizedBox(height: 150),
+          Padding(
+            padding: const EdgeInsets.all(12),
 
-                            Center(child: Text('No purchases found')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadPurchases,
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                searchPurchases(value);
+                setState(() {});
+              },
 
-                          child: ListView.builder(
-                            padding: const EdgeInsets.only(
-                              left: 8,
-                              right: 8,
-                              top: 8,
-                              bottom: 100,
-                            ),
+              decoration: InputDecoration(
+                hintText: 'Search by date, notes or amount',
+                prefixIcon: const Icon(Icons.search),
 
-                            itemCount: filteredPurchases.length,
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
 
-                            itemBuilder: (context, index) {
-                              final purchase = filteredPurchases[index];
-                              final totalAmount =
-                                  double.tryParse(
-                                    purchase['total_amount'].toString(),
-                                  ) ??
-                                  0;
+                        onPressed: () {
+                          searchController.clear();
+                          searchPurchases('');
 
-                              return Card(
-                                child: ListTile(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => PurchaseDetailScreen(
-                                          purchase: purchase,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  title: Text(
-                                    'YER ${currencyFormatter.format(totalAmount)}',
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
 
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
 
-                                  subtitle: Text(purchase['purchase_date']),
-                                  trailing: const Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 16,
-                                  ),
+            child: Center(
+              child: Text(
+                'Showing ${filteredPurchases.length} of ${purchases.length} purchases',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredPurchases.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No purchases found',
+                    icon: Icons.shopping_cart_outlined,
+                    onRefresh: loadPurchases,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadPurchases,
+
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(
+                        left: 8,
+                        right: 8,
+                        top: 8,
+                        bottom: 100,
+                      ),
+
+                      itemCount: filteredPurchases.length,
+
+                      itemBuilder: (context, index) {
+                        final purchase = filteredPurchases[index];
+                        final totalAmount =
+                            double.tryParse(
+                              purchase['total_amount'].toString(),
+                            ) ??
+                            0;
+
+                        return Card(
+                          child: ListTile(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      PurchaseDetailScreen(purchase: purchase),
                                 ),
                               );
+
+                              if (mounted) {
+                                loadPurchases();
+                              }
                             },
+                            title: Text(
+                              'YER ${currencyFormatter.format(totalAmount)}',
+
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            subtitle: Text(purchase['purchase_date']),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                            ),
                           ),
-                        ),
-                ),
-              ],
-            ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

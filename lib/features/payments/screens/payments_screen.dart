@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../services/payment_service.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 import 'payment_detail_screen.dart';
 
@@ -102,185 +104,171 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(message: 'Loading payments...');
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Payments')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Payments'),
-                            Text(
-                              payments.length.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            const Text('Total'),
-                            Text(
-                              'YER ${currencyFormatter.format(totalPaymentsAmount)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            const Text('Average'),
-
-                            Text(
-                              'YER ${currencyFormatter.format(averagePayment)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      const Text('Payments'),
+                      Text(
+                        payments.length.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: TextField(
-                    controller: searchController,
-
-                    onChanged: (value) {
-                      searchPayments(value);
-
-                      setState(() {});
-                    },
-
-                    decoration: InputDecoration(
-                      hintText: 'Search by date, notes or amount',
-                      prefixIcon: const Icon(Icons.search),
-
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-
-                              onPressed: () {
-                                searchController.clear();
-                                searchPayments('');
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                    ),
+                  Column(
+                    children: [
+                      const Text('Total'),
+                      Text(
+                        'YER ${currencyFormatter.format(totalPaymentsAmount)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
+                  Column(
+                    children: [
+                      const Text('Average'),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Center(
-                    child: Text(
-                      'Showing ${filteredPayments.length} of ${payments.length} payments',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                      Text(
+                        'YER ${currencyFormatter.format(averagePayment)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
+                ],
+              ),
+            ),
+          ),
 
-                Expanded(
-                  child: filteredPayments.isEmpty
-                      ? ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          children: const [
-                            SizedBox(height: 150),
-                            Center(child: Text('No payments found')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadPayments,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 100),
-                            itemCount: filteredPayments.length,
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              controller: searchController,
 
-                            itemBuilder: (context, index) {
-                              final payment = filteredPayments[index];
-                              final amount =
-                                  double.tryParse(
-                                    payment['amount'].toString(),
-                                  ) ??
-                                  0;
+              onChanged: (value) {
+                searchPayments(value);
 
-                              return Card(
-                                child: ListTile(
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => PaymentDetailScreen(
-                                          payment: payment,
-                                        ),
-                                      ),
-                                    );
+                setState(() {});
+              },
 
-                                    if (mounted) {
-                                      loadPayments();
-                                    }
-                                  },
+              decoration: InputDecoration(
+                hintText: 'Search by date, notes or amount',
+                prefixIcon: const Icon(Icons.search),
 
-                                  title: Text(
-                                    'YER ${currencyFormatter.format(amount)}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
 
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                        onPressed: () {
+                          searchController.clear();
+                          searchPayments('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
 
-                                    children: [
-                                      Text(payment['payment_date']),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Center(
+              child: Text(
+                'Showing ${filteredPayments.length} of ${payments.length} payments',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
 
-                                      if ((payment['notes'] ?? '')
-                                          .toString()
-                                          .isNotEmpty)
-                                        Text(payment['notes']),
-                                    ],
-                                  ),
+          Expanded(
+            child: filteredPayments.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No payments found',
+                    icon: Icons.payment_outlined,
+                    onRefresh: loadPayments,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadPayments,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 100),
+                      itemCount: filteredPayments.length,
 
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                      itemBuilder: (context, index) {
+                        final payment = filteredPayments[index];
+                        final amount =
+                            double.tryParse(payment['amount'].toString()) ?? 0;
 
-                                    children: [
-                                      Icon(
-                                        Icons.payment,
-                                        color: Colors.green.shade700,
-                                      ),
-
-                                      const SizedBox(width: 8),
-
-                                      const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 16,
-                                      ),
-                                    ],
-                                  ),
+                        return Card(
+                          child: ListTile(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      PaymentDetailScreen(payment: payment),
                                 ),
                               );
+
+                              if (mounted) {
+                                loadPayments();
+                              }
                             },
+
+                            title: Text(
+                              'YER ${currencyFormatter.format(amount)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                              children: [
+                                Text(payment['payment_date']),
+
+                                if ((payment['notes'] ?? '')
+                                    .toString()
+                                    .isNotEmpty)
+                                  Text(payment['notes']),
+                              ],
+                            ),
+
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+
+                              children: [
+                                Icon(
+                                  Icons.payment,
+                                  color: Colors.green.shade700,
+                                ),
+
+                                const SizedBox(width: 8),
+
+                                const Icon(Icons.arrow_forward_ios, size: 16),
+                              ],
+                            ),
                           ),
-                        ),
-                ),
-              ],
-            ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

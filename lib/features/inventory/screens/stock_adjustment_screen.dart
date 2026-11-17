@@ -20,7 +20,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
   final quantityController = TextEditingController();
   final reasonController = TextEditingController();
-
+  bool isLoading = true;
   bool isSaving = false;
 
   @override
@@ -37,6 +37,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
       setState(() {
         products = data;
+        isLoading = false;
 
         if (widget.product != null) {
           final matches = data.where((p) => p['id'] == widget.product!['id']);
@@ -47,6 +48,10 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
         }
       });
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
       debugPrint(e.toString());
 
       if (!mounted) return;
@@ -159,23 +164,28 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
         child: Column(
           children: [
             if (widget.product == null)
-              DropdownButtonFormField<dynamic>(
-                value: selectedProduct,
-                decoration: const InputDecoration(labelText: 'Product'),
+              if (isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            DropdownButtonFormField<dynamic>(
+              value: selectedProduct,
+              decoration: const InputDecoration(labelText: 'Product'),
 
-                items: products.map((product) {
-                  return DropdownMenuItem(
-                    value: product,
-                    child: Text(product['name']),
-                  );
-                }).toList(),
+              items: products.map((product) {
+                return DropdownMenuItem(
+                  value: product,
+                  child: Text(product['name']),
+                );
+              }).toList(),
 
-                onChanged: (value) {
-                  setState(() {
-                    selectedProduct = value;
-                  });
-                },
-              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedProduct = value;
+                });
+              },
+            ),
 
             if (widget.product != null)
               Card(

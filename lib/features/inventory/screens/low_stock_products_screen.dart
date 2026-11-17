@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../products/services/product_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_loading_scaffold.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -78,153 +80,151 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const AppLoadingScaffold(message: 'Loading low stock products...');
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Low Stock Products')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
+      body: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(12),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Low Stock'),
+                children: [
+                  Column(
+                    children: [
+                      const Text('Low Stock'),
 
-                            Text(
-                              lowStockProducts.length.toString(),
+                      Text(
+                        lowStockProducts.length.toString(),
 
-                              style: const TextStyle(
+                        style: const TextStyle(
+                          color: Colors.orange,
+
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+
+            child: TextField(
+              controller: searchController,
+
+              onChanged: (value) {
+                searchProducts(value);
+                setState(() {});
+              },
+
+              decoration: InputDecoration(
+                hintText: 'Search product',
+                prefixIcon: const Icon(Icons.search),
+
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+
+                        onPressed: () {
+                          searchController.clear();
+                          searchProducts('');
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+
+            child: Center(
+              child: Text(
+                'Showing ${filteredProducts.length} of ${lowStockProducts.length} products',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: filteredProducts.isEmpty
+                ? AppRefreshableEmptyState(
+                    message: 'No low stock products',
+                    icon: Icons.warning_amber_rounded,
+                    onRefresh: loadProducts,
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadProducts,
+
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 100),
+                      itemCount: filteredProducts.length,
+
+                      itemBuilder: (context, index) {
+                        final product = filteredProducts[index];
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: AppColors.cardTint(
+                                context,
+                                Colors.orange.shade100,
+                              ),
+                              child: const Icon(
+                                Icons.warning,
                                 color: Colors.orange,
-
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                            title: Text(
+                              product['name']?.toString() ?? 'Unknown Product',
+                            ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12),
+                            subtitle: Text(
+                              'Current: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}'
+                              '\nMinimum: ${(double.tryParse(product['minimum_stock'].toString()) ?? 0).toStringAsFixed(0)}',
+                            ),
 
-                  child: TextField(
-                    controller: searchController,
+                            trailing: const Icon(Icons.arrow_forward_ios),
 
-                    onChanged: (value) {
-                      searchProducts(value);
-                      setState(() {});
-                    },
-
-                    decoration: InputDecoration(
-                      hintText: 'Search product',
-                      prefixIcon: const Icon(Icons.search),
-
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-
-                              onPressed: () {
-                                searchController.clear();
-                                searchProducts('');
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-
-                  child: Center(
-                    child: Text(
-                      'Showing ${filteredProducts.length} of ${lowStockProducts.length} products',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-
-                Expanded(
-                  child: filteredProducts.isEmpty
-                      ? ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          children: const [
-                            SizedBox(height: 150),
-                            Center(child: Text('No low stock products')),
-                          ],
-                        )
-                      : RefreshIndicator(
-                          onRefresh: loadProducts,
-
-                          child: ListView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 100),
-                            itemCount: filteredProducts.length,
-
-                            itemBuilder: (context, index) {
-                              final product = filteredProducts[index];
-
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: AppColors.cardTint(
-                                      context,
-                                      Colors.orange.shade100,
-                                    ),
-                                    child: const Icon(
-                                      Icons.warning,
-                                      color: Colors.orange,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    product['name']?.toString() ??
-                                        'Unknown Product',
-                                  ),
-
-                                  subtitle: Text(
-                                    'Current: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}'
-                                    '\nMinimum: ${(double.tryParse(product['minimum_stock'].toString()) ?? 0).toStringAsFixed(0)}',
-                                  ),
-
-                                  trailing: const Icon(Icons.arrow_forward_ios),
-
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => StockAdjustmentScreen(
-                                          product: product,
-                                        ),
-                                      ),
-                                    );
-
-                                    loadProducts();
-                                  },
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      StockAdjustmentScreen(product: product),
                                 ),
                               );
+
+                              loadProducts();
                             },
                           ),
-                        ),
-                ),
-              ],
-            ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
