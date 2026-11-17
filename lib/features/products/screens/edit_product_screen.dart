@@ -161,8 +161,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     try {
       await ProductService().updateProduct(
-        id: widget.product['id'],
-        shopId: widget.product['shop'],
+        id: widget.product['id'],       
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),

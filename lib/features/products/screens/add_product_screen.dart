@@ -140,8 +140,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
 
     try {
-      await ProductService().createProduct(
-        shopId: 1,
+      await ProductService().createProduct(       
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),

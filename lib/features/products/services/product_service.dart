@@ -17,8 +17,7 @@ class ProductService {
     }
   }
 
-  Future<void> createProduct({
-    required int shopId,
+  Future<void> createProduct({    
     required int categoryId,
     required int unitId,
     required String name,
@@ -50,8 +49,7 @@ class ProductService {
           'minimum_stock': minimumStock.trim(),
           'has_expiry': hasExpiry,
           'expiry_date': expiryDate,
-          'is_active': isActive,
-          'shop': shopId,
+          'is_active': isActive,          
           'category': categoryId,
           'unit': unitId,
         },
@@ -64,8 +62,7 @@ class ProductService {
   }
 
   Future<void> updateProduct({
-    required int id,
-    required int shopId,
+    required int id,    
     required int categoryId,
     required int unitId,
     required String name,
@@ -97,8 +94,7 @@ class ProductService {
           'minimum_stock': minimumStock.trim(),
           'has_expiry': hasExpiry,
           'expiry_date': expiryDate,
-          'is_active': isActive,
-          'shop': shopId,
+          'is_active': isActive,          
           'category': categoryId,
           'unit': unitId,
         },
