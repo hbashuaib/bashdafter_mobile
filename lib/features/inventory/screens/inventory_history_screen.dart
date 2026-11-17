@@ -10,6 +10,7 @@ class InventoryHistoryScreen extends StatefulWidget {
 }
 
 class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
+  final searchController = TextEditingController();
   List<dynamic> transactions = [];
   List<dynamic> filteredTransactions = [];
   bool isLoading = true;
@@ -70,7 +71,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
   }
 
   void searchTransactions(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredTransactions = transactions.where((tx) {
@@ -86,6 +87,12 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Inventory History')),
@@ -98,11 +105,29 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: TextField(
-                    onChanged: searchTransactions,
+                    controller: searchController,
 
-                    decoration: const InputDecoration(
+                    onChanged: (value) {
+                      searchTransactions(value);
+
+                      setState(() {});
+                    },
+
+                    decoration: InputDecoration(
                       hintText: 'Search product, type or reference',
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
+
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+
+                              onPressed: () {
+                                searchController.clear();
+                                searchTransactions('');
+                                setState(() {});
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -121,6 +146,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                 Expanded(
                   child: filteredTransactions.isEmpty
                       ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: const [
                             SizedBox(height: 150),
 
@@ -139,6 +165,12 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
 
                             itemBuilder: (context, index) {
                               final transaction = filteredTransactions[index];
+
+                              final quantity =
+                                  double.tryParse(
+                                    transaction['quantity'].toString(),
+                                  ) ??
+                                  0;
 
                               final color = getTransactionColor(
                                 transaction['transaction_type'],
@@ -211,14 +243,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                                         ),
                                       ),
 
-                                      Text(
-                                        (double.tryParse(
-                                                  transaction['quantity']
-                                                      .toString(),
-                                                ) ??
-                                                0)
-                                            .toStringAsFixed(0),
-                                      ),
+                                      Text(quantity.toStringAsFixed(0)),
                                     ],
                                   ),
                                 ),

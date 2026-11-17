@@ -248,6 +248,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
             TextField(
               controller: reasonController,
+              maxLines: 2,
               decoration: const InputDecoration(labelText: 'Reason'),
               textInputAction: TextInputAction.done,
 
@@ -265,7 +266,16 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
               child: ElevatedButton(
                 onPressed: isSaving ? null : saveAdjustment,
-                child: Text(isSaving ? 'Saving...' : 'Save Adjustment'),
+                child: isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Save Adjustment'),
               ),
             ),
 

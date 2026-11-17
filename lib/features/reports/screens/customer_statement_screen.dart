@@ -19,7 +19,7 @@ class CustomerStatementScreen extends StatefulWidget {
 
 class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
-  Map<String, dynamic>? statement;
+  Map<String, dynamic>? statement;  
   List<dynamic> filteredTransactions = [];
   bool isLoading = true;
 
@@ -45,7 +45,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
         statement = data;
         filteredTransactions = List<dynamic>.from(data['transactions']);
         isLoading = false;
-      });
+      });      
     } catch (e) {
       debugPrint(e.toString());
 
@@ -77,23 +77,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
           })
           .toList();
     });
-  }
-
-  List<double> calculateRunningBalances() {
-    double runningBalance = 0;
-
-    return filteredTransactions.map<double>((item) {
-      final amount = double.tryParse(item['amount'].toString()) ?? 0;
-
-      if (item['type'] == 'purchase') {
-        runningBalance += amount;
-      } else {
-        runningBalance -= amount;
-      }
-
-      return runningBalance;
-    }).toList();
-  }
+  }  
 
   String buildWhatsAppStatement() {
     final buffer = StringBuffer();
@@ -109,9 +93,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     buffer.writeln('');
     buffer.writeln('Current Balance:');
 
-    buffer.writeln(
-      'YER ${currencyFormatter.format(balance)}',
-    );
+    buffer.writeln('YER ${currencyFormatter.format(balance)}');
 
     buffer.writeln('');
     buffer.writeln('Transactions:');
@@ -150,7 +132,6 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     }
 
     final transactions = statement!['transactions'] as List<dynamic>;
-    final runningBalances = calculateRunningBalances();
 
     return Scaffold(
       appBar: AppBar(
@@ -209,9 +190,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
             Card(
               color: AppColors.cardTint(
                 context,
-                balance > 0
-                    ? Colors.red.shade50
-                    : Colors.green.shade50,
+                balance > 0 ? Colors.red.shade50 : Colors.green.shade50,
               ),
 
               child: Padding(
@@ -299,7 +278,11 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                   itemBuilder: (context, index) {
                     final item = filteredTransactions[index];
-                    final runningBalance = runningBalances[index];
+                    
+                    final runningBalance =
+                        double.tryParse(item['running_balance'].toString()) ??
+                        0;
+                        
                     final isPurchase = item['type'] == 'purchase';
 
                     return Card(

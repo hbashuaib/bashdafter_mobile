@@ -16,6 +16,7 @@ class PurchasesScreen extends StatefulWidget {
 
 class _PurchasesScreenState extends State<PurchasesScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> purchases = [];
   List<dynamic> filteredPurchases = [];
   bool isLoading = true;
@@ -56,7 +57,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   }
 
   void searchPurchases(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredPurchases = purchases.where((purchase) {
@@ -91,6 +92,12 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
       (sum, purchase) =>
           sum + (double.tryParse(purchase['total_amount'].toString()) ?? 0),
     );
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -157,11 +164,28 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: TextField(
-                    onChanged: searchPurchases,
+                    controller: searchController,
+                    onChanged: (value) {
+                      searchPurchases(value);
+                      setState(() {});
+                    },
 
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Search by date, notes or amount',
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
+
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+
+                              onPressed: () {
+                                searchController.clear();
+                                searchPurchases('');
+
+                                setState(() {});
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -169,9 +193,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
 
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-
+                  child: Center(
                     child: Text(
                       'Showing ${filteredPurchases.length} of ${purchases.length} purchases',
                       style: const TextStyle(fontWeight: FontWeight.bold),

@@ -23,6 +23,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   List<dynamic> filteredCustomers = [];
   bool isLoading = true;
   String currentFilter = 'active';
+  String searchQuery = '';
   UserProfile? currentUser;
 
   @override
@@ -30,32 +31,26 @@ class _CustomersScreenState extends State<CustomersScreen> {
     super.initState();
     loadCustomers();
     loadCurrentUser();
-  }
+  }  
 
-  void searchCustomers(String value) {
+  void applyFilters() {
+    final query = searchQuery.toLowerCase().trim();
+
     setState(() {
       filteredCustomers = customers.where((customer) {
         final name = customer['name'].toString().toLowerCase();
         final phone = customer['phone'].toString().toLowerCase();
-        final query = value.toLowerCase();
+        final matchesSearch = name.contains(query) || phone.contains(query);
 
-        return name.contains(query) || phone.contains(query);
+        final matchesFilter = currentFilter == 'all'
+            ? true
+            : currentFilter == 'active'
+            ? customer['is_active'] == true
+            : customer['is_active'] == false;
+
+        return matchesSearch && matchesFilter;
       }).toList();
     });
-  }
-
-  void applyFilter() {
-    if (currentFilter == 'all') {
-      filteredCustomers = customers;
-    } else if (currentFilter == 'active') {
-      filteredCustomers = customers
-          .where((customer) => customer['is_active'])
-          .toList();
-    } else {
-      filteredCustomers = customers
-          .where((customer) => !customer['is_active'])
-          .toList();
-    }
   }
 
   Future<void> loadCustomers() async {
@@ -66,9 +61,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
       setState(() {
         customers = data;
-        applyFilter();
         isLoading = false;
       });
+
+      applyFilters();
     } catch (e) {
       debugPrint(e.toString());
 
@@ -152,7 +148,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: TextField(
-                    onChanged: searchCustomers,
+                    onChanged: (value) {
+                      searchQuery = value;
+                      applyFilters();
+                    },
 
                     decoration: const InputDecoration(
                       hintText: 'Search by name or phone',
@@ -176,7 +175,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         onSelected: (_) {
                           setState(() {
                             currentFilter = 'all';
-                            applyFilter();
+                            applyFilters();
                           });
                         },
                       ),
@@ -188,7 +187,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         onSelected: (_) {
                           setState(() {
                             currentFilter = 'active';
-                            applyFilter();
+                            applyFilters();
                           });
                         },
                       ),
@@ -200,7 +199,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         onSelected: (_) {
                           setState(() {
                             currentFilter = 'inactive';
-                            applyFilter();
+                            applyFilters();
                           });
                         },
                       ),

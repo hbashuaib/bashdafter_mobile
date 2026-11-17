@@ -13,6 +13,7 @@ class LowStockProductsScreen extends StatefulWidget {
 }
 
 class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
+  final searchController = TextEditingController();
   List<dynamic> lowStockProducts = [];
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
@@ -54,7 +55,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
   }
 
   void searchProducts(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredProducts = lowStockProducts.where((product) {
@@ -67,6 +68,12 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
         return name.contains(query) || category.contains(query);
       }).toList();
     });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -112,11 +119,28 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: TextField(
-                    onChanged: searchProducts,
+                    controller: searchController,
 
-                    decoration: const InputDecoration(
+                    onChanged: (value) {
+                      searchProducts(value);
+                      setState(() {});
+                    },
+
+                    decoration: InputDecoration(
                       hintText: 'Search product',
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
+
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+
+                              onPressed: () {
+                                searchController.clear();
+                                searchProducts('');
+                                setState(() {});
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -135,9 +159,9 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                 Expanded(
                   child: filteredProducts.isEmpty
                       ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: const [
                             SizedBox(height: 150),
-
                             Center(child: Text('No low stock products')),
                           ],
                         )

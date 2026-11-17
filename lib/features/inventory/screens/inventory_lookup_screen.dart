@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../products/services/barcode_lookup_service.dart';
@@ -14,8 +15,8 @@ class InventoryLookupScreen extends StatefulWidget {
 }
 
 class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
+  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? product;
-
   bool isLoading = false;
 
   Future<void> scanBarcode() async {
@@ -53,6 +54,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
       }
 
       setState(() {
+        product = null;
         isLoading = false;
       });
 
@@ -72,6 +74,10 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
         ? 0.0
         : double.tryParse(product!['minimum_stock'].toString()) ?? 0;
 
+    final sellingPrice = product == null
+        ? 0.0
+        : double.tryParse(product!['selling_price'].toString()) ?? 0;
+
     final isLowStock = currentStock <= minimumStock;
 
     return Scaffold(
@@ -87,7 +93,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
             ElevatedButton.icon(
               onPressed: isLoading ? null : scanBarcode,
               icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Scan Product'),
+              label: Text(isLoading ? 'Searching...' : 'Scan Product'),
             ),
 
             const SizedBox(height: 20),
@@ -116,7 +122,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                       Text('Barcode: ${product!['barcode'] ?? '-'}'),
                       Text('Stock: ${product!['current_stock']}'),
                       Text('Minimum Stock: ${product!['minimum_stock']}'),
-                      Text('Selling Price: ${product!['selling_price']}'),
+                      Text(
+                        'Selling Price: YER ${currencyFormatter.format(sellingPrice)}',
+                      ),
 
                       const SizedBox(height: 12),
 

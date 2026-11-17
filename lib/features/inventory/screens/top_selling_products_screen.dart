@@ -11,6 +11,7 @@ class TopSellingProductsScreen extends StatefulWidget {
 }
 
 class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
+  final searchController = TextEditingController();
   List<dynamic> products = [];
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
@@ -47,16 +48,16 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
     }
   }
 
-  Color getRankColor(int index) {
-    if (index == 0) {
+  Color getRankColor(int rank) {
+    if (rank == 1) {
       return Colors.amber;
     }
 
-    if (index == 1) {
+    if (rank == 2) {
       return Colors.grey;
     }
 
-    if (index == 2) {
+    if (rank == 3) {
       return Colors.orange;
     }
 
@@ -64,7 +65,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
   }
 
   void searchProducts(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredProducts = products.where((product) {
@@ -73,6 +74,12 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
         return name.contains(query);
       }).toList();
     });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -135,12 +142,28 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                   padding: const EdgeInsets.all(12),
 
                   child: TextField(
-                    onChanged: searchProducts,
+                    controller: searchController,
 
-                    decoration: const InputDecoration(
+                    onChanged: (value) {
+                      searchProducts(value);
+                      setState(() {});
+                    },
+
+                    decoration: InputDecoration(
                       hintText: 'Search product',
+                      prefixIcon: const Icon(Icons.search),
 
-                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+
+                              onPressed: () {
+                                searchController.clear();
+                                searchProducts('');
+                                setState(() {});
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -160,9 +183,9 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                 Expanded(
                   child: filteredProducts.isEmpty
                       ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: const [
                             SizedBox(height: 150),
-
                             Center(child: Text('No sales found')),
                           ],
                         )
@@ -177,6 +200,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                             itemBuilder: (context, index) {
                               final product = filteredProducts[index];
+                              final rank = product['rank'] ?? 0;
 
                               final currentStock =
                                   double.tryParse(
@@ -198,10 +222,10 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: getRankColor(index),
+                                    backgroundColor: getRankColor(rank),
 
                                     child: Text(
-                                      '#${index + 1}',
+                                      '#$rank',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

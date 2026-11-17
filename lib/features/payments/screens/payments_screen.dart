@@ -16,6 +16,7 @@ class PaymentsScreen extends StatefulWidget {
 
 class _PaymentsScreenState extends State<PaymentsScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
+  final searchController = TextEditingController();
   List<dynamic> payments = [];
   List<dynamic> filteredPayments = [];
   bool isLoading = true;
@@ -56,7 +57,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   }
 
   void searchPayments(String value) {
-    final query = value.toLowerCase();
+    final query = value.toLowerCase().trim();
 
     setState(() {
       filteredPayments = payments.where((payment) {
@@ -91,6 +92,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
       (sum, payment) =>
           sum + (double.tryParse(payment['amount'].toString()) ?? 0),
     );
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -151,10 +158,29 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: TextField(
-                    onChanged: searchPayments,
-                    decoration: const InputDecoration(
+                    controller: searchController,
+
+                    onChanged: (value) {
+                      searchPayments(value);
+
+                      setState(() {});
+                    },
+
+                    decoration: InputDecoration(
                       hintText: 'Search by date, notes or amount',
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
+
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+
+                              onPressed: () {
+                                searchController.clear();
+                                searchPayments('');
+                                setState(() {});
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -172,6 +198,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 Expanded(
                   child: filteredPayments.isEmpty
                       ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: const [
                             SizedBox(height: 150),
                             Center(child: Text('No payments found')),
@@ -193,8 +220,8 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
                               return Card(
                                 child: ListTile(
-                                  onTap: () {
-                                    Navigator.push(
+                                  onTap: () async {
+                                    await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => PaymentDetailScreen(
@@ -202,6 +229,10 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                         ),
                                       ),
                                     );
+
+                                    if (mounted) {
+                                      loadPayments();
+                                    }
                                   },
 
                                   title: Text(
