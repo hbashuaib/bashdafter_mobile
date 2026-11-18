@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../../core/navigation/main_navigation_screen.dart';
 import '../models/user_profile.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,14 +23,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> login() async {
     if (usernameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Username is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.usernameRequired)));
 
       return;
     }
 
     if (passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Password is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.passwordRequired)));
 
       return;
     }
@@ -62,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid username or password')),
+        SnackBar(content: Text(context.l10n.invalidUsernameOrPassword)),
       );
     } finally {
       if (mounted) {
@@ -94,23 +95,30 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               Image.asset('assets/images/bashsoft_logo.png', height: 120),
               const SizedBox(height: 40),
-              const Text(
-                "Welcome Back",
+              Text(
+                context.l10n.welcomeBack,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 10),
-              const Text("Sign in to continue", textAlign: TextAlign.center),
+              Text(context.l10n.signInToContinue, textAlign: TextAlign.center),
               const SizedBox(height: 40),
 
               TextField(
                 controller: usernameController,
+                textDirection: context.l10n.localeName == 'ar'
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+
                 textInputAction: TextInputAction.next,
                 autocorrect: false,
                 enableSuggestions: false,
                 decoration: InputDecoration(
-                  labelText: "Username",
+                  labelText: context.l10n.username,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -119,6 +127,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextField(
                 controller: passwordController,
+                textDirection: context.l10n.localeName == 'ar'
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+
                 obscureText: obscurePassword,
                 textInputAction: TextInputAction.done,
                 autocorrect: false,
@@ -131,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
 
                 decoration: InputDecoration(
-                  labelText: "Password",
+                  labelText: context.l10n.password,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -161,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text("Login"),
+                    : Text(context.l10n.login),
               ),
             ],
           ),

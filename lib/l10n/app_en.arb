@@ -1,0 +1,162 @@
+{
+  "@@locale": "en",
+
+  "appName": "BashDafter",
+
+  "products": "Products",
+  "customers": "Customers",
+  "payments": "Payments",
+  "purchases": "Purchases",
+  "reports": "Reports",
+  "inventory": "Inventory",
+  "settings": "Settings",
+
+  "search": "Search",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+
+  "loading": "Loading...",
+  "noDataFound": "No data found",
+
+  "profileNotFound": "Profile not found",
+
+  "userManagement": "User Management",
+  "manageSystemUsers": "Manage system users",
+
+  "productCategories": "Product Categories",
+  "manageProductCategories": "Manage product categories",
+
+  "productUnits": "Product Units",
+  "manageProductUnits": "Manage product units",
+
+  "manageApplicationPreferences":
+      "Manage application preferences and information",
+
+  "shopProfile": "Shop Profile",
+  "manageShopInformation": "Manage shop information",
+
+  "profile": "Profile",
+  "userAndApplicationDetails":
+      "User and application details",
+
+  "language": "Language",
+  "changeApplicationLanguage":
+      "Change application language",
+
+  "darkMode": "Dark Mode",
+  "darkModeEnabled": "Dark mode enabled",
+  "lightModeEnabled": "Light mode enabled",
+
+  "about": "About",
+  "applicationInformation":
+      "Application information",
+
+  "logout": "Logout",
+  "signOut":
+      "Sign out of the application",
+
+  "areYouSureLogout":
+      "Are you sure you want to logout?",
+
+"welcomeBack": "Welcome Back",
+"signInToContinue": "Sign in to continue",
+
+"username": "Username",
+"password": "Password",
+
+"usernameRequired": "Username is required",
+"passwordRequired": "Password is required",
+
+"invalidUsernameOrPassword": "Invalid username or password",
+
+"login": "Login",
+
+"dashboard": "Dashboard",
+
+"failedToLoadDashboard": "Failed to load dashboard",
+
+"noDashboardDataAvailable": "No dashboard data available",
+
+"businessDashboard": "Business Dashboard",
+
+"businessDashboardDescription":
+    "Monitor customers, purchases, payments and inventory",
+
+"customersCount": "Customers",
+
+"balance": "Balance",
+
+"businessOverview": "Business Overview",
+
+"totalPurchases": "Total Purchases",
+
+"totalPayments": "Total Payments",
+
+"quickActions": "Quick Actions",
+
+"inventoryManagement": "Inventory",
+
+"inventoryManagementDescription":
+    "Stock adjustments and inventory history",
+
+"voiceEntry": "Voice Entry",
+
+"voiceEntryDescription":
+    "Record customer transactions",
+
+"loadingProducts": "Loading products...",
+"failedToLoadProducts": "Failed to load products",
+
+"total": "Total",
+"active": "Active",
+"inactive": "Inactive",
+
+"searchProducts": "Search by name, category, or barcode",
+
+"all": "All",
+
+"showingProducts":
+    "Showing {filtered} of {total} products",
+
+"productNotFound": "Product not found",
+
+"noProductsFound": "No products found",
+
+"barcode": "Barcode",
+
+"showing": "Showing",
+"outOf": "of",
+"productsLabel": "products",
+
+"loadingCustomers": "Loading customers...",
+"failedToLoadCustomers": "Failed to load customers",
+
+"searchCustomers": "Search by name or phone",
+
+"showingCustomers": "customers",
+
+"noCustomersFound": "No customers found",
+
+"reportsCenter": "Reports Center",
+
+"customerAndFinancialReports":
+    "Customer and financial reports",
+
+"customerSummary": "Customer Summary",
+
+"customerBalancesAndAccounts":
+    "Customer balances and accounts",
+
+"topDebtors": "Top Debtors",
+
+"customersWithHighestBalances":
+    "Customers with highest balances",
+
+"recentTransactions":
+    "Recent Transactions",
+
+"latestPurchasesAndPayments":
+    "Latest purchases and payments"
+}

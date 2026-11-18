@@ -5,6 +5,7 @@ import 'top_debtors_screen.dart';
 import 'recent_transactions_screen.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
@@ -12,7 +13,7 @@ class ReportsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Reports')),
+      appBar: AppBar(title: Text(context.l10n.reports)),
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -21,19 +22,19 @@ class ReportsScreen extends StatelessWidget {
           Card(
             color: AppColors.cardTint(context, Colors.blue.shade50),
 
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(16),
 
               child: Column(
                 children: [
                   Text(
-                    'Reports Center',
+                    context.l10n.reportsCenter,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
                   SizedBox(height: 8),
 
-                  Text('Customer and financial reports'),
+                  Text(context.l10n.customerAndFinancialReports),
                 ],
               ),
             ),
@@ -43,9 +44,9 @@ class ReportsScreen extends StatelessWidget {
             elevation: 1,
             child: ListTile(
               leading: const Icon(Icons.people, color: Colors.blue),
-              title: const Text('Customer Summary'),
+              title: Text(context.l10n.customerSummary),
               trailing: const Icon(Icons.arrow_forward_ios),
-              subtitle: const Text('Customer balances and accounts'),
+              subtitle: Text(context.l10n.customerBalancesAndAccounts),
 
               onTap: () {
                 Navigator.push(
@@ -66,9 +67,9 @@ class ReportsScreen extends StatelessWidget {
                 Icons.account_balance_wallet,
                 color: Colors.orange,
               ),
-              title: const Text('Top Debtors'),
+              title: Text(context.l10n.topDebtors),
               trailing: const Icon(Icons.arrow_forward_ios),
-              subtitle: const Text('Customers with highest balances'),
+              subtitle: Text(context.l10n.customersWithHighestBalances),
 
               onTap: () {
                 Navigator.push(
@@ -84,9 +85,9 @@ class ReportsScreen extends StatelessWidget {
             elevation: 1,
             child: ListTile(
               leading: const Icon(Icons.history, color: Colors.green),
-              title: const Text('Recent Transactions'),
+              title: Text(context.l10n.recentTransactions),
               trailing: const Icon(Icons.arrow_forward_ios),
-              subtitle: const Text('Latest purchases and payments'),
+              subtitle: Text(context.l10n.latestPurchasesAndPayments),
 
               onTap: () {
                 Navigator.push(

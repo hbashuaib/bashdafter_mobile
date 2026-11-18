@@ -1,0 +1,182 @@
+{
+  "@@locale": "ar",
+
+  "appName": "باش دفتر",
+
+  "products": "المنتجات",
+  "customers": "العملاء",
+  "payments": "المدفوعات",
+  "purchases": "المشتريات",
+  "reports": "التقارير",
+  "inventory": "المخزون",
+  "settings": "الإعدادات",
+
+  "search": "بحث",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "edit": "تعديل",
+
+  "loading": "جاري التحميل...",
+  "noDataFound": "لا توجد بيانات",
+
+  "profileNotFound": "لم يتم العثور على الملف الشخصي",
+
+  "userManagement": "إدارة المستخدمين",
+  "manageSystemUsers": "إدارة مستخدمي النظام",
+
+  "productCategories": "فئات المنتجات",
+  "manageProductCategories": "إدارة فئات المنتجات",
+
+  "productUnits": "وحدات المنتجات",
+  "manageProductUnits": "إدارة وحدات المنتجات",
+
+  "manageApplicationPreferences":
+      "إدارة تفضيلات ومعلومات التطبيق",
+
+  "shopProfile": "بيانات المتجر",
+  "manageShopInformation":
+      "إدارة معلومات المتجر",
+
+  "profile": "الملف الشخصي",
+  "userAndApplicationDetails":
+      "بيانات المستخدم والتطبيق",
+
+  "language": "اللغة",
+  "changeApplicationLanguage":
+      "تغيير لغة التطبيق",
+
+  "darkMode": "الوضع الداكن",
+  "darkModeEnabled":
+      "تم تفعيل الوضع الداكن",
+
+  "lightModeEnabled":
+      "تم تفعيل الوضع الفاتح",
+
+  "about": "حول التطبيق",
+  "applicationInformation":
+      "معلومات التطبيق",
+
+  "logout": "تسجيل الخروج",
+
+  "signOut":
+      "تسجيل الخروج من التطبيق",
+
+  "areYouSureLogout":
+      "هل أنت متأكد من تسجيل الخروج؟",
+
+"welcomeBack": "مرحباً بعودتك",
+"signInToContinue": "سجل الدخول للمتابعة",
+
+"username": "اسم المستخدم",
+"password": "كلمة المرور",
+
+"usernameRequired": "اسم المستخدم مطلوب",
+"passwordRequired": "كلمة المرور مطلوبة",
+
+"invalidUsernameOrPassword": "اسم المستخدم أو كلمة المرور غير صحيحة",
+
+"login": "تسجيل الدخول",
+
+"dashboard": "الرئيسية",
+
+"failedToLoadDashboard":
+    "فشل في تحميل لوحة التحكم",
+
+"noDashboardDataAvailable":
+    "لا توجد بيانات متاحة",
+
+"businessDashboard":
+    "لوحة الأعمال",
+
+"businessDashboardDescription":
+    "متابعة العملاء والمشتريات والمدفوعات والمخزون",
+
+"customersCount": "العملاء",
+
+"balance": "الرصيد",
+
+"businessOverview":
+    "نظرة عامة على الأعمال",
+
+"totalPurchases":
+    "إجمالي المشتريات",
+
+"totalPayments":
+    "إجمالي المدفوعات",
+
+"quickActions":
+    "إجراءات سريعة",
+
+"inventoryManagement":
+    "إدارة المخزون",
+
+"inventoryManagementDescription":
+    "تعديلات المخزون وسجل المخزون",
+
+"voiceEntry":
+    "الإدخال الصوتي",
+
+"voiceEntryDescription":
+    "تسجيل معاملات العملاء",
+
+"loadingProducts": "جاري تحميل المنتجات...",
+"failedToLoadProducts": "فشل في تحميل المنتجات",
+
+"total": "الإجمالي",
+"active": "نشط",
+"inactive": "غير نشط",
+
+"searchProducts":
+    "ابحث بالاسم أو الفئة أو الباركود",
+
+"all": "الكل",
+
+"showingProducts":
+    "عرض {filtered} من أصل {total} منتج",
+
+"productNotFound":
+    "لم يتم العثور على المنتج",
+
+"noProductsFound":
+    "لا توجد منتجات",
+
+"barcode": "الباركود",
+
+"showing": "عرض",
+"outOf": "من أصل",
+"productsLabel": "منتج",
+
+"loadingCustomers": "جاري تحميل العملاء...",
+"failedToLoadCustomers": "فشل في تحميل العملاء",
+
+"searchCustomers": "ابحث بالاسم أو رقم الهاتف",
+
+"showingCustomers": "عميل",
+
+"noCustomersFound": "لا يوجد عملاء",
+
+"reportsCenter": "مركز التقارير",
+
+"customerAndFinancialReports":
+    "تقارير العملاء والتقارير المالية",
+
+"customerSummary":
+    "ملخص العملاء",
+
+"customerBalancesAndAccounts":
+    "أرصدة وحسابات العملاء",
+
+"topDebtors":
+    "أعلى المديونين",
+
+"customersWithHighestBalances":
+    "العملاء ذوو أعلى أرصدة",
+
+"recentTransactions":
+    "أحدث المعاملات",
+
+"latestPurchasesAndPayments":
+    "أحدث المشتريات والمدفوعات"
+
+}

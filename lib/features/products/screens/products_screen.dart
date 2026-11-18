@@ -7,6 +7,7 @@ import '../../auth/models/user_profile.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
@@ -26,7 +27,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   List<dynamic> products = [];
   List<dynamic> filteredProducts = [];
   bool isLoading = true;
-  String activeFilter = 'All';
+  String activeFilter = 'all';
   String searchQuery = '';
   UserProfile? currentUser;
 
@@ -66,9 +67,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load products')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadProducts)),
+      );
 
       setState(() {
         isLoading = false;
@@ -102,9 +103,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
             category.contains(query) ||
             barcode.contains(query);
 
-        final matchesFilter = activeFilter == 'All'
+        final matchesFilter = activeFilter == 'all'
             ? true
-            : activeFilter == 'Active'
+            : activeFilter == 'active'
             ? product['is_active'] == true
             : product['is_active'] == false;
 
@@ -116,12 +117,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading products...');
+      return AppLoadingScaffold(message: context.l10n.loadingProducts);
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products'),
+        title: Text(context.l10n.products),
 
         actions: [
           if (currentUser != null &&
@@ -179,7 +180,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   children: [
                     Column(
                       children: [
-                        const Text('Total'),
+                        Text(context.l10n.total),
                         Text(
                           totalProducts.toString(),
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -189,7 +190,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                     Column(
                       children: [
-                        const Text('Active'),
+                        Text(context.l10n.active),
                         Text(
                           activeProducts.toString(),
                           style: const TextStyle(
@@ -202,7 +203,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                     Column(
                       children: [
-                        const Text('Inactive'),
+                        Text(context.l10n.inactive),
                         Text(
                           inactiveProducts.toString(),
                           style: const TextStyle(
@@ -229,7 +230,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search by name, category, or barcode',
+                hintText: context.l10n.searchProducts,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: IconButton(
@@ -237,6 +238,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
+                    final productNotFoundText = context.l10n.productNotFound;
 
                     final barcode = await Navigator.push(
                       context,
@@ -256,7 +258,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                     if (filteredProducts.isEmpty) {
                       messenger.showSnackBar(
-                        const SnackBar(content: Text('Product not found')),
+                        SnackBar(content: Text(productNotFoundText)),
                       );
                     }
                   },
@@ -273,31 +275,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
               children: [
                 FilterChip(
-                  label: const Text('All'),
-                  selected: activeFilter == 'All',
+                  label: Text(context.l10n.all),
+                  selected: activeFilter == 'all',
 
                   onSelected: (_) {
-                    activeFilter = 'All';
+                    activeFilter = 'all';
                     applyFilters();
                   },
                 ),
 
                 FilterChip(
-                  label: const Text('Active'),
-                  selected: activeFilter == 'Active',
+                  label: Text(context.l10n.active),
+                  selected: activeFilter == 'active',
 
                   onSelected: (_) {
-                    activeFilter = 'Active';
+                    activeFilter = 'active';
                     applyFilters();
                   },
                 ),
 
                 FilterChip(
-                  label: const Text('Inactive'),
-                  selected: activeFilter == 'Inactive',
+                  label: Text(context.l10n.inactive),
+                  selected: activeFilter == 'inactive',
 
                   onSelected: (_) {
-                    activeFilter = 'Inactive';
+                    activeFilter = 'inactive';
                     applyFilters();
                   },
                 ),
@@ -310,7 +312,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredProducts.length} of ${products.length} products',
+                '${context.l10n.showing} '
+                '${filteredProducts.length} '
+                '${context.l10n.outOf} '
+                '${products.length} '
+                '${context.l10n.productsLabel}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -323,7 +329,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
               child: filteredProducts.isEmpty
                   ? AppRefreshableEmptyState(
-                      message: 'No products found',
+                      message: context.l10n.noProductsFound,
                       icon: Icons.inventory_2_outlined,
                       onRefresh: loadProducts,
                     )
@@ -346,7 +352,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               );
 
                               if (result == true) {
-                                activeFilter = 'All';
+                                activeFilter = 'all';
                                 await loadProducts();
                               }
                             },
@@ -366,7 +372,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     .trim()
                                     .isNotEmpty)
                                   Text(
-                                    'Barcode: ${product['barcode']}',
+                                    '${context.l10n.barcode}: ${product['barcode']}',
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme

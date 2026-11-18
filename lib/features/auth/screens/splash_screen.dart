@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/storage/token_storage.dart';
-
 import '../../../core/navigation/main_navigation_screen.dart';
+import '../../../core/localization/localization_extension.dart';
+
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -61,9 +62,9 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 20),
             const CircularProgressIndicator(),
             const SizedBox(height: 20),
-            const Text(
-              'Loading BashDafter...',
-              style: TextStyle(fontWeight: FontWeight.w500),
+            Text(
+              context.l10n.loading,
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ],
         ),

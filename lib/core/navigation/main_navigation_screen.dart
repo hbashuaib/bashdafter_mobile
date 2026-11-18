@@ -7,6 +7,7 @@ import '../../features/settings/screens/settings_screen.dart';
 import '../../features/products/screens/products_screen.dart';
 import '../../features/auth/models/user_profile.dart';
 import '../storage/token_storage.dart';
+import '../localization/localization_extension.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -44,7 +45,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     if (profile == null) {
-      return const Scaffold(body: Center(child: Text('Profile not found')));
+      return Scaffold(body: Center(child: Text(context.l10n.profileNotFound)));
     }
 
     final pages = <Widget>[
@@ -79,30 +80,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         },
 
         items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.dashboard),
+            label: context.l10n.dashboard,
           ),
 
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Customers',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.people),
+            label: context.l10n.customers,
           ),
 
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2),
-            label: 'Products',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.inventory_2),
+            label: context.l10n.products,
           ),
 
           if (profile!.isOwner || profile!.isAdmin || profile!.isManager)
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
-              label: 'Reports',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.bar_chart),
+              label: context.l10n.reports,
             ),
 
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.settings),
+            label: context.l10n.settings,
           ),
         ],
       ),

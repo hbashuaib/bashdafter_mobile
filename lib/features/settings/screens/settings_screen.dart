@@ -9,10 +9,12 @@ import '../../users/screens/users_screen.dart';
 import '../../products/screens/categories_screen.dart';
 import '../../products/screens/units_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'about_screen.dart';
 import 'profile_screen.dart';
 import 'shop_profile_screen.dart';
+import 'language_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -49,11 +51,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     if (profile == null) {
-      return const Scaffold(body: Center(child: Text('Profile not found')));
+      return Scaffold(body: Center(child: Text(context.l10n.profileNotFound)));
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(context.l10n.settings)),
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
@@ -65,8 +67,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icons.manage_accounts,
                   color: Colors.orange,
                 ),
-                title: const Text('User Management'),
-                subtitle: const Text('Manage system users'),
+                title: Text(context.l10n.userManagement),
+                subtitle: Text(context.l10n.manageSystemUsers),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -82,9 +84,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.category, color: Colors.purple),
                 trailing: const Icon(Icons.arrow_forward_ios),
 
-                title: const Text('Product Categories'),
+                title: Text(context.l10n.productCategories),
 
-                subtitle: const Text('Manage product categories'),
+                subtitle: Text(context.l10n.manageProductCategories),
 
                 onTap: () {
                   Navigator.push(
@@ -101,9 +103,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.straighten, color: Colors.teal),
                 trailing: const Icon(Icons.arrow_forward_ios),
 
-                title: const Text('Product Units'),
+                title: Text(context.l10n.productUnits),
 
-                subtitle: const Text('Manage product units'),
+                subtitle: Text(context.l10n.manageProductUnits),
 
                 onTap: () {
                   Navigator.push(
@@ -117,20 +119,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Card(
             color: AppColors.cardTint(context, Colors.blue.shade50),
 
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(16),
 
               child: Column(
                 children: [
                   Text(
-                    'Settings',
+                    context.l10n.settings,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
                   SizedBox(height: 6),
 
                   Text(
-                    'Manage application preferences and information',
+                    context.l10n.manageApplicationPreferences,
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -142,8 +144,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ListTile(
               leading: const Icon(Icons.store, color: Colors.blue),
               trailing: const Icon(Icons.arrow_forward_ios),
-              title: const Text('Shop Profile'),
-              subtitle: const Text('Manage shop information'),
+              title: Text(context.l10n.shopProfile),
+              subtitle: Text(context.l10n.manageShopInformation),
 
               onTap: () {
                 Navigator.push(
@@ -158,8 +160,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ListTile(
               leading: const Icon(Icons.person, color: Colors.green),
               trailing: const Icon(Icons.arrow_forward_ios),
-              title: const Text('Profile'),
-              subtitle: const Text('User and application details'),
+              title: Text(context.l10n.profile),
+              subtitle: Text(context.l10n.userAndApplicationDetails),
 
               onTap: () {
                 Navigator.push(
@@ -170,17 +172,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.language, color: Colors.indigo),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              title: Text(context.l10n.language),
+              subtitle: Text(context.l10n.changeApplicationLanguage),
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LanguageScreen()),
+                );
+              },
+            ),
+          ),
+
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return Card(
                 child: SwitchListTile(
                   secondary: const Icon(Icons.dark_mode, color: Colors.purple),
-                  title: const Text('Dark Mode'),
+                  title: Text(context.l10n.darkMode),
                   value: themeProvider.themeMode == ThemeMode.dark,
                   subtitle: Text(
                     themeProvider.themeMode == ThemeMode.dark
-                        ? 'Dark mode enabled'
-                        : 'Light mode enabled',
+                        ? context.l10n.darkModeEnabled
+                        : context.l10n.lightModeEnabled,
                   ),
 
                   onChanged: (value) {
@@ -195,8 +213,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ListTile(
               leading: const Icon(Icons.info, color: Colors.teal),
               trailing: const Icon(Icons.arrow_forward_ios),
-              title: const Text('About'),
-              subtitle: const Text('Application information'),
+              title: Text(context.l10n.about),
+              subtitle: Text(context.l10n.applicationInformation),
 
               onTap: () {
                 Navigator.push(
@@ -211,8 +229,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout'),
-              subtitle: const Text('Sign out of the application'),
+              title: Text(context.l10n.logout),
+              subtitle: Text(context.l10n.signOut),
 
               onTap: () async {
                 final confirmed = await showDialog<bool>(
@@ -220,9 +238,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   builder: (dialogContext) {
                     return AlertDialog(
-                      title: const Text('Logout'),
+                      title: Text(context.l10n.logout),
 
-                      content: const Text('Are you sure you want to logout?'),
+                      content: Text(context.l10n.areYouSureLogout),
 
                       actions: [
                         TextButton(

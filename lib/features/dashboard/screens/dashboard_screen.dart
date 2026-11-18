@@ -7,6 +7,7 @@ import '../../auth/screens/login_screen.dart';
 import '../../inventory/screens/inventory_menu_screen.dart';
 import '../../voice/screens/voice_recorder_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -45,9 +46,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load dashboard')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadDashboard)),
+      );
 
       setState(() {
         isLoading = false;
@@ -65,7 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(context.l10n.dashboard),
 
         actions: [
           IconButton(
@@ -89,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : dashboardData == null
-          ? const Center(child: Text('No dashboard data available'))
+          ? Center(child: Text(context.l10n.noDashboardDataAvailable))
           : RefreshIndicator(
               onRefresh: loadDashboard,
 
@@ -102,13 +103,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Card(
                     color: AppColors.cardTint(context, Colors.indigo.shade50),
 
-                    child: const Padding(
-                      padding: EdgeInsets.all(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
 
                       child: Row(
                         children: [
                           Icon(Icons.dashboard, size: 40, color: Colors.indigo),
-
                           SizedBox(width: 16),
 
                           Expanded(
@@ -117,7 +117,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                               children: [
                                 Text(
-                                  'Business Dashboard',
+                                  context.l10n.businessDashboard,
 
                                   style: TextStyle(
                                     fontSize: 18,
@@ -127,9 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                                 SizedBox(height: 4),
 
-                                Text(
-                                  'Monitor customers, purchases, payments and inventory',
-                                ),
+                                Text(context.l10n.businessDashboardDescription),
                               ],
                             ),
                           ),
@@ -148,7 +146,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         children: [
                           Column(
                             children: [
-                              const Text('Customers'),
+                              Text(context.l10n.customersCount),
 
                               Text(
                                 dashboardData!['customers'].toString(),
@@ -163,7 +161,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           Column(
                             children: [
-                              const Text('Balance'),
+                              Text(context.l10n.balance),
 
                               Text(
                                 'YER ${currencyFormatter.format(totalBalance)}',
@@ -180,14 +178,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 8, bottom: 8, left: 4),
 
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
 
                       child: Text(
-                        'Business Overview',
+                        context.l10n.businessOverview,
 
                         style: TextStyle(
                           fontSize: 18,
@@ -201,7 +199,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: AppColors.cardTint(context, Colors.blue.shade50),
                     child: ListTile(
                       leading: const Icon(Icons.people, color: Colors.blue),
-                      title: const Text('Customers'),
+                      title: Text(context.l10n.customersCount),
                       trailing: Text(
                         dashboardData!['customers'].toString(),
 
@@ -217,7 +215,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Icons.shopping_cart,
                         color: Colors.orange,
                       ),
-                      title: const Text('Total Purchases'),
+                      title: Text(context.l10n.totalPurchases),
                       trailing: Text(
                         'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_purchases'].toString()) ?? 0)}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -229,7 +227,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: AppColors.cardTint(context, Colors.green.shade50),
                     child: ListTile(
                       leading: const Icon(Icons.payments, color: Colors.green),
-                      title: const Text('Total Payments'),
+                      title: Text(context.l10n.totalPayments),
                       trailing: Text(
                         'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_payments'].toString()) ?? 0)}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -248,7 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Icons.account_balance_wallet,
                         color: Colors.purple,
                       ),
-                      title: const Text('Balance'),
+                      title: Text(context.l10n.balance),
                       trailing: Text(
                         'YER ${currencyFormatter.format(totalBalance)}',
 
@@ -260,14 +258,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 16, bottom: 8, left: 4),
 
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
 
                       child: Text(
-                        'Quick Actions',
+                        context.l10n.quickActions,
 
                         style: TextStyle(
                           fontSize: 18,
@@ -280,10 +278,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.inventory, color: Colors.blue),
-                      title: const Text('Inventory'),
+                      title: Text(context.l10n.inventoryManagement),
 
-                      subtitle: const Text(
-                        'Stock adjustments and inventory history',
+                      subtitle: Text(
+                        context.l10n.inventoryManagementDescription,
                       ),
 
                       trailing: const Icon(Icons.arrow_forward_ios),
@@ -304,8 +302,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     child: ListTile(
                       leading: const Icon(Icons.mic, color: Colors.red),
-                      title: const Text('Voice Entry'),
-                      subtitle: const Text('Record customer transactions'),
+                      title: Text(context.l10n.voiceEntry),
+                      subtitle: Text(context.l10n.voiceEntryDescription),
                       trailing: const Icon(Icons.arrow_forward_ios),
 
                       onTap: () {

@@ -7,6 +7,7 @@ import '../../auth/models/user_profile.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'customer_detail_screen.dart';
 import 'add_customer_screen.dart';
@@ -73,9 +74,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load customers')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadCustomers)),
+      );
 
       setState(() {
         isLoading = false;
@@ -102,7 +103,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading customers...');
+      return AppLoadingScaffold(message: context.l10n.loadingCustomers);
     }
 
     return Scaffold(
@@ -123,7 +124,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
           : null,
 
       appBar: AppBar(
-        title: const Text('Customers'),
+        title: Text(context.l10n.customers),
 
         actions: [
           if (currentUser != null &&
@@ -151,7 +152,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredCustomers.length} of ${customers.length} customers',
+                '${context.l10n.showing} '
+                '${filteredCustomers.length} '
+                '${context.l10n.outOf} '
+                '${customers.length} '
+                '${context.l10n.showingCustomers}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -171,7 +176,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search by name or phone',
+                hintText: context.l10n.searchCustomers,
 
                 prefixIcon: const Icon(Icons.search),
 
@@ -199,7 +204,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
               children: [
                 ChoiceChip(
-                  label: const Text('All'),
+                  label: Text(context.l10n.all),
                   selected: currentFilter == 'all',
 
                   onSelected: (_) {
@@ -209,7 +214,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 ),
 
                 ChoiceChip(
-                  label: const Text('Active'),
+                  label: Text(context.l10n.active),
                   selected: currentFilter == 'active',
 
                   onSelected: (_) {
@@ -219,7 +224,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 ),
 
                 ChoiceChip(
-                  label: const Text('Inactive'),
+                  label: Text(context.l10n.inactive),
                   selected: currentFilter == 'inactive',
 
                   onSelected: (_) {
@@ -237,7 +242,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
               child: filteredCustomers.isEmpty
                   ? AppRefreshableEmptyState(
-                      message: 'No customers found',
+                      message: context.l10n.noCustomersFound,
                       icon: Icons.people_outline,
                       onRefresh: loadCustomers,
                     )
