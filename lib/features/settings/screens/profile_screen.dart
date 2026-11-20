@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../services/profile_service.dart';
 import '../services/profile_image_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'change_password_screen.dart';
 
@@ -44,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load profile')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToLoadProfile)));
 
       setState(() {
         isLoading = false;
@@ -70,8 +71,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Profile image updated')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.profileImageUpdated)));
     } catch (e) {
       debugPrint('IMAGE UPLOAD ERROR: $e');
 
@@ -79,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to upload image')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToUploadImage)));
     } finally {
       if (mounted) {
         setState(() {
@@ -97,9 +99,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (profile == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
-
-        body: const Center(child: Text('No profile found')),
+        appBar: AppBar(title: Text(context.l10n.profile)),
+        body: Center(child: Text(context.l10n.noProfileFound)),
       );
     }
 
@@ -109,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final fullName = '$firstName $lastName'.trim();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: Text(context.l10n.profile)),
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -118,20 +119,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             color: AppColors.cardTint(context, Colors.blue.shade50),
 
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(16),
 
               child: Column(
                 children: [
                   Text(
-                    'Profile Information',
-
+                    context.l10n.profileInformation,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
                   SizedBox(height: 6),
 
-                  Text('Application and user details'),
+                  Text(context.l10n.profileInformationDescription),
                 ],
               ),
             ),
@@ -181,9 +181,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onPressed: () {
                               if (kIsWeb) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                      'Profile image upload is currently available in Android/Desktop versions.',
+                                      context
+                                          .l10n
+                                          .profileImageUploadUnsupported,
                                     ),
                                   ),
                                 );
@@ -212,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 6),
 
           Text(
-            profile!['role']?.toString() ?? 'User',
+            profile!['role']?.toString() ?? context.l10n.user,
             textAlign: TextAlign.center,
 
             style: TextStyle(color: Colors.grey.shade600),
@@ -223,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.person, color: Colors.blue),
-              title: const Text('User'),
+              title: Text(context.l10n.user),
               subtitle: Text(
                 fullName.isEmpty ? profile!['username'] : fullName,
               ),
@@ -233,17 +235,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.store, color: Colors.green),
-              title: const Text('Application'),
-              subtitle: const Text('BashDafter'),
+              title: Text(context.l10n.application),
+              subtitle: Text(context.l10n.applicationName),
             ),
           ),
 
           Card(
             child: ListTile(
               leading: const Icon(Icons.verified_user, color: Colors.orange),
-              title: const Text('Role'),
+              title: Text(context.l10n.role),
               subtitle: Text(
-                profile!['role']?.toString().replaceAll('_', ' ') ?? 'User',
+                profile!['role']?.toString().replaceAll('_', ' ') ??
+                    context.l10n.user,
               ),
             ),
           ),
@@ -251,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.alternate_email, color: Colors.cyan),
-              title: const Text('Username'),
+              title: Text(context.l10n.username),
               subtitle: Text(profile!['username']?.toString() ?? ''),
             ),
           ),
@@ -259,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.email, color: Colors.red),
-              title: const Text('Email'),
+              title: Text(context.l10n.email),
 
               subtitle: Text(
                 (profile!['email']?.toString().trim().isNotEmpty ?? false)
@@ -272,7 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.phone, color: Colors.green),
-              title: const Text('Phone Number'),
+              title: Text(context.l10n.phoneNumber),
               subtitle: Text(
                 (profile!['phone_number']?.toString().trim().isNotEmpty ??
                         false)
@@ -285,15 +288,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.color_lens, color: Colors.purple),
-              title: const Text('Theme'),
-              subtitle: Text(isDarkMode ? 'Dark Mode' : 'Light Mode'),
+              title: Text(context.l10n.theme),
+              subtitle: Text(
+                isDarkMode ? context.l10n.darkMode : context.l10n.lightMode,
+              ),
             ),
           ),
 
           Card(
             child: ListTile(
               leading: const Icon(Icons.info, color: Colors.teal),
-              title: const Text('Version'),
+              title: Text(context.l10n.version),
               subtitle: const Text('1.0.0'),
             ),
           ),
@@ -301,8 +306,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.business, color: Colors.indigo),
-              title: const Text('Company'),
-              subtitle: const Text('BashSoft Digital'),
+              title: Text(context.l10n.company),
+              subtitle: Text(context.l10n.companyName),
             ),
           ),
 
@@ -310,10 +315,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ListTile(
               leading: const Icon(Icons.lock_reset, color: Colors.indigo),
 
-              title: const Text('Change Password'),
-
-              subtitle: const Text('Update your account password'),
-
+              title: Text(context.l10n.changePassword),
+              subtitle: Text(context.l10n.updateYourAccountPassword),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {

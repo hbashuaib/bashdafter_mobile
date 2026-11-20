@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../products/services/product_service.dart';
 import '../services/stock_adjustment_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class StockAdjustmentScreen extends StatefulWidget {
   final Map<String, dynamic>? product;
@@ -56,9 +57,9 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load products')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadProducts)),
+      );
     }
   }
 
@@ -66,7 +67,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
     if (selectedProduct == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a product')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.pleaseSelectProduct)));
 
       return;
     }
@@ -76,14 +77,14 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
     if (quantity == null || quantity <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid quantity')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.enterValidQuantity)));
 
       return;
     }
 
     if (reasonController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Reason is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.reasonRequired)));
 
       return;
     }
@@ -96,7 +97,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Only ${currentStock.toStringAsFixed(0)} available in stock',
+              'Only ${currentStock.toStringAsFixed(0)} ${context.l10n.availableInStock}',
             ),
           ),
         );
@@ -120,7 +121,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stock adjustment saved successfully')),
+        SnackBar(content: Text(context.l10n.stockAdjustmentSavedSuccessfully)),
       );
 
       Navigator.pop(context, true);
@@ -130,7 +131,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save stock adjustment')),
+        SnackBar(content: Text(context.l10n.failedToSaveStockAdjustment)),
       );
     } finally {
       if (mounted) {
@@ -156,7 +157,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
         : double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Stock Adjustment')),
+      appBar: AppBar(title: Text(context.l10n.stockAdjustment)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -171,7 +172,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                 ),
             DropdownButtonFormField<dynamic>(
               value: selectedProduct,
-              decoration: const InputDecoration(labelText: 'Product'),
+              decoration: InputDecoration(labelText: context.l10n.product),
 
               items: products.map((product) {
                 return DropdownMenuItem(
@@ -194,7 +195,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
                   title: Text(selectedProduct?['name'] ?? ''),
 
-                  subtitle: const Text('Selected from barcode lookup'),
+                  subtitle: Text(context.l10n.selectedFromBarcodeLookup),
                 ),
               ),
 
@@ -204,7 +205,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
                 child: ListTile(
                   leading: const Icon(Icons.inventory),
-                  title: const Text('Current Stock'),
+                  title: Text(context.l10n.currentStock),
                   subtitle: Text(currentStock.toStringAsFixed(0)),
                 ),
               ),
@@ -214,23 +215,23 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
             DropdownButtonFormField<String>(
               value: adjustmentType,
 
-              decoration: const InputDecoration(labelText: 'Adjustment Type'),
+              decoration: InputDecoration(labelText: context.l10n.adjustmentType),
 
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'OPENING',
 
-                  child: Text('Opening Stock'),
+                  child: Text(context.l10n.openingStock),
                 ),
 
-                DropdownMenuItem(value: 'IN', child: Text('Stock In')),
-                DropdownMenuItem(value: 'OUT', child: Text('Stock Out')),
-                DropdownMenuItem(value: 'DAMAGE', child: Text('Damaged Stock')),
+                DropdownMenuItem(value: 'IN', child: Text(context.l10n.stockIn)),
+                DropdownMenuItem(value: 'OUT', child: Text(context.l10n.stockOut)),
+                DropdownMenuItem(value: 'DAMAGE', child: Text(context.l10n.damagedStock)),
 
                 DropdownMenuItem(
                   value: 'CORRECTION',
 
-                  child: Text('Correction'),
+                  child: Text(context.l10n.correction),
                 ),
               ],
 
@@ -245,21 +246,23 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
             TextField(
               controller: quantityController,
+              textDirection: Directionality.of(context),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: 'Quantity'),
+              decoration: InputDecoration(labelText: context.l10n.quantity),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: reasonController,
+              textDirection: Directionality.of(context),
               maxLines: 2,
-              decoration: const InputDecoration(labelText: 'Reason'),
+              decoration: InputDecoration(labelText: context.l10n.reason),
               textInputAction: TextInputAction.done,
 
               onSubmitted: (_) {
@@ -285,7 +288,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Save Adjustment'),
+                    : Text(context.l10n.saveAdjustment),
               ),
             ),
 

@@ -6,6 +6,7 @@ import '../services/customer_statement_pdf_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'package:share_plus/share_plus.dart';
 
@@ -54,9 +55,9 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load statement')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadStatement)),
+      );
 
       setState(() {
         isLoading = false;
@@ -127,15 +128,15 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading statement...');
+      return AppLoadingScaffold(message: context.l10n.loadingStatement);
     }
 
     if (statement == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Customer Statement')),
+        appBar: AppBar(title: Text(context.l10n.customerStatement)),
 
         body: AppRefreshableEmptyState(
-          message: 'No statement available',
+          message: context.l10n.noStatementAvailable,
           icon: Icons.receipt_long_outlined,
           onRefresh: loadStatement,
         ),
@@ -157,6 +158,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
               if (!mounted) return;
 
               final messenger = ScaffoldMessenger.of(context);
+              final pdfSuccessText = context.l10n.pdfGeneratedSuccessfully;
+              final pdfFailedText = context.l10n.failedToGeneratePdf;
 
               try {
                 await CustomerStatementPdfService().generatePdf(
@@ -167,15 +170,11 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                 if (!mounted) return;
 
-                messenger.showSnackBar(
-                  const SnackBar(content: Text('PDF generated successfully')),
-                );
+                messenger.showSnackBar(SnackBar(content: Text(pdfSuccessText)));
               } catch (e) {
                 if (!mounted) return;
 
-                messenger.showSnackBar(
-                  const SnackBar(content: Text('Failed to generate PDF')),
-                );
+                messenger.showSnackBar(SnackBar(content: Text(pdfFailedText)));
               }
             },
           ),
@@ -214,7 +213,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                   children: [
                     Column(
                       children: [
-                        const Text('Transactions'),
+                        Text(context.l10n.transactions),
 
                         Text(
                           transactions.length.toString(),
@@ -229,7 +228,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                     Column(
                       children: [
-                        const Text('Balance'),
+                        Text(context.l10n.balance),
 
                         Text(
                           'YER ${currencyFormatter.format(balance)}',
@@ -266,7 +265,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search transactions',
+                hintText: context.l10n.searchTransactions,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -287,7 +286,11 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
             Center(
               child: Text(
-                'Showing ${filteredTransactions.length} of ${transactions.length} transactions',
+                '${context.l10n.showing} '
+                '${filteredTransactions.length} '
+                '${context.l10n.outOf} '
+                '${transactions.length} '
+                '${context.l10n.transactions}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -301,7 +304,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                 child: filteredTransactions.isEmpty
                     ? AppRefreshableEmptyState(
-                        message: 'No transactions found',
+                        message: context.l10n.noTransactionsFound,
                         icon: Icons.receipt_long_outlined,
                         onRefresh: loadStatement,
                       )
@@ -324,7 +327,9 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                           return Card(
                             child: ListTile(
                               title: Text(
-                                item['type'].toString().toUpperCase(),
+                                isPurchase
+                                    ? context.l10n.purchaseType
+                                    : context.l10n.paymentType,
                               ),
                               subtitle: Text(item['date']),
 
@@ -345,7 +350,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                                   ),
 
                                   Text(
-                                    'Bal: ${currencyFormatter.format(runningBalance)}',
+                                    '${context.l10n.runningBalance}: '
+                                    '${currencyFormatter.format(runningBalance)}',
 
                                     style: TextStyle(
                                       fontSize: 12,

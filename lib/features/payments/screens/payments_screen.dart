@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/payment_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'payment_detail_screen.dart';
 
@@ -48,9 +49,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load payments')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadPayments)),
+      );
 
       setState(() {
         isLoading = false;
@@ -105,11 +106,11 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading payments...');
+      return AppLoadingScaffold(message: context.l10n.loadingPayments);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Payments')),
+      appBar: AppBar(title: Text(context.l10n.payments)),
 
       body: Column(
         children: [
@@ -122,7 +123,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Payments'),
+                      Text(context.l10n.payments),
                       Text(
                         payments.length.toString(),
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -131,7 +132,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   ),
                   Column(
                     children: [
-                      const Text('Total'),
+                      Text(context.l10n.total),
                       Text(
                         'YER ${currencyFormatter.format(totalPaymentsAmount)}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -140,7 +141,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   ),
                   Column(
                     children: [
-                      const Text('Average'),
+                      Text(context.l10n.average),
 
                       Text(
                         'YER ${currencyFormatter.format(averagePayment)}',
@@ -165,7 +166,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search by date, notes or amount',
+                hintText: context.l10n.searchPayments,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -187,7 +188,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Center(
               child: Text(
-                'Showing ${filteredPayments.length} of ${payments.length} payments',
+                '${context.l10n.showing} '
+                '${filteredPayments.length} '
+                '${context.l10n.outOf} '
+                '${payments.length} '
+                '${context.l10n.showingPayments}',
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -196,7 +202,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           Expanded(
             child: filteredPayments.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No payments found',
+                    message: context.l10n.noPaymentsFound,
                     icon: Icons.payment_outlined,
                     onRefresh: loadPayments,
                   )

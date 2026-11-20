@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -74,7 +75,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load dropdown data')),
+        SnackBar(content: Text(context.l10n.failedToLoadDropdownData)),
       );
 
       setState(() {
@@ -87,22 +88,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Product name is required')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.productNameRequired)));
 
       return;
     }
 
     if (selectedCategory == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.pleaseSelectCategory)),
+      );
 
       return;
     }
 
     if (selectedUnit == null) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please select a unit')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.pleaseSelectUnit)));
 
       return;
     }
@@ -112,7 +113,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (costPrice == null || costPrice < 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid cost price')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.enterValidCostPrice)));
 
       return;
     }
@@ -121,7 +122,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     if (sellingPrice == null || sellingPrice <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid selling price')),
+        SnackBar(content: Text(context.l10n.enterValidSellingPrice)),
       );
 
       return;
@@ -131,7 +132,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     if (minimumStock == null || minimumStock < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid minimum stock')),
+        SnackBar(content: Text(context.l10n.enterValidMinimumStock)),
       );
 
       return;
@@ -139,7 +140,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     if (hasExpiry && expiryDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an expiry date')),
+        SnackBar(content: Text(context.l10n.pleaseSelectExpiryDate)),
       );
 
       return;
@@ -147,8 +148,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     if (sellingPrice < costPrice) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Selling price cannot be less than cost price'),
+        SnackBar(
+          content: Text(context.l10n.sellingPriceCannotBeLessThanCostPrice),
         ),
       );
 
@@ -161,7 +162,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     try {
       await ProductService().updateProduct(
-        id: widget.product['id'],       
+        id: widget.product['id'],
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),
@@ -181,16 +182,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Product updated successfully')),
+        SnackBar(content: Text(context.l10n.productUpdatedSuccessfully)),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to update product')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToUpdateProduct)),
+      );
 
       debugPrint(e.toString());
     } finally {
@@ -220,7 +221,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Product')),
+      appBar: AppBar(title: Text(context.l10n.editProduct)),
 
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -228,24 +229,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
         children: [
           TextField(
             controller: nameController,
+            textDirection: Directionality.of(context),
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Product Name'),
+            decoration: InputDecoration(labelText: context.l10n.productName),
           ),
 
           const SizedBox(height: 12),
 
           TextField(
             controller: barcodeController,
+            textDirection: Directionality.of(context),
             keyboardType: TextInputType.number,
             autocorrect: false,
             enableSuggestions: false,
 
             decoration: InputDecoration(
-              labelText: 'Barcode',
-
+              labelText: context.l10n.barcodeLabel,
               prefixIcon: const Icon(Icons.qr_code),
-
               suffixIcon: IconButton(
                 icon: const Icon(Icons.camera_alt),
 
@@ -269,7 +270,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           DropdownButtonFormField<int>(
             value: selectedCategory,
-            decoration: const InputDecoration(labelText: 'Category'),
+            decoration: InputDecoration(labelText: context.l10n.category),
 
             items: categories.map((item) {
               return DropdownMenuItem<int>(
@@ -289,7 +290,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           DropdownButtonFormField<int>(
             value: selectedUnit,
-            decoration: const InputDecoration(labelText: 'Unit'),
+            decoration: InputDecoration(labelText: context.l10n.unit),
 
             items: units.map((item) {
               return DropdownMenuItem<int>(
@@ -309,39 +310,42 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           TextField(
             controller: costPriceController,
+            textDirection: Directionality.of(context),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Cost Price'),
+            decoration: InputDecoration(labelText: context.l10n.costPrice),
           ),
 
           const SizedBox(height: 12),
 
           TextField(
             controller: sellingPriceController,
+            textDirection: Directionality.of(context),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Selling Price'),
+            decoration: InputDecoration(labelText: context.l10n.sellingPrice),
           ),
 
           const SizedBox(height: 12),
 
           TextField(
             controller: minimumStockController,
+            textDirection: Directionality.of(context),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Minimum Stock'),
+            decoration: InputDecoration(labelText: context.l10n.minimumStock),
           ),
 
           const SizedBox(height: 12),
 
           SwitchListTile(
-            title: const Text('Has Expiry Date'),
+            title: Text(context.l10n.hasExpiryDate),
             value: hasExpiry,
 
             onChanged: (value) {
@@ -361,7 +365,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
               title: Text(
                 expiryDate == null
-                    ? 'Select Expiry Date'
+                    ? context.l10n.selectExpiryDate
                     : expiryDate!.toString().split(' ').first,
               ),
 
@@ -385,6 +389,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           TextField(
             controller: descriptionController,
+            textDirection: Directionality.of(context),
             maxLines: 3,
             textInputAction: TextInputAction.done,
 
@@ -394,7 +399,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               }
             },
 
-            decoration: const InputDecoration(labelText: 'Description'),
+            decoration: InputDecoration(labelText: context.l10n.description),
           ),
 
           const SizedBox(height: 20),
@@ -414,7 +419,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Save Changes'),
+                  : Text(context.l10n.saveChanges),
             ),
           ),
 

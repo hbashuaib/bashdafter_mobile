@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import '../services/change_password_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -32,7 +33,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Future<void> changePassword() async {
     if (oldPasswordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Current password is required')),
+        SnackBar(content: Text(context.l10n.currentPasswordRequired)),
       );
 
       return;
@@ -41,14 +42,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     if (newPasswordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('New password is required')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.newPasswordRequired)));
 
       return;
     }
 
     if (confirmPasswordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Confirm password is required')),
+        SnackBar(content: Text(context.l10n.confirmPasswordRequired)),
       );
 
       return;
@@ -57,7 +58,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     if (newPasswordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.passwordsDoNotMatch)));
 
       return;
     }
@@ -75,12 +76,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully')),
+        SnackBar(content: Text(context.l10n.passwordChangedSuccessfully)),
       );
 
       Navigator.pop(context);
     } on DioException catch (e) {
-      String errorMessage = 'Failed to change password';
+      String errorMessage = context.l10n.failedToChangePassword;
 
       if (e.response?.data is Map<String, dynamic>) {
         final data = e.response!.data as Map<String, dynamic>;
@@ -103,7 +104,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Change Password')),
+      appBar: AppBar(title: Text(context.l10n.changePassword)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -112,10 +113,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           children: [
             TextField(
               controller: oldPasswordController,
+              textDirection: Directionality.of(context),
               obscureText: obscureOldPassword,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: 'Current Password',
+                labelText: context.l10n.currentPassword,
                 border: const OutlineInputBorder(),
 
                 suffixIcon: IconButton(
@@ -137,10 +139,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
             TextField(
               controller: newPasswordController,
+              textDirection: Directionality.of(context),
               obscureText: obscureNewPassword,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: 'New Password',
+                labelText: context.l10n.newPassword,
 
                 border: const OutlineInputBorder(),
 
@@ -163,10 +166,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
             TextField(
               controller: confirmPasswordController,
+              textDirection: Directionality.of(context),
               obscureText: obscureConfirmPassword,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
-                labelText: 'Confirm Password',
+                labelText: context.l10n.confirmPassword,
 
                 border: const OutlineInputBorder(),
 
@@ -208,7 +212,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Change Password'),
+                    : Text(context.l10n.changePassword),
               ),
             ),
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/inventory_transaction_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class InventoryHistoryScreen extends StatefulWidget {
   const InventoryHistoryScreen({super.key});
@@ -40,12 +41,37 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load inventory history')),
+        SnackBar(content: Text(context.l10n.failedToLoadInventoryHistory)),
       );
 
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  String getTransactionLabel(String type) {
+    switch (type) {
+      case 'OPENING':
+        return context.l10n.transactionOpening;
+
+      case 'IN':
+        return context.l10n.transactionIn;
+
+      case 'OUT':
+        return context.l10n.transactionOut;
+
+      case 'SALE':
+        return context.l10n.transactionSale;
+
+      case 'DAMAGE':
+        return context.l10n.transactionDamage;
+
+      case 'CORRECTION':
+        return context.l10n.transactionCorrection;
+
+      default:
+        return type;
     }
   }
 
@@ -97,11 +123,11 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading inventory history...');
+      return AppLoadingScaffold(message: context.l10n.loadingInventoryHistory);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory History')),
+      appBar: AppBar(title: Text(context.l10n.inventoryHistory)),
 
       body: Column(
         children: [
@@ -119,7 +145,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search product, type or reference',
+                hintText: context.l10n.searchInventoryHistory,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -142,7 +168,12 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredTransactions.length} of ${transactions.length} transactions',
+                '${context.l10n.showing} '
+                '${filteredTransactions.length} '
+                '${context.l10n.outOf} '
+                '${transactions.length} '
+                '${context.l10n.transactions}',
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -151,7 +182,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
           Expanded(
             child: filteredTransactions.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No inventory transactions found',
+                    message: context.l10n.noInventoryTransactionsFound,
                     icon: Icons.history,
                     onRefresh: loadTransactions,
                   )
@@ -172,9 +203,10 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                             ) ??
                             0;
 
-                        final color = getTransactionColor(
-                          transaction['transaction_type'],
-                        );
+                        final transactionType =
+                            transaction['transaction_type']?.toString() ?? '';
+
+                        final color = getTransactionColor(transactionType);
 
                         return Card(
                           margin: const EdgeInsets.symmetric(
@@ -187,13 +219,8 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                               backgroundColor: color,
 
                               child: Text(
-                                transaction['transaction_type']
-                                            ?.toString()
-                                            .isNotEmpty ==
-                                        true
-                                    ? transaction['transaction_type']
-                                          .toString()
-                                          .substring(0, 1)
+                                transactionType.isNotEmpty
+                                    ? transactionType.substring(0, 1)
                                     : '?',
                                 style: const TextStyle(color: Colors.white),
                               ),
@@ -201,7 +228,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
 
                             title: Text(
                               transaction['product_name']?.toString() ??
-                                  'Unknown Product',
+                                  context.l10n.unknownProduct,
                             ),
                             subtitle: Text(
                               (transaction['reference'] ?? '')
@@ -229,7 +256,7 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                                   ),
 
                                   child: Text(
-                                    transaction['transaction_type'].toString(),
+                                    getTransactionLabel(transactionType),
 
                                     style: TextStyle(
                                       color: color,

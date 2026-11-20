@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/shop_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class ShopProfileScreen extends StatefulWidget {
   const ShopProfileScreen({super.key});
@@ -53,7 +54,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load shop profile')),
+        SnackBar(content: Text(context.l10n.failedToLoadShopProfile)),
       );      
 
       setState(() {
@@ -65,21 +66,21 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
   Future<void> saveShop() async {
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Shop name is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.shopNameRequired)));
 
       return;
     }
 
     if (phoneController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Phone is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.phoneRequired)));
 
       return;
     }
 
     if (currencyController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Currency is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.currencyRequired)));
 
       return;
     }
@@ -103,14 +104,14 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Shop profile updated')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.shopProfileUpdated)));
     } catch (e) {
       debugPrint(e.toString());
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update shop profile')),
+        SnackBar(content: Text(context.l10n.failedToUpdateShopProfile)),
       );
     } finally {
       if (mounted) {
@@ -129,14 +130,14 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
     if (shop == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Shop Profile')),
+        appBar: AppBar(title: Text(context.l10n.shopProfile)),
 
-        body: const Center(child: Text('No shop profile found')),
+        body: Center(child: Text(context.l10n.noShopProfileFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Shop Profile')),
+      appBar: AppBar(title: Text(context.l10n.shopProfile)),
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -144,44 +145,49 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
         children: [
           TextField(
             controller: nameController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Shop Name'),
+            decoration: InputDecoration(labelText: context.l10n.shopName),
           ),
 
           const SizedBox(height: 15),
 
           TextField(
             controller: phoneController,
+            textDirection: Directionality.of(context),
             keyboardType: TextInputType.phone,
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Phone'),
+            decoration: InputDecoration(labelText: context.l10n.phoneNumber),
           ),
 
           const SizedBox(height: 15),
 
           TextField(
             controller: addressController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Address'),
+            decoration: InputDecoration(labelText: context.l10n.address),
           ),
 
           const SizedBox(height: 15),
 
           TextField(
             controller: cityController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'City'),
+            decoration: InputDecoration(labelText: context.l10n.city),
           ),
 
           const SizedBox(height: 15),
 
           TextField(
             controller: currencyController,
+            textDirection: Directionality.of(context),
             textCapitalization: TextCapitalization.characters,
             textInputAction: TextInputAction.done,
-            decoration: const InputDecoration(labelText: 'Currency'),
+            decoration: InputDecoration(labelText: context.l10n.currency),
             onSubmitted: (_) {
               if (!isSaving) {
                 saveShop();
@@ -192,7 +198,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
           const SizedBox(height: 15),
 
           SwitchListTile(
-            title: const Text('Active'),
+            title: Text(context.l10n.active),
             value: isActive,
             onChanged: (value) {
               setState(() {
@@ -219,7 +225,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Save Changes'),
+                  : Text(context.l10n.saveChanges),
             ),
           ),
         ],

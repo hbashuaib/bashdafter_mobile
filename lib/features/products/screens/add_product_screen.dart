@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -54,7 +55,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load dropdown data')),
+        SnackBar(content: Text(context.l10n.failedToLoadDropdownData)),
       );
 
       setState(() {
@@ -67,7 +68,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Product name is required')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.productNameRequired)));
 
       return;
     }
@@ -75,14 +76,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (selectedCategory == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.pleaseSelectCategory)));
 
       return;
     }
 
     if (selectedUnit == null) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please select a unit')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.pleaseSelectUnit)));
 
       return;
     }
@@ -92,7 +93,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     if (costPrice == null || costPrice < 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid cost price')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.enterValidCostPrice)));
 
       return;
     }
@@ -101,7 +102,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     if (sellingPrice == null || sellingPrice <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid selling price')),
+        SnackBar(content: Text(context.l10n.enterValidSellingPrice)),
       );
 
       return;
@@ -111,7 +112,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     if (minimumStock == null || minimumStock < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid minimum stock')),
+        SnackBar(content: Text(context.l10n.enterValidMinimumStock)),
       );
 
       return;
@@ -119,7 +120,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     if (hasExpiry && expiryDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an expiry date')),
+        SnackBar(content: Text(context.l10n.pleaseSelectExpiryDate)),
       );
 
       return;
@@ -127,8 +128,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     if (sellingPrice < costPrice) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Selling price cannot be less than cost price'),
+        SnackBar(
+          content: Text(context.l10n.sellingPriceCannotBeLessThanCostPrice),
         ),
       );
 
@@ -159,14 +160,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Product added successfully')),
+        SnackBar(content: Text(context.l10n.productAddedSuccessfully)),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save product')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToSaveProduct)));
 
       debugPrint(e.toString());
     } finally {
@@ -196,7 +197,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Product')),
+      appBar: AppBar(title: Text(context.l10n.addProduct)),
 
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -206,7 +207,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             controller: nameController,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Product Name'),
+            decoration: InputDecoration(labelText: context.l10n.productName),
           ),
 
           const SizedBox(height: 12),
@@ -218,12 +219,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
             enableSuggestions: false,
 
             decoration: InputDecoration(
-              labelText: 'Barcode',
-
+              labelText: context.l10n.barcodeLabel,
               prefixIcon: const Icon(Icons.qr_code),
-
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.camera_alt),
+              suffixIcon: IconButton(icon: const Icon(Icons.camera_alt),
 
                 onPressed: () async {
                   final barcode = await Navigator.push(
@@ -253,7 +251,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               );
             }).toList(),
 
-            decoration: const InputDecoration(labelText: 'Category'),
+            decoration: InputDecoration(labelText: context.l10n.category),
 
             onChanged: (value) {
               setState(() {
@@ -275,7 +273,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               );
             }).toList(),
 
-            decoration: const InputDecoration(labelText: 'Unit'),
+            decoration: InputDecoration(labelText: context.l10n.unit),
 
             onChanged: (value) {
               setState(() {
@@ -292,7 +290,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Cost Price'),
+            decoration: InputDecoration(labelText: context.l10n.costPrice),
           ),
 
           const SizedBox(height: 12),
@@ -303,7 +301,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Selling Price'),
+            decoration: InputDecoration(labelText: context.l10n.sellingPrice),
           ),
 
           const SizedBox(height: 12),
@@ -314,11 +312,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Minimum Stock'),
+            decoration: InputDecoration(labelText: context.l10n.minimumStock),
           ),
 
           SwitchListTile(
-            title: const Text('Has Expiry Date'),
+            title: Text(context.l10n.hasExpiryDate),
             value: hasExpiry,
 
             onChanged: (value) {
@@ -338,7 +336,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               title: Text(
                 expiryDate == null
-                    ? 'Select Expiry Date'
+                    ? context.l10n.selectExpiryDate
                     : expiryDate!.toString().split(' ').first,
               ),
 
@@ -363,7 +361,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           TextField(
             controller: descriptionController,
             maxLines: 3,
-            decoration: const InputDecoration(labelText: 'Description'),
+            decoration: InputDecoration(labelText: context.l10n.description),
             textInputAction: TextInputAction.done,
 
             onSubmitted: (_) {
@@ -390,7 +388,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Save Product'),
+                  : Text(context.l10n.saveProduct),
             ),
           ),
 

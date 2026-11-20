@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/inactive_customer_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class InactiveCustomersScreen extends StatefulWidget {
   const InactiveCustomersScreen({super.key});
@@ -41,7 +42,7 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
       if (!mounted) return;
 
       setState(() {
-        errorMessage = 'Failed to load inactive customers';
+        errorMessage = context.l10n.failedToLoadInactiveCustomers;
         isLoading = false;
       });
     }
@@ -52,22 +53,23 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Restore Customer'),
+          title: Text(context.l10n.restoreCustomer),
           content: Text(
-            'Are you sure you want to restore ${customer['name']}?',
+            '${context.l10n.restoreCustomerQuestion}\n\n'
+            '${customer['name']}',
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Restore'),
+              child: Text(context.l10n.restore),
             ),
           ],
         );
@@ -86,7 +88,12 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${customer['name']} restored successfully')),
+        SnackBar(
+          content: Text(
+            '${customer['name']} '
+            '${context.l10n.customerRestoredSuccessfully}',
+          ),
+        ),
       );
 
       await loadCustomers();
@@ -94,7 +101,7 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to restore customer')),
+        SnackBar(content: Text(context.l10n.failedToRestoreCustomer)),
       );
     }
   }
@@ -107,20 +114,20 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
 
     if (errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Inactive Customers')),
+        appBar: AppBar(title: Text(context.l10n.inactiveCustomers)),
         body: Center(child: Text(errorMessage!)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inactive Customers')),
+      appBar: AppBar(title: Text(context.l10n.inactiveCustomers)),
       body: RefreshIndicator(
         onRefresh: loadCustomers,
         child: customers.isEmpty
             ? ListView(
-                children: const [
+                children: [
                   SizedBox(height: 150),
-                  Center(child: Text('No inactive customers')),
+                  Center(child: Text(context.l10n.noInactiveCustomers)),
                 ],
               )
             : ListView.builder(

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../services/inventory_dashboard_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class InventoryDashboardScreen extends StatefulWidget {
   const InventoryDashboardScreen({super.key});
@@ -43,7 +44,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load inventory dashboard')),
+        SnackBar(content: Text(context.l10n.failedToLoadInventoryDashboard)),
       );
 
       setState(() {
@@ -57,31 +58,33 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
     required dynamic value,
     required IconData icon,
     required Color color,
+    required bool isInventoryValue,
+    required bool isExpiring,
   }) {
     return Card(
-      color: title == 'Inventory Value'
+      color: isInventoryValue
           ? AppColors.cardTint(context, Colors.teal.shade50)
-          : title == 'Expiring Products'
+          : isExpiring
           ? AppColors.cardTint(context, Colors.red.shade50)
           : null,
 
       child: ListTile(
         leading: Icon(icon, color: color),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: title == 'Inventory Value'
-            ? const Text('Current stock value')
+        subtitle: isInventoryValue
+            ? Text(context.l10n.currentStockValue)
             : null,
 
         trailing: Text(
-          title == 'Inventory Value'
+          isInventoryValue
               ? 'YER ${currencyFormatter.format(double.tryParse(value.toString()) ?? 0)}'
               : value.toString(),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: title == 'Inventory Value'
+            color: isInventoryValue
                 ? Colors.teal.shade700
-                : title == 'Expiring Products'
+                : isExpiring
                 ? Colors.red.shade700
                 : null,
           ),
@@ -93,12 +96,12 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory Dashboard')),
+      appBar: AppBar(title: Text(context.l10n.inventoryDashboard)),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : dashboard == null
-          ? const Center(child: Text('No inventory data available'))
+          ? Center(child: Text(context.l10n.noInventoryDataAvailable))
           : RefreshIndicator(
               onRefresh: loadDashboard,
 
@@ -119,7 +122,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                         children: [
                           Column(
                             children: [
-                              const Text('Products'),
+                              Text(context.l10n.products),
 
                               Text(
                                 dashboard!['total_products'].toString(),
@@ -134,7 +137,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
                           Column(
                             children: [
-                              const Text('Low Stock'),
+                              Text(context.l10n.lowStock),
 
                               Text(
                                 dashboard!['low_stock_products'].toString(),
@@ -150,7 +153,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
                           Column(
                             children: [
-                              const Text('Expiring'),
+                              Text(context.l10n.expiring),
 
                               Text(
                                 dashboard!['expiring_products'].toString(),
@@ -169,46 +172,58 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                   ),
 
                   buildCard(
-                    title: 'Total Products',
+                    title: context.l10n.totalProducts,
+                    isInventoryValue: false,
+                    isExpiring: false,
                     value: dashboard!['total_products'],
                     icon: Icons.inventory_2,
                     color: Colors.blue,
                   ),
 
                   buildCard(
-                    title: 'Low Stock Products',
+                    title: context.l10n.lowStockProducts,
+                    isInventoryValue: false,
+                    isExpiring: false,
                     value: dashboard!['low_stock_products'],
                     icon: Icons.warning,
                     color: Colors.orange,
                   ),
 
                   buildCard(
-                    title: 'Expiring Products',
+                    title: context.l10n.expiringProducts,
+                    isInventoryValue: false,
+                    isExpiring: true,
                     value: dashboard!['expiring_products'],
                     icon: Icons.calendar_month,
                     color: Colors.red,
                   ),
 
                   buildCard(
-                    title: 'Stock Adjustments',
+                    title: context.l10n.stockAdjustments,
+                    isInventoryValue: false,
+                    isExpiring: false,
                     value: dashboard!['stock_adjustments'],
                     icon: Icons.swap_vert,
                     color: Colors.green,
                   ),
 
                   buildCard(
-                    title: 'Inventory Transactions',
+                    title: context.l10n.inventoryTransactions,
+                    isInventoryValue: false,
+                    isExpiring: false,
                     value: dashboard!['inventory_transactions'],
                     icon: Icons.history,
                     color: Colors.purple,
                   ),
 
                   buildCard(
-                    title: 'Inventory Value',
+                    title: context.l10n.inventoryValue,
+                    isInventoryValue: true,
+                    isExpiring: false,
                     value: dashboard!['inventory_value'],
                     icon: Icons.payments,
                     color: Colors.teal,
-                  ),                  
+                  ),
                 ],
               ),
             ),

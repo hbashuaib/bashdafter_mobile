@@ -10,6 +10,7 @@ import '../../payments/screens/add_payment_screen.dart';
 import '../../purchases/screens/add_purchase_screen.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'edit_customer_screen.dart';
 
@@ -48,9 +49,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load customer')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadCustomer)),
+      );
     }
   }
 
@@ -73,11 +74,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
         builder: (_) {
           return AlertDialog(
-            title: const Text('Cannot Deactivate'),
+            title: Text(context.l10n.cannotDeactivate),
 
-            content: const Text(
-              'Customer balance must be zero before deactivation.',
-            ),
+            content: Text(context.l10n.customerBalanceMustBeZero),
 
             actions: [
               TextButton(
@@ -85,7 +84,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                   Navigator.pop(context);
                 },
 
-                child: const Text('OK'),
+                child: Text(context.l10n.ok),
               ),
             ],
           );
@@ -100,8 +99,10 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Deactivate Customer'),
-          content: Text('Deactivate ${customer!['name']} ?'),
+          title: Text(context.l10n.deactivateCustomer),
+          content: Text(
+            '${context.l10n.deactivateCustomerQuestion}\n\n${customer!['name']}',
+          ),
 
           actions: [
             TextButton(
@@ -109,7 +110,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -117,7 +118,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Deactivate'),
+              child: Text(context.l10n.deactivate),
             ),
           ],
         );
@@ -139,7 +140,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer deactivated successfully')),
+        SnackBar(content: Text(context.l10n.customerDeactivatedSuccessfully)),
       );
 
       Navigator.pop(context);
@@ -147,7 +148,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to deactivate customer')),
+        SnackBar(content: Text(context.l10n.failedToDeactivateCustomer)),
       );
     }
   }
@@ -166,7 +167,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer reactivated successfully')),
+        SnackBar(content: Text(context.l10n.customerReactivatedSuccessfully)),
       );
 
       loadCustomer();
@@ -174,7 +175,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to reactivate customer')),
+        SnackBar(content: Text(context.l10n.failedToReactivateCustomer)),
       );
     }
   }
@@ -263,7 +264,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.account_balance_wallet),
-                      title: Text('Balance'),
+                      title: Text(context.l10n.balance),
                       trailing: Text(
                         currencyFormatter.format(customerBalance),
 
@@ -294,9 +295,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
             const SizedBox(height: 20),
 
-            const Text(
-              'Quick Actions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              context.l10n.quickActions,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 12),
@@ -306,7 +307,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.add_shopping_cart),
-                    label: const Text('Purchase'),
+                    label: Text(context.l10n.purchase),
 
                     onPressed: () async {
                       final result = await Navigator.push(
@@ -330,7 +331,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.payments),
-                    label: const Text('Payment'),
+                    label: Text(context.l10n.payment),
 
                     onPressed: () async {
                       final result = await Navigator.push(
@@ -353,10 +354,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
             const SizedBox(height: 24),
 
-            const Text(
-              'Records',
-
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              context.l10n.records,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 12),
@@ -364,7 +364,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.shopping_bag),
-                title: const Text('Purchases'),
+                title: Text(context.l10n.purchases),
                 trailing: const Icon(Icons.arrow_forward_ios),
 
                 onTap: () {
@@ -383,7 +383,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.payments),
-                title: const Text('Payments'),
+                title: Text(context.l10n.payments),
                 trailing: const Icon(Icons.arrow_forward_ios),
 
                 onTap: () {
@@ -402,7 +402,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.receipt_long),
-                title: const Text('Statement'),
+                title: Text(context.l10n.statement),
                 trailing: const Icon(Icons.arrow_forward_ios),
 
                 onTap: () {

@@ -7,6 +7,7 @@ import '../../products/services/product_service.dart';
 import '../../products/services/barcode_lookup_service.dart';
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -62,9 +63,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load products')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadProducts)),
+      );
     }
   }
 
@@ -72,7 +73,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     if (selectedProduct == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a product')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.pleaseSelectProduct)));
 
       return;
     }
@@ -82,7 +83,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     if (quantity == null || quantity <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid quantity')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.enterValidQuantity)));
 
       return;
     }
@@ -92,7 +93,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     if (unitPrice == null || unitPrice <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid unit price')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.enterValidUnitPrice)));
 
       return;
     }
@@ -102,8 +103,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     );
 
     if (exists) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Product already added')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.productAlreadyAdded)));
 
       return;
     }
@@ -113,7 +115,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
     if (quantity > currentStock) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Only $currentStock available in stock')),
+        SnackBar(
+          content: Text('Only $currentStock ${context.l10n.availableInStock}'),
+        ),
       );
 
       return;
@@ -137,8 +141,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
   Future<void> savePurchase() async {
     if (purchaseItems.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Add at least one item')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.addAtLeastOneItem)));
 
       return;
     }
@@ -166,14 +171,14 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Purchase saved successfully')),
+        SnackBar(content: Text(context.l10n.purchaseSavedSuccessfully)),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save purchase')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToSavePurchase)),
+      );
 
       debugPrint(e.toString());
     } finally {
@@ -206,7 +211,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Purchase')),
+      appBar: AppBar(title: Text(context.l10n.addPurchase)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -220,10 +225,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Scan Product Barcode'),
+                label: Text(context.l10n.scanProductBarcode),
 
                 onPressed: () async {
                   final messenger = ScaffoldMessenger.of(context);
+                  final productNotFoundText = context.l10n.productNotFound;
 
                   final barcode = await Navigator.push(
                     context,
@@ -275,7 +281,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     }
 
                     messenger.showSnackBar(
-                      const SnackBar(content: Text('Product not found')),
+                      SnackBar(content: Text(productNotFoundText)),
                     );
                   }
                 },
@@ -286,7 +292,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             DropdownButtonFormField<dynamic>(
               value: selectedProduct,
-              decoration: const InputDecoration(labelText: 'Product'),
+              decoration: InputDecoration(labelText: context.l10n.product),
 
               items: products.map((product) {
                 return DropdownMenuItem(
@@ -318,7 +324,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               onSubmitted: (_) {
                 addItem();
               },
-              decoration: const InputDecoration(labelText: 'Quantity'),
+              decoration: InputDecoration(labelText: context.l10n.quantity),
             ),
 
             const SizedBox(height: 15),
@@ -340,7 +346,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                 addItem();
               },
 
-              decoration: const InputDecoration(labelText: 'Unit Price'),
+              decoration: InputDecoration(labelText: context.l10n.unitPrice),
             ),
 
             const SizedBox(height: 15),
@@ -355,7 +361,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                   children: [
-                    const Text('Line Total'),
+                    Text(context.l10n.lineTotal),
 
                     Text(
                       currencyFormatter.format(lineTotal),
@@ -378,14 +384,14 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               child: ElevatedButton.icon(
                 onPressed: addItem,
                 icon: const Icon(Icons.add),
-                label: const Text('Add Item'),
+                label: Text(context.l10n.addItem),
               ),
             ),
 
             const SizedBox(height: 20),
 
             Text(
-              'Purchase Items',
+              context.l10n.purchaseItems,
               style: Theme.of(context).textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
@@ -398,7 +404,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Center(
                     child: Text(
-                      'No items added yet',
+                      context.l10n.noItemsAddedYet,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -431,9 +437,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Quantity: ${quantity.toStringAsFixed(0)}'),
                         Text(
-                          'Unit Price: ${currencyFormatter.format(unitPrice)}',
+                          '${context.l10n.quantity}: ${quantity.toStringAsFixed(0)}',
+                        ),
+                        Text(
+                          '${context.l10n.unitPrice}: ${currencyFormatter.format(unitPrice)}',
                         ),
                       ],
                     ),
@@ -477,7 +485,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             TextField(
               controller: notesController,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              decoration: InputDecoration(labelText: context.l10n.notes),
             ),
 
             const SizedBox(height: 15),
@@ -492,8 +500,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                   children: [
-                    const Text(
-                      'Purchase Total',
+                    Text(
+                      context.l10n.purchaseTotal,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
 
@@ -527,7 +535,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Save Purchase'),
+                    : Text(context.l10n.savePurchase),
               ),
             ),
 

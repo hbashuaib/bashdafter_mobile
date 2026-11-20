@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/inactive_product_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class InactiveProductsScreen extends StatefulWidget {
   const InactiveProductsScreen({super.key});
@@ -38,7 +39,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
       if (!mounted) return;
 
       setState(() {
-        errorMessage = 'Failed to load inactive products';
+        errorMessage = context.l10n.failedToLoadInactiveProducts;
         isLoading = false;
       });
     }
@@ -49,20 +50,23 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Restore Product'),
-          content: Text('Are you sure you want to restore ${product['name']}?'),
+          title: Text(context.l10n.restoreProduct),
+          content: Text(
+            '${context.l10n.restoreProductQuestion}\n\n'
+            '${product['name']}',
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Restore'),
+              child: Text(context.l10n.restore),
             ),
           ],
         );
@@ -81,7 +85,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${product['name']} restored successfully')),
+        SnackBar(content: Text(context.l10n.productRestoredSuccessfully)),
       );
 
       await loadProducts();
@@ -89,7 +93,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to restore product')),
+        SnackBar(content: Text(context.l10n.failedToRestoreProduct)),
       );
     }
   }
@@ -102,20 +106,20 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
 
     if (errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Inactive Products')),
+        appBar: AppBar(title: Text(context.l10n.inactiveProducts)),
         body: Center(child: Text(errorMessage!)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inactive Products')),
+      appBar: AppBar(title: Text(context.l10n.inactiveProducts)),
       body: RefreshIndicator(
         onRefresh: loadProducts,
         child: products.isEmpty
             ? ListView(
-                children: const [
+                children: [
                   SizedBox(height: 150),
-                  Center(child: Text('No inactive products')),
+                  Center(child: Text(context.l10n.noInactiveProducts)),
                 ],
               )
             : ListView.builder(
@@ -139,7 +143,8 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
                       ),
                       title: Text(product['name'].toString()),
                       subtitle: Text(
-                        (product['category_name'] ?? 'No Category').toString(),
+                        (product['category_name'] ?? context.l10n.noCategory)
+                            .toString(),
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.restore, color: Colors.green),

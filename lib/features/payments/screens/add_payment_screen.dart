@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../services/create_payment_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class AddPaymentScreen extends StatefulWidget {
   final int customerId;
@@ -23,7 +24,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
   Future<void> savePayment() async {
     if (amountController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment amount is required')),
+        SnackBar(content: Text(context.l10n.paymentAmountRequired)),
       );
 
       return;
@@ -33,14 +34,14 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
 
     if (amount == null) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Enter a valid amount')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.enterValidAmount)));
 
       return;
     }
 
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Amount must be greater than zero')),
+        SnackBar(content: Text(context.l10n.amountMustBeGreaterThanZero)),
       );
 
       return;
@@ -61,14 +62,14 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment added successfully')),
+        SnackBar(content: Text(context.l10n.paymentAddedSuccessfully)),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save payment')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToSavePayment)));
 
       debugPrint(e.toString());
     } finally {
@@ -90,7 +91,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Payment')),
+      appBar: AppBar(title: Text(context.l10n.addPayment)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -99,6 +100,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
           children: [
             TextField(
               controller: amountController,
+              textDirection: Directionality.of(context),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -110,7 +112,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 setState(() {});
               },
 
-              decoration: const InputDecoration(labelText: 'Amount'),
+              decoration: InputDecoration(labelText: context.l10n.amount),
             ),
 
             const SizedBox(height: 15),
@@ -125,7 +127,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                   children: [
-                    const Text('Payment Preview'),
+                    Text(context.l10n.paymentPreview),
 
                     Text(
                       currencyFormatter.format(
@@ -146,7 +148,8 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
 
             TextField(
               controller: notesController,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              textDirection: Directionality.of(context),
+              decoration: InputDecoration(labelText: context.l10n.notes),
               textInputAction: TextInputAction.done,
 
               onSubmitted: (_) {
@@ -171,7 +174,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Save Payment'),
+                    : Text(context.l10n.savePayment),
               ),
             ),
 

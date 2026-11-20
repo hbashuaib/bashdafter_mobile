@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/reports_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class CustomerSummaryScreen extends StatefulWidget {
   const CustomerSummaryScreen({super.key});
@@ -46,7 +47,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load customer summary')),
+        SnackBar(content: Text(context.l10n.failedToLoadCustomerSummary)),
       );
 
       setState(() {
@@ -88,11 +89,11 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading customer summary...');
+      return AppLoadingScaffold(message: context.l10n.loadingCustomerSummary);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Customer Summary')),
+      appBar: AppBar(title: Text(context.l10n.customerSummary)),
 
       body: Column(
         children: [
@@ -108,7 +109,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Customers'),
+                      Text(context.l10n.customers),
 
                       Text(
                         customers.length.toString(),
@@ -120,7 +121,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
 
                   Column(
                     children: [
-                      const Text('Outstanding'),
+                      Text(context.l10n.outstanding),
 
                       Text(
                         'YER ${currencyFormatter.format(totalOutstandingBalance)}',
@@ -146,8 +147,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search customer',
-
+                hintText: context.l10n.searchCustomer,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -170,7 +170,11 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredCustomers.length} of ${customers.length} customers',
+                '${context.l10n.showing} '
+                '${filteredCustomers.length} '
+                '${context.l10n.outOf} '
+                '${customers.length} '
+                '${context.l10n.customers}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -180,7 +184,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
           Expanded(
             child: filteredCustomers.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No customers found',
+                    message: context.l10n.noCustomersFound,
                     icon: Icons.people_outline,
                     onRefresh: loadData,
                   )
@@ -202,7 +206,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                           child: ListTile(
                             title: Text(
                               customer['name']?.toString() ??
-                                  'Unknown Customer',
+                                  context.l10n.unknownCustomer,
                             ),
 
                             subtitle: Text(

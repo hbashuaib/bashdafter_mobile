@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/unit_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class UnitsScreen extends StatefulWidget {
   const UnitsScreen({super.key});
@@ -50,7 +51,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Add Unit'),
+          title: Text(context.l10n.addUnit),
 
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -58,16 +59,18 @@ class _UnitsScreenState extends State<UnitsScreen> {
             children: [
               TextField(
                 controller: nameController,
-
-                decoration: const InputDecoration(labelText: 'Unit Name'),
+                textDirection: Directionality.of(context),
+                decoration: InputDecoration(labelText: context.l10n.unitName),
               ),
 
               const SizedBox(height: 12),
 
               TextField(
                 controller: descriptionController,
-
-                decoration: const InputDecoration(labelText: 'Description'),
+                textDirection: Directionality.of(context),
+                decoration: InputDecoration(
+                  labelText: context.l10n.description,
+                ),
               ),
             ],
           ),
@@ -78,7 +81,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -86,7 +89,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Save'),
+              child: Text(context.l10n.save),
             ),
           ],
         );
@@ -113,9 +116,9 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Unit added successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.unitAddedSuccessfully)),
+      );
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -131,7 +134,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Edit Unit'),
+          title: Text(context.l10n.editUnit),
 
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -167,7 +170,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Update'),
+              child: Text(context.l10n.update),
             ),
           ],
         );
@@ -194,7 +197,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unit updated successfully')),
+        SnackBar(content: Text(context.l10n.unitUpdatedSuccessfully)),
       );
     } catch (e) {
       debugPrint(e.toString());
@@ -207,9 +210,12 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Delete Unit'),
+          title: Text(context.l10n.deleteUnit),
 
-          content: Text('Delete "${unit['name']}"?'),
+          content: Text(
+            '${context.l10n.deleteUnitQuestion}\n\n'
+            '${unit['name']}',
+          ),
 
           actions: [
             TextButton(
@@ -225,7 +231,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Delete'),
+              child: Text(context.l10n.delete),
             ),
           ],
         );
@@ -246,7 +252,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unit deleted successfully')),
+        SnackBar(content: Text(context.l10n.unitDeletedSuccessfully)),
       );
     } catch (e) {
       debugPrint(e.toString());
@@ -254,7 +260,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Unable to delete unit')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.unableToDeleteUnit)));
     }
   }
 
@@ -273,12 +279,12 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(title: const Text('Units')),
+      appBar: AppBar(title: Text(context.l10n.units)),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : units.isEmpty
-          ? const Center(child: Text('No units found'))
+          ? Center(child: Text(context.l10n.noUnitsFound))
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 100),
               itemCount: units.length,

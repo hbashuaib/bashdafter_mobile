@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/update_customer_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class EditCustomerScreen extends StatefulWidget {
   final Map<String, dynamic> customer;
@@ -32,7 +33,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   Future<void> saveChanges() async {
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer name is required')),
+        SnackBar(content: Text(context.l10n.customerNameRequired)),
       );
 
       return;
@@ -41,14 +42,14 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     if (phoneController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Phone number is required')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.phoneNumberRequired)));
 
       return;
     }
 
     if (phoneController.text.trim().length < 7) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid phone number')),
+        SnackBar(content: Text(context.l10n.enterValidPhoneNumber)),
       );
 
       return;
@@ -71,13 +72,13 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer updated successfully')),
+        SnackBar(content: Text(context.l10n.customerUpdatedSuccessfully)),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update customer')),
+        SnackBar(content: Text(context.l10n.failedToUpdateCustomer)),
       );
 
       debugPrint(e.toString());
@@ -103,7 +104,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Customer')),
+      appBar: AppBar(title: Text(context.l10n.editCustomer)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -112,34 +113,38 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
           children: [
             TextField(
               controller: nameController,
+              textDirection: Directionality.of(context),
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: context.l10n.name),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: phoneController,
+              textDirection: Directionality.of(context),
               keyboardType: TextInputType.phone,
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: 'Phone'),
+              decoration: InputDecoration(labelText: context.l10n.phone),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: addressController,
+              textDirection: Directionality.of(context),
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: 'Address'),
+              decoration: InputDecoration(labelText: context.l10n.address),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: notesController,
+              textDirection: Directionality.of(context),
               maxLines: 3,
               textInputAction: TextInputAction.done,
 
@@ -149,13 +154,13 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                 }
               },
 
-              decoration: const InputDecoration(labelText: 'Notes'),
+              decoration: InputDecoration(labelText: context.l10n.notes),
             ),
 
             const SizedBox(height: 15),
 
             SwitchListTile(
-              title: const Text('Active'),
+              title: Text(context.l10n.activeStatus),
 
               value: isActive,
 
@@ -183,7 +188,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Save Changes'),
+                    : Text(context.l10n.saveChanges),
               ),
             ),
 

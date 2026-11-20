@@ -5,6 +5,7 @@ import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../services/product_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'edit_product_screen.dart';
 
@@ -45,10 +46,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Deactivate Product'),
+          title: Text(context.l10n.deactivateProduct),
 
           content: Text(
-            'Are you sure you want to deactivate ${widget.product['name']}?',
+            '${context.l10n.deactivateProductQuestion}\n\n'
+            '${widget.product['name']}',
           ),
 
           actions: [
@@ -57,7 +59,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 Navigator.pop(dialogContext, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -65,7 +67,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 Navigator.pop(dialogContext, true);
               },
 
-              child: const Text('Deactivate'),
+              child: Text(context.l10n.deactivate),
             ),
           ],
         );
@@ -82,7 +84,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Product deactivated successfully')),
+        SnackBar(content: Text(context.l10n.productDeactivatedSuccessfully)),
       );
 
       Navigator.pop(context, true);
@@ -90,7 +92,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to deactivate product')),
+        SnackBar(content: Text(context.l10n.failedToDeactivateProduct)),
       );
     }
   }
@@ -160,21 +162,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Card(
             child: ListTile(
-              title: const Text('Category'),
+              title: Text(context.l10n.category),
               subtitle: Text(widget.product['category_name'] ?? ''),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Unit'),
+              title: Text(context.l10n.unit),
               subtitle: Text(widget.product['unit_name'] ?? ''),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Barcode'),
+              title: Text(context.l10n.barcodeLabel),
               subtitle: Text(
                 (widget.product['barcode'] ?? '').toString().trim().isEmpty
                     ? '-'
@@ -185,10 +187,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           Card(
             child: ListTile(
-              title: const Text('Description'),
+              title: Text(context.l10n.description),
               subtitle: Text(
                 (widget.product['description'] ?? '').toString().trim().isEmpty
-                    ? 'No description'
+                    ? context.l10n.noDescription
                     : widget.product['description'],
               ),
             ),
@@ -196,35 +198,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           Card(
             child: ListTile(
-              title: const Text('Cost Price'),
+              title: Text(context.l10n.costPrice),
               subtitle: Text('YER ${currencyFormatter.format(costPrice)}'),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Selling Price'),
+              title: Text(context.l10n.sellingPrice),
               subtitle: Text('YER ${currencyFormatter.format(sellingPrice)}'),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Current Stock'),
+              title: Text(context.l10n.currentStock),
               subtitle: Text(currentStock.toStringAsFixed(0)),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Total Sold'),
+              title: Text(context.l10n.totalSold),
               subtitle: Text(totalSold.toStringAsFixed(0)),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Stock Adjustments'),
+              title: Text(context.l10n.stockAdjustments),
               subtitle: Text(totalAdjustments.toStringAsFixed(0)),
             ),
           ),
@@ -233,38 +235,42 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Card(
               color: AppColors.cardTint(context, Colors.red.shade50),
 
-              child: const ListTile(
+              child: ListTile(
                 leading: Icon(Icons.warning, color: Colors.red),
 
                 title: Text(
-                  'LOW STOCK',
+                  context.l10n.lowStockStatus,
                   style: TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
 
-                subtitle: Text('Current stock is below minimum stock level'),
+                subtitle: Text(context.l10n.currentStockBelowMinimum),
               ),
             ),
 
           Card(
             child: ListTile(
-              title: const Text('Minimum Stock'),
+              title: Text(context.l10n.minimumStock),
               subtitle: Text(minimumStock.toStringAsFixed(0)),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Has Expiry'),
-              subtitle: Text(widget.product['has_expiry'] ? 'Yes' : 'No'),
+              title: Text(context.l10n.hasExpiry),
+              subtitle: Text(
+                widget.product['has_expiry']
+                    ? context.l10n.yes
+                    : context.l10n.no,
+              ),
             ),
           ),
           if (widget.product['has_expiry'] == true)
             Card(
               child: ListTile(
-                title: const Text('Expiry Date'),
+                title: Text(context.l10n.expiryDate),
 
                 subtitle: Text(
                   widget.product['expiry_date']?.toString() ?? '-',
@@ -288,15 +294,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 if (remaining < 0) {
                   cardColor = Colors.red.shade50;
                   textColor = Colors.red.shade900;
-                  status = 'EXPIRED';
+                  status = context.l10n.expired;
                 } else if (remaining <= 30) {
                   cardColor = Colors.orange.shade50;
                   textColor = Colors.orange.shade900;
-                  status = 'Expires in $remaining days';
+                  status =
+                      '${context.l10n.expiresIn} '
+                      '$remaining '
+                      '${context.l10n.daysRemaining}';
                 } else {
                   cardColor = Colors.green.shade50;
                   textColor = Colors.green.shade900;
-                  status = '$remaining days remaining';
+                  status =
+                      '$remaining '
+                      '${context.l10n.daysRemaining}';
                 }
 
                 return Card(
@@ -320,7 +331,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           Card(
             child: ListTile(
-              title: const Text('Status'),
+              title: Text(context.l10n.status),
               subtitle: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -339,7 +350,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
 
                 child: Text(
-                  widget.product['is_active'] ? 'Active' : 'Inactive',
+                  widget.product['is_active']
+                      ? context.l10n.active
+                      : context.l10n.inactive,
 
                   style: TextStyle(
                     color: widget.product['is_active']

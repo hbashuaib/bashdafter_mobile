@@ -4,6 +4,7 @@ import '../../products/services/product_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -47,7 +48,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load low stock products')),
+        SnackBar(content: Text(context.l10n.failedToLoadLowStockProducts)),
       );
 
       setState(() {
@@ -81,11 +82,11 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading low stock products...');
+      return AppLoadingScaffold(message: context.l10n.loadingLowStockProducts);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Low Stock Products')),
+      appBar: AppBar(title: Text(context.l10n.lowStockProducts)),
 
       body: Column(
         children: [
@@ -101,7 +102,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Low Stock'),
+                      Text(context.l10n.lowStock),
 
                       Text(
                         lowStockProducts.length.toString(),
@@ -131,7 +132,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search product',
+                hintText: context.l10n.searchProduct,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -154,7 +155,12 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredProducts.length} of ${lowStockProducts.length} products',
+                '${context.l10n.showing} '
+                '${filteredProducts.length} '
+                '${context.l10n.outOf} '
+                '${lowStockProducts.length} '
+                '${context.l10n.products}',
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -163,7 +169,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
           Expanded(
             child: filteredProducts.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No low stock products',
+                    message: context.l10n.noLowStockProducts,
                     icon: Icons.warning_amber_rounded,
                     onRefresh: loadProducts,
                   )
@@ -196,12 +202,15 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                               ),
                             ),
                             title: Text(
-                              product['name']?.toString() ?? 'Unknown Product',
+                              product['name']?.toString() ??
+                                  context.l10n.unknownProduct,
                             ),
 
                             subtitle: Text(
-                              'Current: ${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}'
-                              '\nMinimum: ${(double.tryParse(product['minimum_stock'].toString()) ?? 0).toStringAsFixed(0)}',
+                              '${context.l10n.current}: '
+                              '${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}'
+                              '\n${context.l10n.minimum}: '
+                              '${(double.tryParse(product['minimum_stock'].toString()) ?? 0).toStringAsFixed(0)}',
                             ),
 
                             trailing: const Icon(Icons.arrow_forward_ios),
@@ -215,7 +224,9 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                                 ),
                               );
 
-                              loadProducts();
+                              if (!mounted) return;
+
+                              await loadProducts();
                             },
                           ),
                         );

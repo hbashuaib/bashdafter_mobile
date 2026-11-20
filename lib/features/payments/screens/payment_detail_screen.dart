@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class PaymentDetailScreen extends StatelessWidget {
   final Map<String, dynamic> payment;
@@ -25,9 +26,7 @@ class PaymentDetailScreen extends StatelessWidget {
     buffer.writeln('Date: ${payment['payment_date']}');
     buffer.writeln('');
     buffer.writeln('Payment Amount:');
-    buffer.writeln(
-      'YER ${currencyFormatter.format(amount)}',
-    );
+    buffer.writeln('YER ${currencyFormatter.format(amount)}');
 
     if ((payment['notes'] ?? '').toString().trim().isNotEmpty) {
       buffer.writeln('');
@@ -48,7 +47,7 @@ class PaymentDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Details'),
+        title: Text(context.l10n.paymentDetails),
 
         actions: [
           IconButton(
@@ -79,9 +78,12 @@ class PaymentDetailScreen extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  const Text(
-                    'PAYMENT RECEIPT',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  Text(
+                    context.l10n.paymentReceipt,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ],
               ),
@@ -98,7 +100,10 @@ class PaymentDetailScreen extends StatelessWidget {
 
               child: Column(
                 children: [
-                  const Text('Payment Amount', style: TextStyle(fontSize: 16)),
+                  Text(
+                    context.l10n.paymentAmount,
+                    style: const TextStyle(fontSize: 16),
+                  ),
 
                   const SizedBox(height: 12),
 
@@ -120,7 +125,7 @@ class PaymentDetailScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.calendar_today),
 
-              title: const Text('Payment Date'),
+              title: Text(context.l10n.paymentDate),
 
               subtitle: Text(payment['payment_date']?.toString() ?? '-'),
             ),
@@ -130,7 +135,7 @@ class PaymentDetailScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.receipt_long),
 
-              title: const Text('Payment ID'),
+              title: Text(context.l10n.paymentId),
 
               subtitle: Text(payment['id']?.toString() ?? '-'),
             ),
@@ -140,11 +145,11 @@ class PaymentDetailScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.notes),
 
-              title: const Text('Notes'),
+              title: Text(context.l10n.notes),
 
               subtitle: Text(
                 (payment['notes'] ?? '').toString().trim().isEmpty
-                    ? 'No notes'
+                    ? context.l10n.noNotes
                     : payment['notes'].toString(),
               ),
             ),

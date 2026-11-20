@@ -4,6 +4,7 @@ import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../../products/screens/expiring_products_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'inventory_history_screen.dart';
 import 'stock_adjustment_screen.dart';
@@ -41,7 +42,7 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory')),
+      appBar: AppBar(title: Text(context.l10n.inventoryManagement)),
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
@@ -49,7 +50,7 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             color: AppColors.cardTint(context, Colors.blue.shade50),
 
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(16),
 
               child: Row(
@@ -64,7 +65,7 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
 
                       children: [
                         Text(
-                          'Inventory Management',
+                          context.l10n.inventoryManagement,
 
                           style: TextStyle(
                             fontSize: 18,
@@ -74,7 +75,7 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
 
                         SizedBox(height: 8),
 
-                        Text('Manage stock operations and inventory reports'),
+                        Text(context.l10n.inventoryManagementDescription),
                       ],
                     ),
                   ),
@@ -83,14 +84,14 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
             ),
           ),
 
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 12, bottom: 8, left: 8),
 
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerStart,
 
               child: Text(
-                'Inventory Functions',
+                context.l10n.inventoryFunctions,
 
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -100,8 +101,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.dashboard, color: Colors.blue),
-              title: const Text('Inventory Dashboard'),
-              subtitle: const Text('Inventory statistics and summary'),
+              title: Text(context.l10n.inventoryDashboard),
+              subtitle: Text(context.l10n.inventoryDashboardDescription),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -118,8 +119,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.qr_code_scanner, color: Colors.indigo),
-              title: const Text('Inventory Lookup'),
-              subtitle: const Text('Scan barcode and check stock'),
+              title: Text(context.l10n.inventoryLookup),
+              subtitle: Text(context.l10n.inventoryLookupDescription),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -136,8 +137,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.warning, color: Colors.orange),
-              title: const Text('Low Stock Products'),
-              subtitle: const Text('Products requiring replenishment'),
+              title: Text(context.l10n.lowStockProducts),
+              subtitle: Text(context.l10n.lowStockProductsDescription),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -154,8 +155,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.calendar_month, color: Colors.orange),
-              title: const Text('Expiring Products'),
-              subtitle: const Text('Products expiring soon'),
+              title: Text(context.l10n.expiringProducts),
+              subtitle: Text(context.l10n.expiringProductsDescription),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -172,8 +173,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.emoji_events, color: Colors.amber),
-              title: const Text('Top Selling Products'),
-              subtitle: const Text('Best performing products'),
+              title: Text(context.l10n.topSellingProducts),
+              subtitle: Text(context.l10n.topSellingProductsDescription),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -190,8 +191,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.history, color: Colors.purple),
-              title: const Text('Inventory History'),
-              subtitle: const Text('All inventory transactions'),
+              title: Text(context.l10n.inventoryHistory),
+              subtitle: Text(context.l10n.inventoryHistoryDescription),
               trailing: const Icon(Icons.arrow_forward_ios),
 
               onTap: () {
@@ -209,8 +210,8 @@ class _InventoryMenuScreenState extends State<InventoryMenuScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.inventory, color: Colors.green),
-                title: const Text('Stock Adjustments'),
-                subtitle: const Text('Increase or decrease stock'),
+                title: Text(context.l10n.stockAdjustments),
+                subtitle: Text(context.l10n.stockAdjustmentsDescription),
                 trailing: const Icon(Icons.arrow_forward_ios),
 
                 onTap: () {

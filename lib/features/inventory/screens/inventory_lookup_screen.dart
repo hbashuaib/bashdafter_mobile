@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../products/services/barcode_lookup_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -21,6 +22,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
   Future<void> scanBarcode() async {
     final messenger = ScaffoldMessenger.of(context);
+    final productNotFoundText = context.l10n.productNotFound;
 
     final barcode = await Navigator.push(
       context,
@@ -58,9 +60,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
         isLoading = false;
       });
 
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Product not found')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(productNotFoundText)));
     }
   }
 
@@ -81,7 +81,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
     final isLowStock = currentStock <= minimumStock;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory Lookup')),
+      appBar: AppBar(title: Text(context.l10n.inventoryLookup)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -102,19 +102,19 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Scan Product'),
+                  : Text(context.l10n.scanProduct),
             ),
 
             const SizedBox(height: 20),
 
             if (isLoading)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 12),
-                    Text('Searching product...'),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 12),
+                    Text(context.l10n.searchingProduct),
                   ],
                 ),
               ),
@@ -138,11 +138,18 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                       const SizedBox(height: 10),
 
-                      Text('Barcode: ${product!['barcode'] ?? '-'}'),
-                      Text('Stock: ${product!['current_stock']}'),
-                      Text('Minimum Stock: ${product!['minimum_stock']}'),
                       Text(
-                        'Selling Price: YER ${currencyFormatter.format(sellingPrice)}',
+                        '${context.l10n.barcodeLabel}: ${product!['barcode'] ?? '-'}',
+                      ),
+                      Text(
+                        '${context.l10n.stock}: ${product!['current_stock']}',
+                      ),
+                      Text(
+                        '${context.l10n.minimumStock}: ${product!['minimum_stock']}',
+                      ),
+                      Text(
+                        '${context.l10n.sellingPrice}: '
+                        'YER ${currencyFormatter.format(sellingPrice)}',
                       ),
 
                       const SizedBox(height: 12),
@@ -163,7 +170,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                         ),
 
                         child: Text(
-                          isLowStock ? 'LOW STOCK' : 'IN STOCK',
+                          isLowStock
+                              ? context.l10n.lowStockStatus
+                              : context.l10n.inStock,
 
                           style: TextStyle(
                             color: isLowStock ? Colors.red : Colors.green,
@@ -179,10 +188,12 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.inventory),
-                          label: const Text('Adjust Stock'),
+                          label: Text(context.l10n.adjustStock),
 
                           onPressed: () async {
                             final messenger = ScaffoldMessenger.of(context);
+                            final stockUpdatedText = context.l10n.stockUpdated;
+                            final currentStockText = context.l10n.currentStock;
 
                             final result = await Navigator.push(
                               context,
@@ -220,7 +231,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                                   SnackBar(
                                     behavior: SnackBarBehavior.floating,
                                     content: Text(
-                                      'Stock updated. Current stock: ${updatedProduct['current_stock']}',
+                                      '$stockUpdatedText. '
+                                      '$currentStockText: '
+                                      '${updatedProduct['current_stock']}',
                                     ),
                                   ),
                                 );

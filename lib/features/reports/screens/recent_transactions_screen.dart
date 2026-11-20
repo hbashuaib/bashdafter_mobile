@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/reports_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class RecentTransactionsScreen extends StatefulWidget {
   const RecentTransactionsScreen({super.key});
@@ -47,7 +48,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load transactions')),
+        SnackBar(content: Text(context.l10n.failedToLoadTransactions)),
       );
 
       setState(() {
@@ -74,6 +75,19 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
     });
   }
 
+  String getTransactionTypeLabel(String type) {
+    switch (type.toLowerCase()) {
+      case 'purchase':
+        return context.l10n.purchase;
+
+      case 'payment':
+        return context.l10n.payment;
+
+      default:
+        return type;
+    }
+  }
+
   @override
   void dispose() {
     searchController.dispose();
@@ -89,13 +103,13 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(
-        message: 'Loading recent transactions...',
+      return AppLoadingScaffold(
+        message: context.l10n.loadingRecentTransactions,
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recent Transactions')),
+      appBar: AppBar(title: Text(context.l10n.recentTransactions)),
 
       body: Column(
         children: [
@@ -111,7 +125,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Transactions'),
+                      Text(context.l10n.transactions),
 
                       Text(
                         transactions.length.toString(),
@@ -123,7 +137,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
                   Column(
                     children: [
-                      const Text('Purchases'),
+                      Text(context.l10n.purchases),
 
                       Text(
                         purchaseCount.toString(),
@@ -138,7 +152,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
                   Column(
                     children: [
-                      const Text('Payments'),
+                      Text(context.l10n.payments),
 
                       Text(
                         paymentCount.toString(),
@@ -167,8 +181,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search transactions',
-
+                hintText: context.l10n.searchTransactions,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -191,7 +204,12 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredTransactions.length} of ${transactions.length} transactions',
+                '${context.l10n.showing} '
+                '${filteredTransactions.length} '
+                '${context.l10n.outOf} '
+                '${transactions.length} '
+                '${context.l10n.transactions}',
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -200,7 +218,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
           Expanded(
             child: filteredTransactions.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No transactions found',
+                    message: context.l10n.noTransactionsFound,
                     icon: Icons.receipt_long_outlined,
                     onRefresh: loadData,
                   )
@@ -220,11 +238,12 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                           child: ListTile(
                             title: Text(
                               item['customer']?.toString() ??
-                                  'Unknown Customer',
+                                  context.l10n.unknownCustomer,
                             ),
 
                             subtitle: Text(
-                              '${item['type'].toString().toUpperCase()} • ${item['date']}',
+                              '${getTransactionTypeLabel(item['type'].toString())} • '
+                              '${item['date']}',
                             ),
 
                             trailing: Text(

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/purchase_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'purchase_detail_screen.dart';
 
@@ -48,9 +49,9 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to load purchases')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadPurchases)),
+      );
 
       setState(() {
         isLoading = false;
@@ -105,11 +106,11 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading purchases...');
+      return AppLoadingScaffold(message: context.l10n.loadingPurchases);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Purchases')),
+      appBar: AppBar(title: Text(context.l10n.purchases)),
 
       body: Column(
         children: [
@@ -125,7 +126,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Purchases'),
+                      Text(context.l10n.purchases),
                       Text(
                         purchases.length.toString(),
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -135,7 +136,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
                   Column(
                     children: [
-                      const Text('Total'),
+                      Text(context.l10n.total),
                       Text(
                         'YER ${currencyFormatter.format(totalPurchasesAmount)}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -145,7 +146,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
                   Column(
                     children: [
-                      const Text('Average'),
+                      Text(context.l10n.average),
 
                       Text(
                         'YER ${currencyFormatter.format(averagePurchase)}',
@@ -169,7 +170,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search by date, notes or amount',
+                hintText: context.l10n.searchPurchases,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -193,7 +194,12 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredPurchases.length} of ${purchases.length} purchases',
+                '${context.l10n.showing} '
+                '${filteredPurchases.length} '
+                '${context.l10n.outOf} '
+                '${purchases.length} '
+                '${context.l10n.showingPurchases}',
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -202,7 +208,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           Expanded(
             child: filteredPurchases.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No purchases found',
+                    message: context.l10n.noPurchasesFound,
                     icon: Icons.shopping_cart_outlined,
                     onRefresh: loadPurchases,
                   )

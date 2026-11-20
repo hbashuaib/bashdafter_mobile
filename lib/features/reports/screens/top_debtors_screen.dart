@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/reports_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class TopDebtorsScreen extends StatefulWidget {
   const TopDebtorsScreen({super.key});
@@ -46,7 +47,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load top debtors')),
+        SnackBar(content: Text(context.l10n.failedToLoadTopDebtors)),
       );
 
       setState(() {
@@ -92,11 +93,11 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(message: 'Loading top debtors...');
+      return AppLoadingScaffold(message: context.l10n.loadingTopDebtors);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Top Debtors')),
+      appBar: AppBar(title: Text(context.l10n.topDebtors)),
 
       body: Column(
         children: [
@@ -112,7 +113,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Debtors'),
+                      Text(context.l10n.debtors),
 
                       Text(
                         debtors.length.toString(),
@@ -124,7 +125,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
 
                   Column(
                     children: [
-                      const Text('Highest Debt'),
+                      Text(context.l10n.highestDebt),
 
                       Text(
                         debtors.isEmpty
@@ -152,7 +153,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search debtor',
+                hintText: context.l10n.searchDebtor,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -175,7 +176,12 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredDebtors.length} of ${debtors.length} debtors',
+                '${context.l10n.showing} '
+                '${filteredDebtors.length} '
+                '${context.l10n.outOf} '
+                '${debtors.length} '
+                '${context.l10n.debtors}',
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -184,7 +190,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
           Expanded(
             child: filteredDebtors.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No debtors found',
+                    message: context.l10n.noDebtorsFound,
                     icon: Icons.account_balance_wallet_outlined,
                     onRefresh: loadData,
                   )
@@ -219,7 +225,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                             ),
 
                             title: Text(
-                              debtor['name']?.toString() ?? 'Unknown Customer',
+                              debtor['name']?.toString() ?? context.l10n.unknownCustomer,
                             ),
 
                             trailing: Text(

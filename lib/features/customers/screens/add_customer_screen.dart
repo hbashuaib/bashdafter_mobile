@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/create_customer_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class AddCustomerScreen extends StatefulWidget {
   const AddCustomerScreen({super.key});
@@ -20,7 +21,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   Future<void> saveCustomer() async {
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer name is required')),
+        SnackBar(content: Text(context.l10n.customerNameRequired)),
       );
 
       return;
@@ -29,14 +30,14 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     if (phoneController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Phone number is required')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.phoneNumberRequired)));
 
       return;
     }
 
     if (phoneController.text.trim().length < 7) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid phone number')),
+        SnackBar(content: Text(context.l10n.enterValidPhoneNumber)),
       );
 
       return;
@@ -57,14 +58,14 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer added successfully')),
+        SnackBar(content: Text(context.l10n.customerAddedSuccessfully)),
       );
 
       Navigator.pop(context, true);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save customer')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToSaveCustomer)),
+      );
 
       debugPrint(e.toString());
     } finally {
@@ -88,7 +89,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Customer')),
+      appBar: AppBar(title: Text(context.l10n.addCustomer)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -98,7 +99,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             TextField(
               controller: nameController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Name'),
+              textDirection: Directionality.of(context),
+              decoration: InputDecoration(labelText: context.l10n.name),
               textInputAction: TextInputAction.next,
             ),
 
@@ -109,7 +111,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               keyboardType: TextInputType.phone,
               autocorrect: false,
               enableSuggestions: false,
-              decoration: const InputDecoration(labelText: 'Phone'),
+              textDirection: Directionality.of(context),
+              decoration: InputDecoration(labelText: context.l10n.phone),
               textInputAction: TextInputAction.next,
             ),
 
@@ -117,7 +120,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
             TextField(
               controller: addressController,
-              decoration: const InputDecoration(labelText: 'Address'),
+              textDirection: Directionality.of(context),
+              decoration: InputDecoration(labelText: context.l10n.address),
               textInputAction: TextInputAction.next,
             ),
 
@@ -126,7 +130,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             TextField(
               controller: notesController,
               maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              textDirection: Directionality.of(context),
+              decoration: InputDecoration(labelText: context.l10n.notes),
               textInputAction: TextInputAction.done,
 
               onSubmitted: (_) {
@@ -153,7 +158,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Save Customer'),
+                    : Text(context.l10n.saveCustomer),
               ),
             ),
 

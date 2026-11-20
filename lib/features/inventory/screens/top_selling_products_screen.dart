@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/top_selling_products_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class TopSellingProductsScreen extends StatefulWidget {
   const TopSellingProductsScreen({super.key});
@@ -41,7 +42,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load top selling products')),
+        SnackBar(content: Text(context.l10n.failedToLoadTopSellingProducts)),
       );
 
       setState(() {
@@ -87,13 +88,13 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const AppLoadingScaffold(
-        message: 'Loading top selling products...',
+      return AppLoadingScaffold(
+        message: context.l10n.loadingTopSellingProducts,
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Top Selling Products')),
+      appBar: AppBar(title: Text(context.l10n.topSellingProducts)),
 
       body: Column(
         children: [
@@ -109,7 +110,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                 children: [
                   Column(
                     children: [
-                      const Text('Products'),
+                      Text(context.l10n.products),
 
                       Text(
                         products.length.toString(),
@@ -121,7 +122,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                   Column(
                     children: [
-                      const Text('Top Seller'),
+                      Text(context.l10n.topSeller),
 
                       SizedBox(
                         width: 100,
@@ -154,7 +155,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: 'Search product',
+                hintText: context.l10n.searchProduct,
                 prefixIcon: const Icon(Icons.search),
 
                 suffixIcon: searchController.text.isNotEmpty
@@ -177,7 +178,11 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
             child: Center(
               child: Text(
-                'Showing ${filteredProducts.length} of ${products.length} products',
+                '${context.l10n.showing} '
+                '${filteredProducts.length} '
+                '${context.l10n.outOf} '
+                '${products.length} '
+                '${context.l10n.products}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -187,7 +192,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
           Expanded(
             child: filteredProducts.isEmpty
                 ? AppRefreshableEmptyState(
-                    message: 'No sales found',
+                    message: context.l10n.noSalesFound,
                     icon: Icons.leaderboard_outlined,
                     onRefresh: loadProducts,
                   )
@@ -234,20 +239,22 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                             ),
 
                             title: Text(
-                              product['name']?.toString() ?? 'Unknown Product',
+                              product['name']?.toString() ??
+                                  context.l10n.unknownProduct,
                             ),
 
                             subtitle: Text(
-                              'Current Stock: ${currentStock.toStringAsFixed(0)}',
+                              '${context.l10n.currentStock}: '
+                              '${currentStock.toStringAsFixed(0)}',
                             ),
 
                             trailing: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
 
                               children: [
-                                const Text(
-                                  'Sold',
-                                  style: TextStyle(fontSize: 12),
+                                Text(
+                                  context.l10n.sold,
+                                  style: const TextStyle(fontSize: 12),
                                 ),
 
                                 Text(

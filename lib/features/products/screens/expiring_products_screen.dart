@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/expiring_products_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class ExpiringProductsScreen extends StatefulWidget {
   const ExpiringProductsScreen({super.key});
@@ -46,20 +47,18 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Expiring Products')),
+      appBar: AppBar(title: Text(context.l10n.expiringProducts)),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : products.isEmpty
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check_circle, color: Colors.green, size: 48),
-
-                  SizedBox(height: 12),
-
-                  Text('No expiring products'),
+                  const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                  const SizedBox(height: 12),
+                  Text(context.l10n.noExpiringProducts),
                 ],
               ),
             )
@@ -69,7 +68,14 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
 
               itemBuilder: (context, index) {
                 final product = products[index];
-                final expiryDate = DateTime.parse(product['expiry_date']);
+                final expiryDate = DateTime.tryParse(
+                  product['expiry_date'].toString(),
+                );
+
+                if (expiryDate == null) {
+                  return const SizedBox.shrink();
+                }
+                
                 final today = DateTime.now();
 
                 final days =
@@ -93,10 +99,15 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
                   child: ListTile(
                     leading: Icon(Icons.calendar_month, color: color),
                     title: Text(product['name']),
-                    subtitle: Text('Expiry: ${product['expiry_date']}'),
+                    subtitle: Text(
+                      '${context.l10n.expiryDate}: '
+                      '${product['expiry_date']}',
+                    ),
 
                     trailing: Text(
-                      days < 0 ? 'Expired' : '$days days',
+                      days < 0
+                          ? context.l10n.expired
+                          : '$days ${context.l10n.days}',
                       style: TextStyle(
                         color: color,
                         fontWeight: FontWeight.bold,

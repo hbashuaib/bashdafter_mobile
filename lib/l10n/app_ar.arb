@@ -108,11 +108,10 @@
 "quickActions":
     "إجراءات سريعة",
 
-"inventoryManagement":
-    "إدارة المخزون",
+"inventoryManagement": "إدارة المخزون",
 
 "inventoryManagementDescription":
-    "تعديلات المخزون وسجل المخزون",
+    "إدارة عمليات المخزون وتقارير المخزون",
 
 "voiceEntry":
     "الإدخال الصوتي",
@@ -132,8 +131,19 @@
 
 "all": "الكل",
 
-"showingProducts":
-    "عرض {filtered} من أصل {total} منتج",
+"showingProducts": "عرض {filtered} من أصل {total} منتج",
+
+"@showingProducts": {
+  "description": "Shows filtered products count",
+  "placeholders": {
+    "filtered": {
+      "type": "int"
+    },
+    "total": {
+      "type": "int"
+    }
+  }
+},
 
 "productNotFound":
     "لم يتم العثور على المنتج",
@@ -177,6 +187,730 @@
     "أحدث المعاملات",
 
 "latestPurchasesAndPayments":
-    "أحدث المشتريات والمدفوعات"
+    "أحدث المشتريات والمدفوعات",
 
+"failedToLoadCustomer": "فشل في تحميل بيانات العميل",
+
+"cannotDeactivate": "لا يمكن تعطيل العميل",
+
+"customerBalanceMustBeZero":
+    "يجب أن يكون رصيد العميل صفراً قبل التعطيل.",
+
+"ok": "موافق",
+
+"deactivateCustomer": "تعطيل العميل",
+
+"deactivate": "تعطيل",
+
+"deactivateCustomerQuestion":
+    "هل تريد تعطيل العميل؟",
+
+"customerDeactivatedSuccessfully":
+    "تم تعطيل العميل بنجاح",
+
+"failedToDeactivateCustomer":
+    "فشل في تعطيل العميل",
+
+"customerReactivatedSuccessfully":
+    "تمت إعادة تفعيل العميل بنجاح",
+
+"failedToReactivateCustomer":
+    "فشل في إعادة تفعيل العميل",
+
+"purchase": "شراء",
+
+"payment": "دفعة",
+
+"records": "السجلات",
+
+"statement": "كشف الحساب",
+
+"addCustomer": "إضافة عميل",
+
+"name": "الاسم",
+"phone": "الهاتف",
+"address": "العنوان",
+"notes": "ملاحظات",
+
+"saveCustomer": "حفظ العميل",
+
+"customerNameRequired":
+    "اسم العميل مطلوب",
+
+"phoneNumberRequired":
+    "رقم الهاتف مطلوب",
+
+"enterValidPhoneNumber":
+    "أدخل رقم هاتف صحيح",
+
+"customerAddedSuccessfully":
+    "تمت إضافة العميل بنجاح",
+
+"failedToSaveCustomer":
+    "فشل في حفظ العميل",
+
+"editCustomer": "تعديل العميل",
+
+"activeStatus": "نشط",
+
+"saveChanges": "حفظ التعديلات",
+
+"customerUpdatedSuccessfully":
+    "تم تحديث العميل بنجاح",
+
+"failedToUpdateCustomer":
+    "فشل في تحديث العميل",
+
+"inactiveCustomers": "العملاء المعطلون",
+
+"failedToLoadInactiveCustomers":
+    "فشل في تحميل العملاء المعطلين",
+
+"restoreCustomer": "استعادة العميل",
+
+"restore": "استعادة",
+
+"restoreCustomerQuestion":
+    "هل أنت متأكد من استعادة هذا العميل؟",
+
+"customerRestoredSuccessfully":
+    "تمت استعادة العميل بنجاح",
+
+"failedToRestoreCustomer":
+    "فشل في استعادة العميل",
+
+"noInactiveCustomers":
+    "لا يوجد عملاء معطلون",
+
+"customerStatement": "كشف حساب العميل",
+
+"loadingStatement": "جاري تحميل كشف الحساب...",
+
+"failedToLoadStatement": "فشل في تحميل كشف الحساب",
+
+"noStatementAvailable": "لا يوجد كشف حساب متاح",
+
+"transactions": "المعاملات",
+
+"searchTransactions": "البحث في المعاملات",
+
+"noTransactionsFound": "لا توجد معاملات",
+
+"currentBalance": "الرصيد الحالي",
+
+"phoneLabel": "الهاتف",
+
+"pdfGeneratedSuccessfully":
+    "تم إنشاء ملف PDF بنجاح",
+
+"failedToGeneratePdf":
+    "فشل في إنشاء ملف PDF",
+
+"generatedByBashDafter":
+    "تم الإنشاء بواسطة باش دفتر",
+
+"purchaseType": "شراء",
+
+"paymentType": "دفعة",
+
+"runningBalance": "الرصيد",
+
+"loadingPurchases": "جاري تحميل المشتريات...",
+
+"failedToLoadPurchases":
+    "فشل في تحميل المشتريات",
+
+"average": "المتوسط",
+
+"searchPurchases":
+    "البحث بالتاريخ أو الملاحظات أو المبلغ",
+
+"showingPurchases": "مشتريات",
+
+"noPurchasesFound":
+    "لا توجد مشتريات",
+
+"purchaseDetails": "تفاصيل الشراء",
+
+"purchaseDate": "تاريخ الشراء",
+
+"totalAmount": "إجمالي المبلغ",
+
+"noNotes": "لا توجد ملاحظات",
+
+"items": "الأصناف",
+
+"addPurchase": "إضافة مشتريات",
+
+"scanProductBarcode": "مسح باركود المنتج",
+
+"product": "المنتج",
+
+"quantity": "الكمية",
+
+"unitPrice": "سعر الوحدة",
+
+"lineTotal": "إجمالي السطر",
+
+"addItem": "إضافة صنف",
+
+"purchaseItems": "أصناف المشتريات",
+
+"purchaseTotal": "إجمالي المشتريات",
+
+"savePurchase": "حفظ المشتريات",
+
+"pleaseSelectProduct": "الرجاء اختيار منتج",
+
+"enterValidQuantity": "أدخل كمية صحيحة",
+
+"enterValidUnitPrice": "أدخل سعر وحدة صحيح",
+
+"productAlreadyAdded": "تمت إضافة المنتج مسبقاً",
+
+"availableInStock": "متوفر في المخزون",
+
+"addAtLeastOneItem": "أضف صنفاً واحداً على الأقل",
+
+"purchaseSavedSuccessfully": "تم حفظ المشتريات بنجاح",
+
+"failedToSavePurchase": "فشل في حفظ المشتريات",
+
+"noItemsAddedYet": "لم تتم إضافة أي أصناف بعد",
+
+"loadingPayments": "جاري تحميل المدفوعات...",
+
+"failedToLoadPayments":
+    "فشل في تحميل المدفوعات",
+
+"searchPayments":
+    "البحث بالتاريخ أو الملاحظات أو المبلغ",
+
+"showingPayments": "مدفوعات",
+
+"noPaymentsFound":
+    "لا توجد مدفوعات",
+
+"paymentDetails": "تفاصيل الدفعة",
+
+"paymentReceipt": "إيصال دفعة",
+
+"paymentAmount": "مبلغ الدفعة",
+
+"paymentDate": "تاريخ الدفعة",
+
+"paymentId": "رقم الدفعة",
+
+"addPayment": "إضافة دفعة",
+
+"amount": "المبلغ",
+
+"paymentPreview": "معاينة الدفعة",
+
+"savePayment": "حفظ الدفعة",
+
+"paymentAmountRequired":
+    "مبلغ الدفعة مطلوب",
+
+"enterValidAmount":
+    "أدخل مبلغاً صحيحاً",
+
+"amountMustBeGreaterThanZero":
+    "يجب أن يكون المبلغ أكبر من صفر",
+
+"paymentAddedSuccessfully":
+    "تمت إضافة الدفعة بنجاح",
+
+"failedToSavePayment":
+    "فشل في حفظ الدفعة",
+
+"inventoryFunctions": "وظائف المخزون",
+
+"inventoryDashboard": "لوحة المخزون",
+
+"inventoryDashboardDescription":
+    "إحصائيات وملخص المخزون",
+
+"inventoryLookup": "استعلام المخزون",
+
+"inventoryLookupDescription":
+    "مسح الباركود والتحقق من المخزون",
+
+"lowStockProducts": "المنتجات منخفضة المخزون",
+
+"lowStockProductsDescription":
+    "المنتجات التي تحتاج إلى إعادة تزويد",
+
+"expiringProducts": "المنتجات قاربة الانتهاء",
+
+"expiringProductsDescription":
+    "المنتجات التي ستنتهي صلاحيتها قريباً",
+
+"topSellingProducts": "المنتجات الأكثر مبيعاً",
+
+"topSellingProductsDescription":
+    "أفضل المنتجات أداءً",
+
+"inventoryHistory": "سجل المخزون",
+
+"inventoryHistoryDescription":
+    "جميع حركات المخزون",
+
+"stockAdjustments": "تعديلات المخزون",
+
+"stockAdjustmentsDescription":
+    "زيادة أو تقليل المخزون",
+
+"failedToLoadInventoryDashboard":
+    "فشل في تحميل لوحة المخزون",
+
+"noInventoryDataAvailable":
+    "لا توجد بيانات مخزون متاحة",
+
+"lowStock": "منخفض",
+
+"expiring": "منتهي قريباً",
+
+"totalProducts": "إجمالي المنتجات",
+
+"inventoryTransactions":
+    "حركات المخزون",
+
+"inventoryValue": "قيمة المخزون",
+
+"currentStockValue":
+    "القيمة الحالية للمخزون",
+
+"scanProduct": "مسح المنتج",
+
+"searchingProduct": "جاري البحث عن المنتج...",
+
+"stock": "المخزون",
+
+"minimumStock": "الحد الأدنى للمخزون",
+
+"sellingPrice": "سعر البيع",
+
+"inStock": "متوفر",
+
+"lowStockStatus": "مخزون منخفض",
+
+"adjustStock": "تعديل المخزون",
+
+"stockUpdated": "تم تحديث المخزون",
+
+"currentStockLabel": "المخزون الحالي",
+
+"barcodeLabel": "الباركود",
+
+"stockAdjustment": "تعديل المخزون",
+
+"adjustmentType": "نوع التعديل",
+
+"reason": "السبب",
+
+"saveAdjustment": "حفظ التعديل",
+
+"reasonRequired": "السبب مطلوب",
+
+"stockAdjustmentSavedSuccessfully":
+    "تم حفظ تعديل المخزون بنجاح",
+
+"failedToSaveStockAdjustment":
+    "فشل في حفظ تعديل المخزون",
+
+"selectedFromBarcodeLookup":
+    "تم الاختيار من البحث بالباركود",
+
+"currentStock": "المخزون الحالي",
+
+"openingStock": "رصيد افتتاحي",
+
+"stockIn": "إضافة للمخزون",
+
+"stockOut": "سحب من المخزون",
+
+"damagedStock": "مخزون تالف",
+
+"correction": "تصحيح",
+
+"loadingLowStockProducts":
+    "جاري تحميل المنتجات منخفضة المخزون...",
+
+"failedToLoadLowStockProducts":
+    "فشل في تحميل المنتجات منخفضة المخزون",
+
+"searchProduct":
+    "البحث عن منتج",
+
+"noLowStockProducts":
+    "لا توجد منتجات منخفضة المخزون",
+
+"current": "الحالي",
+
+"minimum": "الحد الأدنى",
+
+"unknownProduct": "منتج غير معروف",
+
+"loadingTopSellingProducts":
+    "جاري تحميل المنتجات الأكثر مبيعاً...",
+
+"failedToLoadTopSellingProducts":
+    "فشل في تحميل المنتجات الأكثر مبيعاً",
+
+"topSeller": "الأكثر مبيعاً",
+
+"noSalesFound": "لا توجد مبيعات",
+
+"sold": "تم البيع",
+
+"loadingInventoryHistory":
+    "جاري تحميل سجل المخزون...",
+
+"failedToLoadInventoryHistory":
+    "فشل في تحميل سجل المخزون",
+
+"searchInventoryHistory":
+    "البحث بالمنتج أو النوع أو المرجع",
+
+"noInventoryTransactionsFound":
+    "لا توجد حركات مخزون",
+
+"reference": "المرجع",
+
+"sale": "بيع",
+
+"transactionOpening": "افتتاحي",
+
+"transactionIn": "إدخال",
+
+"transactionOut": "إخراج",
+
+"transactionDamage": "تالف",
+
+"transactionCorrection": "تصحيح",
+
+"transactionSale": "بيع",
+
+"deactivateProduct": "تعطيل المنتج",
+
+"deactivateProductQuestion":
+    "هل أنت متأكد من تعطيل هذا المنتج؟",
+
+"productDeactivatedSuccessfully":
+    "تم تعطيل المنتج بنجاح",
+
+"failedToDeactivateProduct":
+    "فشل في تعطيل المنتج",
+
+"category": "الفئة",
+
+"unit": "الوحدة",
+
+"description": "الوصف",
+
+"noDescription": "لا يوجد وصف",
+
+"costPrice": "سعر التكلفة",
+
+"totalSold": "إجمالي المبيعات",
+
+"hasExpiry": "له تاريخ انتهاء",
+
+"expiryDate": "تاريخ الانتهاء",
+
+"status": "الحالة",
+
+"yes": "نعم",
+
+"no": "لا",
+
+"expired": "منتهي الصلاحية",
+
+"daysRemaining": "يوم متبقي",
+
+"expiresIn": "ينتهي خلال",
+
+"currentStockBelowMinimum":
+    "المخزون الحالي أقل من الحد الأدنى",
+
+"addProduct": "إضافة منتج",
+
+"productName": "اسم المنتج",
+
+"failedToLoadDropdownData":
+    "فشل في تحميل بيانات القوائم",
+
+"pleaseSelectCategory":
+    "الرجاء اختيار فئة",
+
+"pleaseSelectUnit":
+    "الرجاء اختيار وحدة",
+
+"enterValidCostPrice":
+    "أدخل سعر تكلفة صحيح",
+
+"enterValidSellingPrice":
+    "أدخل سعر بيع صحيح",
+
+"enterValidMinimumStock":
+    "أدخل حدًا أدنى صحيحًا للمخزون",
+
+"pleaseSelectExpiryDate":
+    "الرجاء اختيار تاريخ انتهاء",
+
+"sellingPriceCannotBeLessThanCostPrice":
+    "لا يمكن أن يكون سعر البيع أقل من سعر التكلفة",
+
+"productAddedSuccessfully":
+    "تمت إضافة المنتج بنجاح",
+
+"failedToSaveProduct":
+    "فشل في حفظ المنتج",
+
+"hasExpiryDate":
+    "له تاريخ انتهاء",
+
+"selectExpiryDate":
+    "اختر تاريخ الانتهاء",
+
+"saveProduct":
+    "حفظ المنتج",
+
+"productNameRequired": "اسم المنتج مطلوب",
+
+"editProduct": "تعديل المنتج",
+
+"productUpdatedSuccessfully":
+    "تم تحديث المنتج بنجاح",
+
+"failedToUpdateProduct":
+    "فشل في تحديث المنتج",
+
+"addCategory": "إضافة فئة",
+
+"editCategory": "تعديل فئة",
+
+"categoryName": "اسم الفئة",
+
+"categoryAddedSuccessfully":
+    "تمت إضافة الفئة بنجاح",
+
+"categoryUpdatedSuccessfully":
+    "تم تحديث الفئة بنجاح",
+
+"categoryDeletedSuccessfully":
+    "تم حذف الفئة بنجاح",
+
+"deleteCategory": "حذف فئة",
+
+"deleteCategoryQuestion":
+    "حذف الفئة؟",
+
+"update": "تحديث",
+
+"noCategoriesFound":
+    "لا توجد فئات",
+
+"unableToDeleteCategory":
+    "تعذر حذف الفئة",
+
+"categories": "الفئات",
+
+"scanBarcode": "مسح الباركود",
+
+"units": "الوحدات",
+
+"addUnit": "إضافة وحدة",
+
+"editUnit": "تعديل وحدة",
+
+"unitName": "اسم الوحدة",
+
+"unitAddedSuccessfully":
+    "تمت إضافة الوحدة بنجاح",
+
+"unitUpdatedSuccessfully":
+    "تم تحديث الوحدة بنجاح",
+
+"unitDeletedSuccessfully":
+    "تم حذف الوحدة بنجاح",
+
+"deleteUnit": "حذف وحدة",
+
+"deleteUnitQuestion":
+    "حذف الوحدة؟",
+
+"noUnitsFound":
+    "لا توجد وحدات",
+
+"unableToDeleteUnit":
+    "تعذر حذف الوحدة",
+
+"noExpiringProducts":
+    "لا توجد منتجات قاربت على الانتهاء",
+
+"days": "يوم",
+
+"inactiveProducts": "المنتجات غير النشطة",
+
+"failedToLoadInactiveProducts":
+    "فشل في تحميل المنتجات غير النشطة",
+
+"restoreProduct": "استعادة المنتج",
+
+"restoreProductQuestion":
+    "هل أنت متأكد من استعادة هذا المنتج؟",
+
+"productRestoredSuccessfully":
+    "تمت استعادة المنتج بنجاح",
+
+"failedToRestoreProduct":
+    "فشل في استعادة المنتج",
+
+"noInactiveProducts":
+    "لا توجد منتجات غير نشطة",
+
+"noCategory": "بدون فئة",
+
+"failedToLoadProfile":
+    "فشل في تحميل الملف الشخصي",
+
+"noProfileFound":
+    "لم يتم العثور على ملف شخصي",
+
+"profileImageUpdated":
+    "تم تحديث صورة الملف الشخصي",
+
+"failedToUploadImage":
+    "فشل في رفع الصورة",
+
+"profileInformation":
+    "معلومات الملف الشخصي",
+
+"profileInformationDescription":
+    "معلومات التطبيق والمستخدم",
+
+"user": "المستخدم",
+
+"application": "التطبيق",
+
+"role": "الدور",
+
+"email": "البريد الإلكتروني",
+
+"phoneNumber": "رقم الهاتف",
+
+"theme": "المظهر",
+
+"lightMode": "الوضع الفاتح",
+
+"version": "الإصدار",
+
+"company": "الشركة",
+
+"changePassword": "تغيير كلمة المرور",
+
+"updateYourAccountPassword":
+    "تحديث كلمة مرور الحساب",
+
+"profileImageUploadUnsupported":
+    "رفع صورة الملف الشخصي متاح حالياً في إصدارات أندرويد وسطح المكتب فقط.",
+
+"applicationName": "باش دَفتر",
+
+"companyName": "باش سوفت ديجيتال",
+
+"failedToLoadShopProfile":
+    "فشل في تحميل ملف المتجر",
+
+"shopProfileUpdated":
+    "تم تحديث ملف المتجر",
+
+"failedToUpdateShopProfile":
+    "فشل في تحديث ملف المتجر",
+
+"noShopProfileFound":
+    "لم يتم العثور على ملف المتجر",
+
+"shopName": "اسم المتجر",
+
+"shopNameRequired":
+    "اسم المتجر مطلوب",
+
+"currency": "العملة",
+
+"currencyRequired":
+    "العملة مطلوبة",
+
+"phoneRequired": "رقم الهاتف مطلوب",
+
+"city": "المدينة",
+
+"currentPassword": "كلمة المرور الحالية",
+
+"currentPasswordRequired":
+    "كلمة المرور الحالية مطلوبة",
+
+"newPassword": "كلمة المرور الجديدة",
+
+"newPasswordRequired":
+    "كلمة المرور الجديدة مطلوبة",
+
+"confirmPassword": "تأكيد كلمة المرور",
+
+"confirmPasswordRequired":
+    "تأكيد كلمة المرور مطلوب",
+
+"passwordsDoNotMatch":
+    "كلمتا المرور غير متطابقتين",
+
+"passwordChangedSuccessfully":
+    "تم تغيير كلمة المرور بنجاح",
+
+"failedToChangePassword":
+    "فشل في تغيير كلمة المرور",
+
+"english": "English",
+"arabic": "العربية",
+
+"aboutDescription":
+    "يساعد باش دفتر الشركات على إدارة العملاء والمشتريات والمدفوعات والمخزون والتقارير.",
+
+"businessAccountingAndInventoryManagementSystem":
+    "نظام محاسبة وإدارة مخزون للأعمال.",
+
+"developedBy": "تم التطوير بواسطة",
+
+"loadingCustomerSummary":
+    "جاري تحميل ملخص العملاء...",
+
+"failedToLoadCustomerSummary":
+    "فشل في تحميل ملخص العملاء",
+
+"outstanding": "المستحق",
+
+"searchCustomer": "البحث عن عميل",
+
+"unknownCustomer": "عميل غير معروف",
+
+"loadingRecentTransactions":
+    "جاري تحميل أحدث المعاملات...",
+
+"failedToLoadTransactions":
+    "فشل في تحميل المعاملات",
+
+"loadingTopDebtors":
+    "جاري تحميل أكبر المدينين...",
+
+"failedToLoadTopDebtors":
+    "فشل في تحميل أكبر المدينين",
+
+"debtors": "المدينون",
+
+"highestDebt": "أعلى دين",
+
+"searchDebtor": "البحث عن مدين",
+
+"noDebtorsFound": "لا يوجد مدينون"
 }

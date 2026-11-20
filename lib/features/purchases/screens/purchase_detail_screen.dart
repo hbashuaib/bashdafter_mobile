@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/localization/localization_extension.dart';
+
 class PurchaseDetailScreen extends StatelessWidget {
   final Map<String, dynamic> purchase;
   final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
@@ -52,7 +54,7 @@ class PurchaseDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Purchase Details'),
+        title: Text(context.l10n.purchaseDetails),
 
         actions: [
           IconButton(
@@ -72,24 +74,24 @@ class PurchaseDetailScreen extends StatelessWidget {
         children: [
           Card(
             child: ListTile(
-              title: const Text('Purchase Date'),
+              title: Text(context.l10n.purchaseDate),
               subtitle: Text(purchase['purchase_date'].toString()),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Total Amount'),
+              title: Text(context.l10n.totalAmount),
               subtitle: Text('YER ${currencyFormatter.format(totalAmount)}'),
             ),
           ),
 
           Card(
             child: ListTile(
-              title: const Text('Notes'),
+              title: Text(context.l10n.notes),
               subtitle: Text(
                 (purchase['notes'] ?? '').toString().trim().isEmpty
-                    ? 'No notes'
+                    ? context.l10n.noNotes
                     : purchase['notes'],
               ),
             ),
@@ -97,9 +99,9 @@ class PurchaseDetailScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          const Text(
-            'Items',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            context.l10n.items,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 10),

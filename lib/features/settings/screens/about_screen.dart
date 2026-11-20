@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -8,7 +9,7 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('About')),
+      appBar: AppBar(title: Text(context.l10n.about)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 100),
@@ -27,7 +28,7 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   Text(
-                    'BashDafter',
+                    context.l10n.applicationName,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
@@ -35,7 +36,7 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(height: 10),
 
                   Text(
-                    'Version 1.0.0',
+                    '${context.l10n.version} 1.0.0',
 
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -48,11 +49,11 @@ class AboutScreen extends StatelessWidget {
                   Card(
                     color: Theme.of(context).colorScheme.primary
                         .withValues(alpha: 0.05),
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.all(12),
 
                       child: Text(
-                        'BashDafter helps businesses manage customers, purchases, payments, inventory, and reports.',
+                        context.l10n.aboutDescription,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -61,22 +62,23 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   Text(
-                    'Business accounting and inventory management system.',
+                    context.l10n.businessAccountingAndInventoryManagementSystem,
                     textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: 20),
 
                   Text(
-                    'Developed by BashSoft Digital',
+                    '${context.l10n.developedBy} '
+                    '${context.l10n.companyName}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 10),
 
                   Text(
-                    '© 2026 BashSoft Digital',
+                    '© 2026 ${context.l10n.companyName}',
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),

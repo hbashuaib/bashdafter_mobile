@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/localization/locale_provider.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
@@ -11,7 +12,7 @@ class LanguageScreen extends StatelessWidget {
     final localeProvider = context.watch<LocaleProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Language')),
+      appBar: AppBar(title: Text(context.l10n.language)),
 
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -22,7 +23,7 @@ class LanguageScreen extends StatelessWidget {
               child: RadioListTile<String>(
                 value: 'en',
                 groupValue: localeProvider.locale.languageCode,
-                title: const Text('English'),
+                title: Text(context.l10n.english),
                 secondary: const Text('🇺🇸'),
 
                 onChanged: (value) async {
@@ -37,7 +38,7 @@ class LanguageScreen extends StatelessWidget {
               child: RadioListTile<String>(
                 value: 'ar',
                 groupValue: localeProvider.locale.languageCode,
-                title: const Text('العربية'),
+                title: Text(context.l10n.arabic),
                 secondary: const Text('🇾🇪'),
 
                 onChanged: (value) async {

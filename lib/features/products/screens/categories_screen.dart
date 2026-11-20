@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/category_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -50,7 +51,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Add Category'),
+          title: Text(context.l10n.addCategory),
 
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -58,16 +59,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             children: [
               TextField(
                 controller: nameController,
-
-                decoration: const InputDecoration(labelText: 'Category Name'),
+                textDirection: Directionality.of(context),
+                decoration: InputDecoration(
+                  labelText: context.l10n.categoryName,
+                ),
               ),
 
               const SizedBox(height: 12),
 
               TextField(
                 controller: descriptionController,
-
-                decoration: const InputDecoration(labelText: 'Description'),
+                textDirection: Directionality.of(context),
+                decoration: InputDecoration(
+                  labelText: context.l10n.description,
+                ),
               ),
             ],
           ),
@@ -78,7 +83,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -86,7 +91,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Save'),
+              child: Text(context.l10n.save),
             ),
           ],
         );
@@ -114,7 +119,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category added successfully')),
+        SnackBar(content: Text(context.l10n.categoryAddedSuccessfully)),
       );
     } catch (e) {
       debugPrint(e.toString());
@@ -131,7 +136,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Edit Category'),
+          title: Text(context.l10n.editCategory),
 
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -140,7 +145,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               TextField(
                 controller: nameController,
 
-                decoration: const InputDecoration(labelText: 'Category Name'),
+                decoration: InputDecoration(labelText: context.l10n.categoryName),
               ),
 
               const SizedBox(height: 12),
@@ -148,7 +153,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               TextField(
                 controller: descriptionController,
 
-                decoration: const InputDecoration(labelText: 'Description'),
+                decoration: InputDecoration(labelText: context.l10n.description),
               ),
             ],
           ),
@@ -159,7 +164,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -167,7 +172,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Update'),
+              child: Text(context.l10n.update),
             ),
           ],
         );
@@ -183,9 +188,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     try {
       await CategoryService().updateCategory(
         id: categoryId,
-
         name: nameController.text,
-
         description: descriptionController.text,
       );
 
@@ -194,7 +197,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category updated successfully')),
+        SnackBar(content: Text(context.l10n.categoryUpdatedSuccessfully)),
       );
     } catch (e) {
       debugPrint(e.toString());
@@ -207,9 +210,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Delete Category'),
+          title: Text(context.l10n.deleteCategory),
 
-          content: Text('Delete "${category['name']}"?'),
+          content: Text(
+            '${context.l10n.deleteCategoryQuestion}\n\n'
+            '${category['name']}',
+          ),
 
           actions: [
             TextButton(
@@ -217,7 +223,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -225,7 +231,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.pop(context, true);
               },
 
-              child: const Text('Delete'),
+              child: Text(context.l10n.delete),
             ),
           ],
         );
@@ -246,7 +252,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category deleted successfully')),
+        SnackBar(content: Text(context.l10n.categoryDeletedSuccessfully)),
       );
     } catch (e) {
       debugPrint(e.toString());
@@ -254,7 +260,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to delete category')),
+        SnackBar(content: Text(context.l10n.unableToDeleteCategory)),
       );
     }
   }
@@ -274,12 +280,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(title: const Text('Categories')),
+      appBar: AppBar(title: Text(context.l10n.categories)),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : categories.isEmpty
-          ? const Center(child: Text('No categories found'))
+          ? Center(child: Text(context.l10n.noCategoriesFound))
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 100),
               itemCount: categories.length,
