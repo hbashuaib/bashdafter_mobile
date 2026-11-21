@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/purchase_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'purchase_detail_screen.dart';
 
@@ -128,7 +131,8 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                     children: [
                       Text(context.l10n.purchases),
                       Text(
-                        purchases.length.toString(),
+                        // purchases.length.toString(),
+                        AppFormatters.number(context, purchases.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -138,7 +142,12 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                     children: [
                       Text(context.l10n.total),
                       Text(
-                        'YER ${currencyFormatter.format(totalPurchasesAmount)}',
+                        // 'YER ${currencyFormatter.format(totalPurchasesAmount)}',
+                        AppFormatters.currency(
+                          context,
+                          totalPurchasesAmount,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -149,7 +158,12 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                       Text(context.l10n.average),
 
                       Text(
-                        'YER ${currencyFormatter.format(averagePurchase)}',
+                        // 'YER ${currencyFormatter.format(averagePurchase)}',
+                        AppFormatters.currency(
+                          context,
+                          averagePurchase,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -249,8 +263,12 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                               }
                             },
                             title: Text(
-                              'YER ${currencyFormatter.format(totalAmount)}',
-
+                              // 'YER ${currencyFormatter.format(totalAmount)}',
+                              AppFormatters.currency(
+                                context,
+                                totalAmount,
+                                context.read<ShopProvider>().currency,
+                              ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),

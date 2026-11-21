@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/create_payment_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class AddPaymentScreen extends StatefulWidget {
   final int customerId;
-
   const AddPaymentScreen({super.key, required this.customerId});
 
   @override
@@ -15,10 +16,8 @@ class AddPaymentScreen extends StatefulWidget {
 }
 
 class _AddPaymentScreenState extends State<AddPaymentScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final amountController = TextEditingController();
   final notesController = TextEditingController();
-
   bool isSaving = false;
 
   Future<void> savePayment() async {
@@ -130,8 +129,10 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                     Text(context.l10n.paymentPreview),
 
                     Text(
-                      currencyFormatter.format(
+                      AppFormatters.currency(
+                        context,
                         double.tryParse(amountController.text) ?? 0,
+                        context.read<ShopProvider>().currency,
                       ),
 
                       style: const TextStyle(

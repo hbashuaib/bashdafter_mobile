@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/expiring_products_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 class ExpiringProductsScreen extends StatefulWidget {
   const ExpiringProductsScreen({super.key});
@@ -75,7 +76,7 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
                 if (expiryDate == null) {
                   return const SizedBox.shrink();
                 }
-                
+
                 final today = DateTime.now();
 
                 final days =
@@ -101,13 +102,13 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
                     title: Text(product['name']),
                     subtitle: Text(
                       '${context.l10n.expiryDate}: '
-                      '${product['expiry_date']}',
+                      '${AppFormatters.date(context, expiryDate)}',
                     ),
 
                     trailing: Text(
                       days < 0
                           ? context.l10n.expired
-                          : '$days ${context.l10n.days}',
+                          : '${AppFormatters.number(context, days)} ${context.l10n.days}',
                       style: TextStyle(
                         color: color,
                         fontWeight: FontWeight.bold,

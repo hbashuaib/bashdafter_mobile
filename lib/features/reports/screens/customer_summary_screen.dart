@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/reports_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class CustomerSummaryScreen extends StatefulWidget {
   const CustomerSummaryScreen({super.key});
@@ -14,7 +16,6 @@ class CustomerSummaryScreen extends StatefulWidget {
 }
 
 class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   List<dynamic> customers = [];
   List<dynamic> filteredCustomers = [];
@@ -112,8 +113,8 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                       Text(context.l10n.customers),
 
                       Text(
-                        customers.length.toString(),
-
+                        // customers.length.toString(),
+                        AppFormatters.number(context, customers.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -124,8 +125,12 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                       Text(context.l10n.outstanding),
 
                       Text(
-                        'YER ${currencyFormatter.format(totalOutstandingBalance)}',
-
+                        // 'YER ${currencyFormatter.format(totalOutstandingBalance)}',
+                        AppFormatters.currency(
+                          context,
+                          totalOutstandingBalance,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -171,11 +176,11 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredCustomers.length} '
+                '${AppFormatters.number(context, filteredCustomers.length)} '
                 '${context.l10n.outOf} '
-                '${customers.length} '
+                '${AppFormatters.number(context, customers.length)} '
                 '${context.l10n.customers}',
-
+                
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -214,7 +219,12 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                             ),
 
                             trailing: Text(
-                              'YER ${currencyFormatter.format(balance)}',
+                              // 'YER ${currencyFormatter.format(balance)}',
+                              AppFormatters.currency(
+                                context,
+                                balance,
+                                context.read<ShopProvider>().currency,
+                              ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),

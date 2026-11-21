@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/reports_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class RecentTransactionsScreen extends StatefulWidget {
   const RecentTransactionsScreen({super.key});
@@ -15,7 +17,6 @@ class RecentTransactionsScreen extends StatefulWidget {
 }
 
 class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   List<dynamic> transactions = [];
   List<dynamic> filteredTransactions = [];
@@ -128,8 +129,8 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                       Text(context.l10n.transactions),
 
                       Text(
-                        transactions.length.toString(),
-
+                        // transactions.length.toString(),
+                        AppFormatters.number(context, transactions.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -140,7 +141,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                       Text(context.l10n.purchases),
 
                       Text(
-                        purchaseCount.toString(),
+                        AppFormatters.number(context, purchaseCount),
 
                         style: const TextStyle(
                           color: Colors.red,
@@ -155,7 +156,7 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
                       Text(context.l10n.payments),
 
                       Text(
-                        paymentCount.toString(),
+                        AppFormatters.number(context, paymentCount),
 
                         style: const TextStyle(
                           color: Colors.green,
@@ -205,9 +206,9 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredTransactions.length} '
+                '${AppFormatters.number(context, filteredTransactions.length)} '
                 '${context.l10n.outOf} '
-                '${transactions.length} '
+                '${AppFormatters.number(context, transactions.length)} '
                 '${context.l10n.transactions}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -243,11 +244,12 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
                             subtitle: Text(
                               '${getTransactionTypeLabel(item['type'].toString())} • '
-                              '${item['date']}',
+                              '${AppFormatters.date(context, DateTime.parse(item['date'].toString()))}',
                             ),
 
                             trailing: Text(
-                              '${purchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
+                              '${purchase ? '+' : '-'}'
+                              '${AppFormatters.currency(context, double.tryParse(item['amount'].toString()) ?? 0, context.read<ShopProvider>().currency)}',
 
                               style: TextStyle(
                                 color: purchase ? Colors.red : Colors.green,

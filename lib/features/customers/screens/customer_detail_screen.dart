@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/customer_detail_service.dart';
 import '../services/update_customer_service.dart';
@@ -11,6 +11,8 @@ import '../../purchases/screens/add_purchase_screen.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'edit_customer_screen.dart';
 
@@ -24,7 +26,6 @@ class CustomerDetailScreen extends StatefulWidget {
 }
 
 class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? customer;
   UserProfile? currentUser;
 
@@ -266,11 +267,15 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       leading: const Icon(Icons.account_balance_wallet),
                       title: Text(context.l10n.balance),
                       trailing: Text(
-                        currencyFormatter.format(customerBalance),
+                        // currencyFormatter.format(customerBalance),
+                        AppFormatters.currency(
+                          context,
+                          customerBalance,
+                          context.read<ShopProvider>().currency,
+                        ),
 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-
                           color: hasBalance ? Colors.orange : Colors.green,
                         ),
                       ),

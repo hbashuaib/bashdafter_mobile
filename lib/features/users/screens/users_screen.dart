@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/user_service.dart';
 import '../../../core/storage/token_storage.dart';
+import '../../../core/localization/localization_extension.dart';
 
 import 'inactive_users_screen.dart';
 import 'user_form_screen.dart';
@@ -57,7 +58,7 @@ class _UsersScreenState extends State<UsersScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.blue),
-                title: const Text('Edit User'),
+                title: Text(context.l10n.editUser),
                 onTap: () async {
                   Navigator.pop(context);
 
@@ -76,7 +77,7 @@ class _UsersScreenState extends State<UsersScreen> {
 
               ListTile(
                 leading: const Icon(Icons.lock_reset, color: Colors.indigo),
-                title: const Text('Reset Password'),
+                title: Text(context.l10n.resetPassword),
                 onTap: () {
                   Navigator.pop(context);
                   showResetPasswordDialog(user);
@@ -86,7 +87,7 @@ class _UsersScreenState extends State<UsersScreen> {
               if (user.id != currentUserId)
                 ListTile(
                   leading: const Icon(Icons.block, color: Colors.red),
-                  title: const Text('Deactivate User'),
+                  title: Text(context.l10n.deactivateUser),
                   onTap: () {
                     Navigator.pop(context);
                     showDeactivateConfirmation(user);
@@ -107,12 +108,12 @@ class _UsersScreenState extends State<UsersScreen> {
 
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text('Reset ${user.username}'),
+          title: Text(context.l10n.resetUserPassword(user.username)),
 
           content: TextField(
             controller: controller,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'New Password'),
+            decoration: InputDecoration(labelText: context.l10n.newPassword),
           ),
 
           actions: [
@@ -122,7 +123,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 Navigator.pop(dialogContext);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -131,9 +132,7 @@ class _UsersScreenState extends State<UsersScreen> {
 
                 if (password.length < 6) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password must be at least 6 characters'),
-                    ),
+                    SnackBar(content: Text(context.l10n.passwordMinLength)),
                   );
 
                   return;
@@ -145,7 +144,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 await resetPassword(user, password);
               },
 
-              child: const Text('Reset'),
+              child: Text(context.l10n.resetPassword),
             ),
           ],
         );
@@ -173,7 +172,7 @@ class _UsersScreenState extends State<UsersScreen> {
       if (!mounted) return;
 
       setState(() {
-        errorMessage = 'Failed to load users';
+        errorMessage = context.l10n.failedToLoadUsers;
         isLoading = false;
       });
     }
@@ -196,14 +195,16 @@ class _UsersScreenState extends State<UsersScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${user.username} password reset successfully')),
+        SnackBar(
+          content: Text(context.l10n.resetPasswordSuccess(user.username)),
+        ),
       );
     } catch (_) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to reset password')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToResetPassword)),
+      );
     }
   }
 
@@ -214,14 +215,14 @@ class _UsersScreenState extends State<UsersScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('${user.username} deactivated')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.userDeactivated(user.username))),
+      );
     } catch (_) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to deactivate user')),
+        SnackBar(content: Text(context.l10n.failedToDeactivateUser)),
       );
     }
   }
@@ -231,22 +232,20 @@ class _UsersScreenState extends State<UsersScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Deactivate User'),
-          content: Text(
-            'Are you sure you want to deactivate ${user.username}?',
-          ),
+          title: Text(context.l10n.deactivateUser),
+          content: Text(context.l10n.deactivateUserQuestion(user.username)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Deactivate'),
+              child: Text(context.l10n.deactivateUser),
             ),
           ],
         );
@@ -266,7 +265,7 @@ class _UsersScreenState extends State<UsersScreen> {
 
     if (errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('User Management')),
+        appBar: AppBar(title: Text(context.l10n.userManagement)),
         body: Center(child: Text(errorMessage!)),
       );
     }
@@ -307,8 +306,8 @@ class _UsersScreenState extends State<UsersScreen> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               controller: searchController,
-              decoration: const InputDecoration(
-                labelText: 'Search Users',
+              decoration: InputDecoration(
+                labelText: context.l10n.searchUsers,
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -319,9 +318,9 @@ class _UsersScreenState extends State<UsersScreen> {
             child: filteredUsers.isEmpty
                 ? ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    children: const [
+                    children: [
                       SizedBox(height: 150),
-                      Center(child: Text('No users found')),
+                      Center(child: Text(context.l10n.noUsersFound)),
                     ],
                   )
                 : RefreshIndicator(

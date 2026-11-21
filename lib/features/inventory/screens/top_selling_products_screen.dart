@@ -4,6 +4,7 @@ import '../services/top_selling_products_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 class TopSellingProductsScreen extends StatefulWidget {
   const TopSellingProductsScreen({super.key});
@@ -113,8 +114,8 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                       Text(context.l10n.products),
 
                       Text(
-                        products.length.toString(),
-
+                        // products.length.toString(),
+                        AppFormatters.number(context, products.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -179,9 +180,9 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredProducts.length} '
+                '${AppFormatters.number(context, filteredProducts.length)} '
                 '${context.l10n.outOf} '
-                '${products.length} '
+                '${AppFormatters.number(context, products.length)} '
                 '${context.l10n.products}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -230,7 +231,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                               backgroundColor: getRankColor(rank),
 
                               child: Text(
-                                '#$rank',
+                                '#${AppFormatters.number(context, rank)}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -245,7 +246,9 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                             subtitle: Text(
                               '${context.l10n.currentStock}: '
-                              '${currentStock.toStringAsFixed(0)}',
+                              '${
+                              // currentStock.toStringAsFixed(0)
+                              AppFormatters.number(context, currentStock)}',
                             ),
 
                             trailing: Column(
@@ -258,7 +261,8 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                                 ),
 
                                 Text(
-                                  totalSold.toStringAsFixed(0),
+                                  // totalSold.toStringAsFixed(0),
+                                  AppFormatters.number(context, totalSold),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,

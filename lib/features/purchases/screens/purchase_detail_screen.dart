@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class PurchaseDetailScreen extends StatelessWidget {
   final Map<String, dynamic> purchase;
-  final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
+  const PurchaseDetailScreen({super.key, required this.purchase});
 
-  PurchaseDetailScreen({super.key, required this.purchase});
-
-  String buildWhatsAppMessage() {
+  String buildWhatsAppMessage(BuildContext context) {
     final buffer = StringBuffer();
     final totalAmount =
         double.tryParse(purchase['total_amount'].toString()) ?? 0;
@@ -38,7 +38,7 @@ class PurchaseDetailScreen extends StatelessWidget {
 
     buffer.writeln(
       'Total Amount: '
-      'YER ${currencyFormatter.format(totalAmount)}',
+      '${AppFormatters.currency(context, totalAmount, context.read<ShopProvider>().currency)}',
     );
 
     buffer.writeln('');
@@ -62,7 +62,7 @@ class PurchaseDetailScreen extends StatelessWidget {
 
             onPressed: () {
               SharePlus.instance.share(
-                ShareParams(text: buildWhatsAppMessage()),
+                ShareParams(text: buildWhatsAppMessage(context)),
               );
             },
           ),
@@ -75,14 +75,26 @@ class PurchaseDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               title: Text(context.l10n.purchaseDate),
-              subtitle: Text(purchase['purchase_date'].toString()),
+              subtitle: Text(
+                AppFormatters.date(
+                  context,
+                  DateTime.parse(purchase['purchase_date'].toString()),
+                ),
+              ),
             ),
           ),
 
           Card(
             child: ListTile(
               title: Text(context.l10n.totalAmount),
-              subtitle: Text('YER ${currencyFormatter.format(totalAmount)}'),
+              subtitle: Text(
+                // 'YER ${currencyFormatter.format(totalAmount)}',
+                AppFormatters.currency(
+                  context,
+                  totalAmount,
+                  context.read<ShopProvider>().currency,
+                ),
+              ),
             ),
           ),
 
@@ -117,10 +129,17 @@ class PurchaseDetailScreen extends StatelessWidget {
               child: ListTile(
                 title: Text(item['item_name']),
                 subtitle: Text(
-                  '${item['quantity']} x ${currencyFormatter.format(unitPrice)}',
+                  '${item['quantity']} x ${
+                  // currencyFormatter.format(unitPrice)
+                  AppFormatters.currency(context, unitPrice, context.read<ShopProvider>().currency)}',
                 ),
                 trailing: Text(
-                  currencyFormatter.format(totalPrice),
+                  // currencyFormatter.format(totalPrice),
+                  AppFormatters.currency(
+                    context,
+                    totalPrice,
+                    context.read<ShopProvider>().currency,
+                  ),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),

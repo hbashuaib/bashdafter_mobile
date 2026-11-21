@@ -1204,4 +1204,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noDebtorsFound => 'No debtors found';
+
+  @override
+  String get only => 'Only';
+
+  @override
+  String get inactiveUsers => 'Inactive Users';
+
+  @override
+  String get noInactiveUsersFound => 'No inactive users found';
+
+  @override
+  String get failedToLoadInactiveUsers => 'Failed to load inactive users';
+
+  @override
+  String get failedToRestoreUser => 'Failed to restore user';
+
+  @override
+  String get restoreUser => 'Restore User';
+
+  @override
+  String restoreUserQuestion(Object username) {
+    return 'Are you sure you want to restore $username?';
+  }
+
+  @override
+  String userRestoredSuccessfully(Object username) {
+    return '$username restored successfully';
+  }
+
+  @override
+  String get userFormCreateTitle => 'Create User';
+
+  @override
+  String get userFormEditTitle => 'Edit User';
+
+  @override
+  String get firstName => 'First Name';
+
+  @override
+  String get lastName => 'Last Name';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters';
+
+  @override
+  String get userCreatedSuccessfully => 'User created successfully';
+
+  @override
+  String get userUpdatedSuccessfully => 'User updated successfully';
+
+  @override
+  String get failedToCreateUser => 'Failed to create user';
+
+  @override
+  String get failedToUpdateUser => 'Failed to update user';
+
+  @override
+  String get createUser => 'Create User';
+
+  @override
+  String get adminRole => 'Admin';
+
+  @override
+  String get managerRole => 'Manager';
+
+  @override
+  String get cashierRole => 'Cashier';
+
+  @override
+  String get searchUsers => 'Search Users';
+
+  @override
+  String get noUsersFound => 'No users found';
+
+  @override
+  String get editUser => 'Edit User';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get deactivateUser => 'Deactivate User';
+
+  @override
+  String get failedToLoadUsers => 'Failed to load users';
+
+  @override
+  String get failedToResetPassword => 'Failed to reset password';
+
+  @override
+  String get failedToDeactivateUser => 'Failed to deactivate user';
+
+  @override
+  String resetUserPassword(Object username) {
+    return 'Reset $username';
+  }
+
+  @override
+  String resetPasswordSuccess(Object username) {
+    return '$username password reset successfully';
+  }
+
+  @override
+  String deactivateUserQuestion(Object username) {
+    return 'Are you sure you want to deactivate $username?';
+  }
+
+  @override
+  String userDeactivated(Object username) {
+    return '$username deactivated';
+  }
 }

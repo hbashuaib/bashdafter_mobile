@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
 import '../services/user_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class InactiveUsersScreen extends StatefulWidget {
   const InactiveUsersScreen({super.key});
@@ -43,7 +44,7 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
       if (!mounted) return;
 
       setState(() {
-        errorMessage = 'Failed to load inactive users';
+        errorMessage = context.l10n.failedToLoadInactiveUsers;
         isLoading = false;
       });
     }
@@ -56,7 +57,9 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${user.username} restored successfully')),
+        SnackBar(
+          content: Text(context.l10n.userRestoredSuccessfully(user.username)),
+        ),
       );
 
       loadUsers();
@@ -65,7 +68,7 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to restore user')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToRestoreUser)));
     }
   }
 
@@ -74,20 +77,20 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Restore User'),
-          content: Text('Are you sure you want to restore ${user.username}?'),
+          title: Text(context.l10n.restoreUser),
+          content: Text(context.l10n.restoreUserQuestion(user.username)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Restore'),
+              child: Text(context.l10n.restore),
             ),
           ],
         );
@@ -107,20 +110,19 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
 
     if (errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Inactive Users')),
+        appBar: AppBar(title: Text(context.l10n.inactiveUsers)),
         body: Center(child: Text(errorMessage!)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inactive Users')),
+      appBar: AppBar(title: Text(context.l10n.inactiveUsers)),
       body: users.isEmpty
           ? ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(height: 150),
-
-                Center(child: Text('No inactive users found')),
+              children: [
+                const SizedBox(height: 150),
+                Center(child: Text(context.l10n.noInactiveUsersFound)),
               ],
             )
           : RefreshIndicator(

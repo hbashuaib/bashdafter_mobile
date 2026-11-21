@@ -4,6 +4,7 @@ import '../services/inventory_transaction_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 class InventoryHistoryScreen extends StatefulWidget {
   const InventoryHistoryScreen({super.key});
@@ -169,9 +170,9 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredTransactions.length} '
+                '${AppFormatters.number(context, filteredTransactions.length)} '
                 '${context.l10n.outOf} '
-                '${transactions.length} '
+                '${AppFormatters.number(context, transactions.length)} '
                 '${context.l10n.transactions}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -265,7 +266,10 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                                   ),
                                 ),
 
-                                Text(quantity.toStringAsFixed(0)),
+                                Text(
+                                  // quantity.toStringAsFixed(0)
+                                  AppFormatters.number(context, quantity),
+                                ),
                               ],
                             ),
                           ),

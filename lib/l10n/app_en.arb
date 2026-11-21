@@ -895,5 +895,85 @@
 
 "searchDebtor": "Search debtor",
 
-"noDebtorsFound": "No debtors found"
+"noDebtorsFound": "No debtors found",
+
+"only": "Only",
+
+"inactiveUsers": "Inactive Users",
+"noInactiveUsersFound": "No inactive users found",
+"failedToLoadInactiveUsers": "Failed to load inactive users",
+"failedToRestoreUser": "Failed to restore user",
+"restoreUser": "Restore User",
+"restoreUserQuestion": "Are you sure you want to restore {username}?",
+"@restoreUserQuestion": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"userRestoredSuccessfully": "{username} restored successfully",
+"@userRestoredSuccessfully": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"userFormCreateTitle": "Create User",
+"userFormEditTitle": "Edit User",
+
+"firstName": "First Name",
+"lastName": "Last Name",
+
+"passwordMinLength": "Password must be at least 6 characters",
+
+"userCreatedSuccessfully": "User created successfully",
+"userUpdatedSuccessfully": "User updated successfully",
+
+"failedToCreateUser": "Failed to create user",
+"failedToUpdateUser": "Failed to update user",
+
+"createUser": "Create User",
+
+"adminRole": "Admin",
+"managerRole": "Manager",
+"cashierRole": "Cashier",
+
+"searchUsers": "Search Users",
+"noUsersFound": "No users found",
+
+"editUser": "Edit User",
+"resetPassword": "Reset Password",
+"deactivateUser": "Deactivate User",
+
+"failedToLoadUsers": "Failed to load users",
+"failedToResetPassword": "Failed to reset password",
+"failedToDeactivateUser": "Failed to deactivate user",
+
+"resetUserPassword": "Reset {username}",
+"@resetUserPassword": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"resetPasswordSuccess": "{username} password reset successfully",
+"@resetPasswordSuccess": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"deactivateUserQuestion": "Are you sure you want to deactivate {username}?",
+"@deactivateUserQuestion": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"userDeactivated": "{username} deactivated",
+"@userDeactivated": {
+  "placeholders": {
+    "username": {}
+  }
+}
 }

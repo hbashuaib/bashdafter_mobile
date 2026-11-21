@@ -4,6 +4,7 @@ import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -74,9 +75,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
 
     if (selectedCategory == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.pleaseSelectCategory)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.pleaseSelectCategory)),
+      );
 
       return;
     }
@@ -141,7 +142,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
 
     try {
-      await ProductService().createProduct(       
+      await ProductService().createProduct(
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),
@@ -221,7 +222,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
             decoration: InputDecoration(
               labelText: context.l10n.barcodeLabel,
               prefixIcon: const Icon(Icons.qr_code),
-              suffixIcon: IconButton(icon: const Icon(Icons.camera_alt),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.camera_alt),
 
                 onPressed: () async {
                   final barcode = await Navigator.push(
@@ -242,7 +244,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           const SizedBox(height: 12),
 
           DropdownButtonFormField<int>(
-            value: selectedCategory,
+            initialValue: selectedCategory,
 
             items: categories.map((item) {
               return DropdownMenuItem<int>(
@@ -263,7 +265,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           const SizedBox(height: 12),
 
           DropdownButtonFormField<int>(
-            value: selectedUnit,
+            initialValue: selectedUnit,
 
             items: units.map((item) {
               return DropdownMenuItem<int>(
@@ -337,7 +339,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               title: Text(
                 expiryDate == null
                     ? context.l10n.selectExpiryDate
-                    : expiryDate!.toString().split(' ').first,
+                    : AppFormatters.date(context, expiryDate!),
               ),
 
               onTap: () async {

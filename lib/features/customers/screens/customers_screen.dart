@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/customer_service.dart';
 import '../../../core/storage/token_storage.dart';
@@ -8,6 +8,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'customer_detail_screen.dart';
 import 'add_customer_screen.dart';
@@ -21,7 +23,6 @@ class CustomersScreen extends StatefulWidget {
 }
 
 class _CustomersScreenState extends State<CustomersScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   List<dynamic> customers = [];
   List<dynamic> filteredCustomers = [];
@@ -153,9 +154,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredCustomers.length} '
+                '${AppFormatters.number(context, filteredCustomers.length)} '
                 '${context.l10n.outOf} '
-                '${customers.length} '
+                '${AppFormatters.number(context, customers.length)} '
                 '${context.l10n.showingCustomers}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -283,11 +284,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               ),
 
                               label: Text(
-                                currencyFormatter.format(
+                                AppFormatters.currency(
+                                  context,
                                   double.tryParse(
                                         customer['balance'].toString(),
                                       ) ??
                                       0,
+                                  context.read<ShopProvider>().currency,
                                 ),
                               ),
                             ),

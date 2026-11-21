@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../products/services/barcode_lookup_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -16,7 +18,6 @@ class InventoryLookupScreen extends StatefulWidget {
 }
 
 class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? product;
   bool isLoading = false;
 
@@ -142,14 +143,16 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                         '${context.l10n.barcodeLabel}: ${product!['barcode'] ?? '-'}',
                       ),
                       Text(
-                        '${context.l10n.stock}: ${product!['current_stock']}',
+                        '${context.l10n.stock}: '
+                        '${AppFormatters.number(context, currentStock)}',
                       ),
                       Text(
-                        '${context.l10n.minimumStock}: ${product!['minimum_stock']}',
+                        '${context.l10n.minimumStock}: '
+                        '${AppFormatters.number(context, minimumStock)}',
                       ),
                       Text(
                         '${context.l10n.sellingPrice}: '
-                        'YER ${currencyFormatter.format(sellingPrice)}',
+                        '${AppFormatters.currency(context, sellingPrice, context.read<ShopProvider>().currency)}',
                       ),
 
                       const SizedBox(height: 12),
@@ -193,7 +196,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                           onPressed: () async {
                             final messenger = ScaffoldMessenger.of(context);
                             final stockUpdatedText = context.l10n.stockUpdated;
-                            final currentStockText = context.l10n.currentStock;
+                            final currentStockText = context.l10n.currentStock;                            
 
                             final result = await Navigator.push(
                               context,
@@ -219,6 +222,13 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                                           product!['barcode'],
                                         );
 
+                                final updatedStock =
+                                    double.tryParse(
+                                      updatedProduct['current_stock']
+                                          .toString(),
+                                    ) ??
+                                    0;
+
                                 if (!mounted) {
                                   return;
                                 }
@@ -233,7 +243,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                                     content: Text(
                                       '$stockUpdatedText. '
                                       '$currentStockText: '
-                                      '${updatedProduct['current_stock']}',
+                                      '${updatedStock.toInt()}',
                                     ),
                                   ),
                                 );

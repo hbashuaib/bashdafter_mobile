@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/payment_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'payment_detail_screen.dart';
 
@@ -18,7 +20,6 @@ class PaymentsScreen extends StatefulWidget {
 }
 
 class _PaymentsScreenState extends State<PaymentsScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   List<dynamic> payments = [];
   List<dynamic> filteredPayments = [];
@@ -125,7 +126,8 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                     children: [
                       Text(context.l10n.payments),
                       Text(
-                        payments.length.toString(),
+                        // payments.length.toString(),
+                        AppFormatters.number(context, payments.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -134,7 +136,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                     children: [
                       Text(context.l10n.total),
                       Text(
-                        'YER ${currencyFormatter.format(totalPaymentsAmount)}',
+                        // 'YER ${currencyFormatter.format(totalPaymentsAmount)}',
+                        AppFormatters.currency(
+                          context,
+                          totalPaymentsAmount,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -144,7 +151,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                       Text(context.l10n.average),
 
                       Text(
-                        'YER ${currencyFormatter.format(averagePayment)}',
+                        // 'YER ${currencyFormatter.format(averagePayment)}',
+                        AppFormatters.currency(
+                          context,
+                          averagePayment,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -189,9 +201,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredPayments.length} '
+                '${AppFormatters.number(context, filteredPayments.length)} '
                 '${context.l10n.outOf} '
-                '${payments.length} '
+                '${AppFormatters.number(context, payments.length)} '
                 '${context.l10n.showingPayments}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -234,7 +246,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                             },
 
                             title: Text(
-                              'YER ${currencyFormatter.format(amount)}',
+                              // 'YER ${currencyFormatter.format(amount)}',
+                              AppFormatters.currency(
+                                context,
+                                amount,
+                                context.read<ShopProvider>().currency,
+                              ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -244,7 +261,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
 
                               children: [
-                                Text(payment['payment_date']),
+                                Text(
+                                  AppFormatters.date(
+                                    context,
+                                    DateTime.parse(
+                                      payment['payment_date'].toString(),
+                                    ),
+                                  ),
+                                ),
 
                                 if ((payment['notes'] ?? '')
                                     .toString()

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/create_purchase_service.dart';
 import '../services/create_purchase_item_service.dart';
@@ -8,6 +8,8 @@ import '../../products/services/barcode_lookup_service.dart';
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -22,10 +24,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   final quantityController = TextEditingController();
   final unitPriceController = TextEditingController();
   final notesController = TextEditingController();
-  final currencyFormatter = NumberFormat('#,##0.00');
-
   final FocusNode quantityFocusNode = FocusNode();
-
   bool isSaving = false;
   List<Map<String, dynamic>> purchaseItems = [];
   List<dynamic> products = [];
@@ -116,7 +115,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     if (quantity > currentStock) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Only $currentStock ${context.l10n.availableInStock}'),
+          content: Text(
+            '${context.l10n.only} '
+            '${AppFormatters.number(context, currentStock)} '
+            '${context.l10n.availableInStock}',
+          ),
         ),
       );
 
@@ -291,7 +294,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             const SizedBox(height: 15),
 
             DropdownButtonFormField<dynamic>(
-              value: selectedProduct,
+              initialValue: selectedProduct,
               decoration: InputDecoration(labelText: context.l10n.product),
 
               items: products.map((product) {
@@ -364,11 +367,14 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     Text(context.l10n.lineTotal),
 
                     Text(
-                      currencyFormatter.format(lineTotal),
+                      AppFormatters.currency(
+                        context,
+                        lineTotal,
+                        context.read<ShopProvider>().currency,
+                      ),
 
                       style: const TextStyle(
                         fontSize: 18,
-
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -438,10 +444,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${context.l10n.quantity}: ${quantity.toStringAsFixed(0)}',
+                          '${context.l10n.quantity}: ${AppFormatters.number(context, quantity)}',
                         ),
                         Text(
-                          '${context.l10n.unitPrice}: ${currencyFormatter.format(unitPrice)}',
+                          '${context.l10n.unitPrice}: '
+                          '${AppFormatters.currency(context, unitPrice, context.read<ShopProvider>().currency)}',
                         ),
                       ],
                     ),
@@ -463,7 +470,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            currencyFormatter.format(total),
+                            AppFormatters.currency(
+                              context,
+                              total,
+                              context.read<ShopProvider>().currency,
+                            ),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -506,11 +517,14 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     ),
 
                     Text(
-                      currencyFormatter.format(totalAmount),
+                      AppFormatters.currency(
+                        context,
+                        totalAmount,
+                        context.read<ShopProvider>().currency,
+                      ),
 
                       style: const TextStyle(
                         fontSize: 20,
-
                         fontWeight: FontWeight.bold,
                       ),
                     ),

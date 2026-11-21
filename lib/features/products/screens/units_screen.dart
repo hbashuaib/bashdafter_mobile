@@ -142,16 +142,16 @@ class _UnitsScreenState extends State<UnitsScreen> {
             children: [
               TextField(
                 controller: nameController,
-
-                decoration: const InputDecoration(labelText: 'Unit Name'),
+                decoration: InputDecoration(labelText: context.l10n.unitName),
               ),
 
               const SizedBox(height: 12),
 
               TextField(
                 controller: descriptionController,
-
-                decoration: const InputDecoration(labelText: 'Description'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.description,
+                ),
               ),
             ],
           ),
@@ -162,7 +162,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -223,7 +223,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 Navigator.pop(context, false);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton(
@@ -259,8 +259,9 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(context.l10n.unableToDeleteUnit)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.unableToDeleteUnit)));
     }
   }
 

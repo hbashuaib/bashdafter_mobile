@@ -4,6 +4,7 @@ import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -269,7 +270,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           const SizedBox(height: 12),
 
           DropdownButtonFormField<int>(
-            value: selectedCategory,
+            initialValue: selectedCategory,
             decoration: InputDecoration(labelText: context.l10n.category),
 
             items: categories.map((item) {
@@ -289,7 +290,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           const SizedBox(height: 12),
 
           DropdownButtonFormField<int>(
-            value: selectedUnit,
+            initialValue: selectedUnit,
             decoration: InputDecoration(labelText: context.l10n.unit),
 
             items: units.map((item) {
@@ -366,7 +367,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               title: Text(
                 expiryDate == null
                     ? context.l10n.selectExpiryDate
-                    : expiryDate!.toString().split(' ').first,
+                    : AppFormatters.date(context, expiryDate!),
               ),
 
               onTap: () async {

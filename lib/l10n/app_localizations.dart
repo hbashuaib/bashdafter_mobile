@@ -2443,6 +2443,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No debtors found'**
   String get noDebtorsFound;
+
+  /// No description provided for @only.
+  ///
+  /// In en, this message translates to:
+  /// **'Only'**
+  String get only;
+
+  /// No description provided for @inactiveUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive Users'**
+  String get inactiveUsers;
+
+  /// No description provided for @noInactiveUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No inactive users found'**
+  String get noInactiveUsersFound;
+
+  /// No description provided for @failedToLoadInactiveUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load inactive users'**
+  String get failedToLoadInactiveUsers;
+
+  /// No description provided for @failedToRestoreUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restore user'**
+  String get failedToRestoreUser;
+
+  /// No description provided for @restoreUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore User'**
+  String get restoreUser;
+
+  /// No description provided for @restoreUserQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to restore {username}?'**
+  String restoreUserQuestion(Object username);
+
+  /// No description provided for @userRestoredSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} restored successfully'**
+  String userRestoredSuccessfully(Object username);
+
+  /// No description provided for @userFormCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create User'**
+  String get userFormCreateTitle;
+
+  /// No description provided for @userFormEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit User'**
+  String get userFormEditTitle;
+
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstName;
+
+  /// No description provided for @lastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastName;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordMinLength;
+
+  /// No description provided for @userCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'User created successfully'**
+  String get userCreatedSuccessfully;
+
+  /// No description provided for @userUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'User updated successfully'**
+  String get userUpdatedSuccessfully;
+
+  /// No description provided for @failedToCreateUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create user'**
+  String get failedToCreateUser;
+
+  /// No description provided for @failedToUpdateUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update user'**
+  String get failedToUpdateUser;
+
+  /// No description provided for @createUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Create User'**
+  String get createUser;
+
+  /// No description provided for @adminRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin'**
+  String get adminRole;
+
+  /// No description provided for @managerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get managerRole;
+
+  /// No description provided for @cashierRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Cashier'**
+  String get cashierRole;
+
+  /// No description provided for @searchUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Users'**
+  String get searchUsers;
+
+  /// No description provided for @noUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get noUsersFound;
+
+  /// No description provided for @editUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit User'**
+  String get editUser;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPassword;
+
+  /// No description provided for @deactivateUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate User'**
+  String get deactivateUser;
+
+  /// No description provided for @failedToLoadUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load users'**
+  String get failedToLoadUsers;
+
+  /// No description provided for @failedToResetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reset password'**
+  String get failedToResetPassword;
+
+  /// No description provided for @failedToDeactivateUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to deactivate user'**
+  String get failedToDeactivateUser;
+
+  /// No description provided for @resetUserPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset {username}'**
+  String resetUserPassword(Object username);
+
+  /// No description provided for @resetPasswordSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} password reset successfully'**
+  String resetPasswordSuccess(Object username);
+
+  /// No description provided for @deactivateUserQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to deactivate {username}?'**
+  String deactivateUserQuestion(Object username);
+
+  /// No description provided for @userDeactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} deactivated'**
+  String userDeactivated(Object username);
 }
 
 class _AppLocalizationsDelegate

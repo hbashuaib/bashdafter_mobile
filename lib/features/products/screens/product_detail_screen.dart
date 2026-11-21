@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../services/product_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'edit_product_screen.dart';
 
@@ -19,9 +21,7 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
   final ProductService _productService = ProductService();
-
   UserProfile? currentUser;
 
   @override
@@ -199,35 +199,58 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Card(
             child: ListTile(
               title: Text(context.l10n.costPrice),
-              subtitle: Text('YER ${currencyFormatter.format(costPrice)}'),
+              subtitle: Text(
+                // 'YER ${currencyFormatter.format(costPrice)}'
+                AppFormatters.currency(
+                  context,
+                  costPrice,
+                  context.read<ShopProvider>().currency,
+                ),
+              ),
             ),
           ),
 
           Card(
             child: ListTile(
               title: Text(context.l10n.sellingPrice),
-              subtitle: Text('YER ${currencyFormatter.format(sellingPrice)}'),
+              subtitle: Text(
+                // 'YER ${currencyFormatter.format(sellingPrice)}'
+                AppFormatters.currency(
+                  context,
+                  sellingPrice,
+                  context.read<ShopProvider>().currency,
+                ),
+              ),
             ),
           ),
 
           Card(
             child: ListTile(
               title: Text(context.l10n.currentStock),
-              subtitle: Text(currentStock.toStringAsFixed(0)),
+              subtitle: Text(
+                // currentStock.toStringAsFixed(0)
+                AppFormatters.number(context, currentStock),
+              ),
             ),
           ),
 
           Card(
             child: ListTile(
               title: Text(context.l10n.totalSold),
-              subtitle: Text(totalSold.toStringAsFixed(0)),
+              subtitle: Text(
+                // totalSold.toStringAsFixed(0)
+                AppFormatters.number(context, totalSold),
+              ),
             ),
           ),
 
           Card(
             child: ListTile(
               title: Text(context.l10n.stockAdjustments),
-              subtitle: Text(totalAdjustments.toStringAsFixed(0)),
+              subtitle: Text(
+                // totalAdjustments.toStringAsFixed(0)
+                AppFormatters.number(context, totalAdjustments),
+              ),
             ),
           ),
 
@@ -253,7 +276,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Card(
             child: ListTile(
               title: Text(context.l10n.minimumStock),
-              subtitle: Text(minimumStock.toStringAsFixed(0)),
+              subtitle: Text(
+                // minimumStock.toStringAsFixed(0)
+                AppFormatters.number(context, minimumStock),
+              ),
             ),
           ),
 
@@ -273,7 +299,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 title: Text(context.l10n.expiryDate),
 
                 subtitle: Text(
-                  widget.product['expiry_date']?.toString() ?? '-',
+                  widget.product['expiry_date'] == null
+                      ? '-'
+                      : AppFormatters.date(
+                          context,
+                          DateTime.parse(widget.product['expiry_date']),
+                        ),
                 ),
               ),
             ),
@@ -300,13 +331,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   textColor = Colors.orange.shade900;
                   status =
                       '${context.l10n.expiresIn} '
-                      '$remaining '
+                      '${AppFormatters.number(context, remaining)} '
                       '${context.l10n.daysRemaining}';
                 } else {
                   cardColor = Colors.green.shade50;
                   textColor = Colors.green.shade900;
                   status =
-                      '$remaining '
+                      '${AppFormatters.number(context, remaining)} '
                       '${context.l10n.daysRemaining}';
                 }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/product_service.dart';
 import '../../../core/storage/token_storage.dart';
@@ -8,6 +8,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
@@ -22,7 +24,6 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   List<dynamic> products = [];
   List<dynamic> filteredProducts = [];
@@ -182,7 +183,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       children: [
                         Text(context.l10n.total),
                         Text(
-                          totalProducts.toString(),
+                          AppFormatters.number(context, totalProducts),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -192,7 +193,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       children: [
                         Text(context.l10n.active),
                         Text(
-                          activeProducts.toString(),
+                          AppFormatters.number(context, activeProducts),
                           style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -205,7 +206,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       children: [
                         Text(context.l10n.inactive),
                         Text(
-                          inactiveProducts.toString(),
+                          AppFormatters.number(context, inactiveProducts),
                           style: const TextStyle(
                             color: Colors.red,
                             fontWeight: FontWeight.bold,
@@ -313,9 +314,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredProducts.length} '
+                '${AppFormatters.number(context, filteredProducts.length)} '
                 '${context.l10n.outOf} '
-                '${products.length} '
+                '${AppFormatters.number(context, products.length)} '
                 '${context.l10n.productsLabel}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -384,7 +385,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ),
 
                             trailing: Text(
-                              'YER ${currencyFormatter.format(double.tryParse(product['selling_price'].toString()) ?? 0)}',
+                              AppFormatters.currency(
+                                context,
+                                double.tryParse(
+                                      product['selling_price'].toString(),
+                                    ) ??
+                                    0,
+                                context.read<ShopProvider>().currency,
+                              ),
 
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,

@@ -192,7 +192,7 @@ class CustomerStatementPdfService {
                         ),
                       ),
                     )
-                  : pw.Table.fromTextArray(
+                  : pw.TableHelper.fromTextArray(
                       headerDecoration: const pw.BoxDecoration(
                         color: PdfColors.blue200,
                       ),

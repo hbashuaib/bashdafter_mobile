@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/inventory_dashboard_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class InventoryDashboardScreen extends StatefulWidget {
   const InventoryDashboardScreen({super.key});
@@ -14,7 +16,6 @@ class InventoryDashboardScreen extends StatefulWidget {
 }
 
 class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? dashboard;
   bool isLoading = true;
 
@@ -77,8 +78,15 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
         trailing: Text(
           isInventoryValue
-              ? 'YER ${currencyFormatter.format(double.tryParse(value.toString()) ?? 0)}'
-              : value.toString(),
+              ? AppFormatters.currency(
+                  context,
+                  double.tryParse(value.toString()) ?? 0,
+                  context.read<ShopProvider>().currency,
+                )
+              : AppFormatters.number(
+                  context,
+                  num.tryParse(value.toString()) ?? 0,
+                ),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -125,7 +133,10 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                               Text(context.l10n.products),
 
                               Text(
-                                dashboard!['total_products'].toString(),
+                                AppFormatters.number(
+                                  context,
+                                  dashboard!['total_products'] ?? 0,
+                                ),
 
                                 style: const TextStyle(
                                   fontSize: 20,
@@ -140,7 +151,10 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                               Text(context.l10n.lowStock),
 
                               Text(
-                                dashboard!['low_stock_products'].toString(),
+                                AppFormatters.number(
+                                  context,
+                                  dashboard!['low_stock_products'] ?? 0,
+                                ),
 
                                 style: const TextStyle(
                                   color: Colors.orange,
@@ -156,7 +170,10 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                               Text(context.l10n.expiring),
 
                               Text(
-                                dashboard!['expiring_products'].toString(),
+                                AppFormatters.number(
+                                  context,
+                                  dashboard!['expiring_products'] ?? 0,
+                                ),
 
                                 style: const TextStyle(
                                   color: Colors.red,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:provider/provider.dart';
 
 import '../services/customer_statement_service.dart';
 import '../services/customer_statement_pdf_service.dart';
@@ -7,8 +8,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
-
-import 'package:share_plus/share_plus.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class CustomerStatementScreen extends StatefulWidget {
   final int customerId;
@@ -21,7 +22,6 @@ class CustomerStatementScreen extends StatefulWidget {
 }
 
 class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   Map<String, dynamic>? statement;
   List<dynamic> filteredTransactions = [];
@@ -83,7 +83,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     });
   }
 
-  String buildWhatsAppStatement() {
+  String buildWhatsAppStatement(BuildContext context) {
     final buffer = StringBuffer();
     final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
 
@@ -97,19 +97,32 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     buffer.writeln('');
     buffer.writeln('Current Balance:');
 
-    buffer.writeln('YER ${currencyFormatter.format(balance)}');
+    buffer.writeln(
+      AppFormatters.currency(
+        context,
+        balance,
+        context.read<ShopProvider>().currency,
+      ),
+    );
 
     buffer.writeln('');
     buffer.writeln('Transactions:');
 
     for (final item in filteredTransactions) {
       final isPurchase = item['type'] == 'purchase';
+      final amount = double.tryParse(item['amount'].toString()) ?? 0;
+
+      final formattedAmount = AppFormatters.currency(
+        context,
+        amount,
+        context.read<ShopProvider>().currency,
+      );
 
       buffer.writeln(
         '${item['date']}'
         ' | ${isPurchase ? '🛒 PURCHASE' : '💰 PAYMENT'}'
         ' | ${isPurchase ? '+' : '-'}'
-        '${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
+        '$formattedAmount',
       );
     }
 
@@ -184,7 +197,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
             onPressed: () {
               SharePlus.instance.share(
-                ShareParams(text: buildWhatsAppStatement()),
+                ShareParams(text: buildWhatsAppStatement(context)),
               );
             },
           ),
@@ -216,8 +229,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                         Text(context.l10n.transactions),
 
                         Text(
-                          transactions.length.toString(),
-
+                          // transactions.length.toString(),
+                          AppFormatters.number(context, transactions.length),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -231,8 +244,12 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                         Text(context.l10n.balance),
 
                         Text(
-                          'YER ${currencyFormatter.format(balance)}',
-
+                          // 'YER ${currencyFormatter.format(balance)}',
+                          AppFormatters.currency(
+                            context,
+                            balance,
+                            context.read<ShopProvider>().currency,
+                          ),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -287,9 +304,9 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
             Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredTransactions.length} '
+                '${AppFormatters.number(context, filteredTransactions.length)} '
                 '${context.l10n.outOf} '
-                '${transactions.length} '
+                '${AppFormatters.number(context, transactions.length)} '
                 '${context.l10n.transactions}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -331,7 +348,12 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                                     ? context.l10n.purchaseType
                                     : context.l10n.paymentType,
                               ),
-                              subtitle: Text(item['date']),
+                              subtitle: Text(
+                                AppFormatters.date(
+                                  context,
+                                  DateTime.parse(item['date'].toString()),
+                                ),
+                              ),
 
                               trailing: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -339,8 +361,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                                 children: [
                                   Text(
-                                    '${isPurchase ? '+' : '-'}YER ${currencyFormatter.format(double.tryParse(item['amount'].toString()) ?? 0)}',
-
+                                    '${isPurchase ? '+' : '-'}'
+                                    '${AppFormatters.currency(context, double.tryParse(item['amount'].toString()) ?? 0, context.read<ShopProvider>().currency)}',
                                     style: TextStyle(
                                       color: isPurchase
                                           ? Colors.red
@@ -351,11 +373,9 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                                   Text(
                                     '${context.l10n.runningBalance}: '
-                                    '${currencyFormatter.format(runningBalance)}',
-
+                                    '${AppFormatters.currency(context, runningBalance, context.read<ShopProvider>().currency)}',
                                     style: TextStyle(
                                       fontSize: 12,
-
                                       color: runningBalance > 0
                                           ? Colors.red
                                           : Colors.green,

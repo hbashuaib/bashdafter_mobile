@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/dashboard_service.dart';
 import '../../../core/storage/token_storage.dart';
@@ -8,6 +8,8 @@ import '../../inventory/screens/inventory_menu_screen.dart';
 import '../../voice/screens/voice_recorder_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,7 +19,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   Map<String, dynamic>? dashboardData;
   bool isLoading = true;
 
@@ -149,7 +150,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Text(context.l10n.customersCount),
 
                               Text(
-                                dashboardData!['customers'].toString(),
+                                // dashboardData!['customers'].toString(),
+                                AppFormatters.number(
+                                  context,
+                                  dashboardData!['customers'] ?? 0,
+                                ),
 
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -164,8 +169,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Text(context.l10n.balance),
 
                               Text(
-                                'YER ${currencyFormatter.format(totalBalance)}',
-
+                                // 'YER ${currencyFormatter.format(totalBalance)}',
+                                AppFormatters.currency(
+                                  context,
+                                  totalBalance,
+                                  context.read<ShopProvider>().currency,
+                                ),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -201,8 +210,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       leading: const Icon(Icons.people, color: Colors.blue),
                       title: Text(context.l10n.customersCount),
                       trailing: Text(
-                        dashboardData!['customers'].toString(),
-
+                        // dashboardData!['customers'].toString(),
+                        AppFormatters.number(
+                          context,
+                          dashboardData!['customers'] ?? 0,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -217,7 +229,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       title: Text(context.l10n.totalPurchases),
                       trailing: Text(
-                        'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_purchases'].toString()) ?? 0)}',
+                        // 'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_purchases'].toString()) ?? 0)}',
+                        AppFormatters.currency(
+                          context,
+                          double.tryParse(
+                                dashboardData!['total_purchases'].toString(),
+                              ) ??
+                              0,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -229,7 +249,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       leading: const Icon(Icons.payments, color: Colors.green),
                       title: Text(context.l10n.totalPayments),
                       trailing: Text(
-                        'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_payments'].toString()) ?? 0)}',
+                        // 'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_payments'].toString()) ?? 0)}',
+                        AppFormatters.currency(
+                          context,
+                          double.tryParse(
+                                dashboardData!['total_payments'].toString(),
+                              ) ??
+                              0,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -248,8 +276,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       title: Text(context.l10n.balance),
                       trailing: Text(
-                        'YER ${currencyFormatter.format(totalBalance)}',
-
+                        // 'YER ${currencyFormatter.format(totalBalance)}',
+                        AppFormatters.currency(
+                          context,
+                          totalBalance,
+                          context.read<ShopProvider>().currency,
+                        ),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: hasBalance ? Colors.orange : Colors.green,

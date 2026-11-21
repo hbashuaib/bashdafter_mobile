@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../services/shop_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/providers/shop_provider.dart';
+import '../../../core/constants/supported_currencies.dart';
+
 
 class ShopProfileScreen extends StatefulWidget {
   const ShopProfileScreen({super.key});
@@ -16,7 +20,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
   final phoneController = TextEditingController();
   final addressController = TextEditingController();
   final cityController = TextEditingController();
-  final currencyController = TextEditingController();
+  String selectedCurrency = 'YER';
   bool isActive = true;
   bool isLoading = true;
   bool isSaving = false;
@@ -41,10 +45,11 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
       phoneController.text = data['phone']?.toString() ?? '';
       addressController.text = data['address']?.toString() ?? '';
       cityController.text = data['city']?.toString() ?? '';
-      currencyController.text = data['currency']?.toString() ?? '';
+      selectedCurrency = data['currency']?.toString() ?? 'YER';
+      context.read<ShopProvider>().setShop(data);
 
       setState(() {
-        shop = data;
+        shop = data;        
         isActive = data['is_active'] ?? true;
         isLoading = false;
       });
@@ -55,7 +60,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.failedToLoadShopProfile)),
-      );      
+      );
 
       setState(() {
         isLoading = false;
@@ -77,14 +82,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
       return;
     }
-
-    if (currencyController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(context.l10n.currencyRequired)));
-
-      return;
-    }
-
+    
     setState(() {
       isSaving = true;
     });
@@ -96,15 +94,16 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
         phone: phoneController.text,
         address: addressController.text,
         city: cityController.text,
-        currency: currencyController.text,
+        currency: selectedCurrency,
         isActive: isActive,
         owner: shop!['owner'],
       );
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(context.l10n.shopProfileUpdated)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.shopProfileUpdated)));
     } catch (e) {
       debugPrint(e.toString());
 
@@ -182,15 +181,22 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
           const SizedBox(height: 15),
 
-          TextField(
-            controller: currencyController,
-            textDirection: Directionality.of(context),
-            textCapitalization: TextCapitalization.characters,
-            textInputAction: TextInputAction.done,
+          DropdownButtonFormField<String>(
+            initialValue: selectedCurrency,
             decoration: InputDecoration(labelText: context.l10n.currency),
-            onSubmitted: (_) {
-              if (!isSaving) {
-                saveShop();
+
+            items: SupportedCurrencies.all.map((currency) {
+              return DropdownMenuItem<String>(
+                value: currency,
+                child: Text(currency),
+              );
+            }).toList(),
+
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  selectedCurrency = value;
+                });
               }
             },
           ),
@@ -239,8 +245,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
     phoneController.dispose();
     addressController.dispose();
     cityController.dispose();
-    currencyController.dispose();
-
+   
     super.dispose();
   }
 }

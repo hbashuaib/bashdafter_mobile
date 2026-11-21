@@ -4,6 +4,7 @@ import '../../products/services/product_service.dart';
 import '../services/stock_adjustment_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 class StockAdjustmentScreen extends StatefulWidget {
   final Map<String, dynamic>? product;
@@ -97,7 +98,9 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Only ${currentStock.toStringAsFixed(0)} ${context.l10n.availableInStock}',
+              '${context.l10n.only} '
+              '${AppFormatters.number(context, currentStock)} '
+              '${context.l10n.availableInStock}',
             ),
           ),
         );
@@ -171,7 +174,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                   child: Center(child: CircularProgressIndicator()),
                 ),
             DropdownButtonFormField<dynamic>(
-              value: selectedProduct,
+              initialValue: selectedProduct,
               decoration: InputDecoration(labelText: context.l10n.product),
 
               items: products.map((product) {
@@ -206,16 +209,21 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.inventory),
                   title: Text(context.l10n.currentStock),
-                  subtitle: Text(currentStock.toStringAsFixed(0)),
+                  subtitle: Text(
+                    // currentStock.toStringAsFixed(0)
+                    AppFormatters.number(context, currentStock),
+                  ),
                 ),
               ),
 
             const SizedBox(height: 15),
 
             DropdownButtonFormField<String>(
-              value: adjustmentType,
+              initialValue: adjustmentType,
 
-              decoration: InputDecoration(labelText: context.l10n.adjustmentType),
+              decoration: InputDecoration(
+                labelText: context.l10n.adjustmentType,
+              ),
 
               items: [
                 DropdownMenuItem(
@@ -224,9 +232,18 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                   child: Text(context.l10n.openingStock),
                 ),
 
-                DropdownMenuItem(value: 'IN', child: Text(context.l10n.stockIn)),
-                DropdownMenuItem(value: 'OUT', child: Text(context.l10n.stockOut)),
-                DropdownMenuItem(value: 'DAMAGE', child: Text(context.l10n.damagedStock)),
+                DropdownMenuItem(
+                  value: 'IN',
+                  child: Text(context.l10n.stockIn),
+                ),
+                DropdownMenuItem(
+                  value: 'OUT',
+                  child: Text(context.l10n.stockOut),
+                ),
+                DropdownMenuItem(
+                  value: 'DAMAGE',
+                  child: Text(context.l10n.damagedStock),
+                ),
 
                 DropdownMenuItem(
                   value: 'CORRECTION',

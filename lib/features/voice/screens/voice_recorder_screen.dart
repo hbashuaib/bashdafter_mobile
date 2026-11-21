@@ -3,6 +3,7 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:speech_to_text/speech_to_text.dart' as speech;
+import 'package:provider/provider.dart';
 
 import 'dart:io';
 
@@ -12,6 +13,8 @@ import '../../purchases/services/create_purchase_service.dart';
 import '../../purchases/services/create_purchase_item_service.dart';
 import '../models/voice_purchase_item.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class VoiceRecorderScreen extends StatefulWidget {
   const VoiceRecorderScreen({super.key});
@@ -315,7 +318,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                   const Divider(),
 
                   Text(
-                    'Total: YER ${voicePurchaseTotal.toStringAsFixed(0)}',
+                    'Total: ${AppFormatters.currency(context, voicePurchaseTotal, context.read<ShopProvider>().currency)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -499,7 +502,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
     await _speech.listen(
       onResult: (result) {
         if (!mounted) return;
-        
+
         setState(() {
           recognizedText = result.recognizedWords;
 
@@ -535,7 +538,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 const CircularProgressIndicator()
               else
                 DropdownButtonFormField<Map<String, dynamic>>(
-                  value: selectedCustomer,
+                  initialValue: selectedCustomer,
 
                   decoration: const InputDecoration(
                     labelText: 'Customer',
@@ -783,8 +786,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
                           subtitle: item.matchedProduct != null
                               ? Text(
-                                  'Price: YER ${item.matchedProduct!['selling_price']}'
-                                  '\nStock: ${item.matchedProduct!['current_stock']}'
+                                  'Price: ${AppFormatters.currency(context, double.tryParse(item.matchedProduct!['selling_price'].toString()) ?? 0, context.read<ShopProvider>().currency)}'
+                                  '\nStock: ${AppFormatters.number(context, double.tryParse(item.matchedProduct!['current_stock'].toString()) ?? 0)}'
                                   '${hasInsufficientStock(item) ? '\n⚠ Insufficient Stock' : ''}',
                                   style: TextStyle(
                                     color: hasInsufficientStock(item)
@@ -840,8 +843,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                                   title: Text(product['name']),
 
                                                   subtitle: Text(
-                                                    'Stock: ${product['current_stock']}'
-                                                    ' | Price: YER ${product['selling_price']}',
+                                                    'Stock: ${AppFormatters.number(context, double.tryParse(product['current_stock'].toString()) ?? 0)}'
+                                                    ' | Price: ${AppFormatters.currency(context, double.tryParse(product['selling_price'].toString()) ?? 0, context.read<ShopProvider>().currency)}',
                                                   ),
 
                                                   onTap: () {
@@ -950,13 +953,18 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                     ),
 
                                     Text(
-                                      '${item.quantity} × ${price.toStringAsFixed(0)}',
+                                      '${AppFormatters.number(context, item.quantity)} × '
+                                      '${AppFormatters.currency(context, price, context.read<ShopProvider>().currency)}',
                                     ),
 
                                     const SizedBox(width: 12),
 
                                     Text(
-                                      itemTotal(item).toStringAsFixed(0),
+                                      AppFormatters.currency(
+                                        context,
+                                        itemTotal(item),
+                                        context.read<ShopProvider>().currency,
+                                      ),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -981,7 +989,11 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                             ),
 
                             Text(
-                              'YER ${voicePurchaseTotal.toStringAsFixed(0)}',
+                              AppFormatters.currency(
+                                context,
+                                voicePurchaseTotal,
+                                context.read<ShopProvider>().currency,
+                              ),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../services/reports_service.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class TopDebtorsScreen extends StatefulWidget {
   const TopDebtorsScreen({super.key});
@@ -14,7 +16,6 @@ class TopDebtorsScreen extends StatefulWidget {
 }
 
 class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
-  final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
   List<dynamic> debtors = [];
   List<dynamic> filteredDebtors = [];
@@ -116,8 +117,8 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                       Text(context.l10n.debtors),
 
                       Text(
-                        debtors.length.toString(),
-
+                        // debtors.length.toString(),
+                        AppFormatters.number(context, debtors.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -129,8 +130,19 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
 
                       Text(
                         debtors.isEmpty
-                            ? 'YER 0'
-                            : 'YER ${currencyFormatter.format(double.tryParse(debtors.first['balance'].toString()) ?? 0)}',
+                            ? AppFormatters.currency(
+                                context,
+                                0,
+                                context.read<ShopProvider>().currency,
+                              )
+                            : AppFormatters.currency(
+                                context,
+                                double.tryParse(
+                                      debtors.first['balance'].toString(),
+                                    ) ??
+                                    0,
+                                context.read<ShopProvider>().currency,
+                              ),
 
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -177,9 +189,9 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredDebtors.length} '
+                '${AppFormatters.number(context, filteredDebtors.length)} '
                 '${context.l10n.outOf} '
-                '${debtors.length} '
+                '${AppFormatters.number(context, debtors.length)} '
                 '${context.l10n.debtors}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -215,8 +227,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                               backgroundColor: getRankColor(rank),
 
                               child: Text(
-                                '$rank',
-
+                                AppFormatters.number(context, rank),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -225,11 +236,17 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                             ),
 
                             title: Text(
-                              debtor['name']?.toString() ?? context.l10n.unknownCustomer,
+                              debtor['name']?.toString() ??
+                                  context.l10n.unknownCustomer,
                             ),
 
                             trailing: Text(
-                              'YER ${currencyFormatter.format(balance)}',
+                              // 'YER ${currencyFormatter.format(balance)}',
+                              AppFormatters.currency(
+                                context,
+                                balance,
+                                context.read<ShopProvider>().currency,
+                              ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),

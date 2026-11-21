@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -105,8 +106,8 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                       Text(context.l10n.lowStock),
 
                       Text(
-                        lowStockProducts.length.toString(),
-
+                        // lowStockProducts.length.toString(),
+                        AppFormatters.number(context, lowStockProducts.length),
                         style: const TextStyle(
                           color: Colors.orange,
 
@@ -156,9 +157,9 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredProducts.length} '
+                '${AppFormatters.number(context, filteredProducts.length)} '
                 '${context.l10n.outOf} '
-                '${lowStockProducts.length} '
+                '${AppFormatters.number(context, lowStockProducts.length)} '
                 '${context.l10n.products}',
 
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -208,9 +209,9 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
 
                             subtitle: Text(
                               '${context.l10n.current}: '
-                              '${(double.tryParse(product['current_stock'].toString()) ?? 0).toStringAsFixed(0)}'
+                              '${AppFormatters.number(context, double.tryParse(product['current_stock'].toString()) ?? 0)}'
                               '\n${context.l10n.minimum}: '
-                              '${(double.tryParse(product['minimum_stock'].toString()) ?? 0).toStringAsFixed(0)}',
+                              '${AppFormatters.number(context, double.tryParse(product['minimum_stock'].toString()) ?? 0)}',
                             ),
 
                             trailing: const Icon(Icons.arrow_forward_ios),

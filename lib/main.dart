@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/localization/locale_provider.dart';
 import 'l10n/app_localizations.dart';
@@ -9,6 +8,7 @@ import 'features/auth/screens/splash_screen.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
+import 'core/providers/shop_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +21,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider.value(value: localeProvider),
+        ChangeNotifierProvider(create: (_) => ShopProvider()),
       ],
 
       child: const BashDafterApp(),

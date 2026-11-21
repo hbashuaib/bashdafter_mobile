@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/providers/shop_provider.dart';
 
 class PaymentDetailScreen extends StatelessWidget {
   final Map<String, dynamic> payment;
-  final NumberFormat currencyFormatter = NumberFormat('#,##0.00');
+  const PaymentDetailScreen({super.key, required this.payment});
 
-  PaymentDetailScreen({super.key, required this.payment});
-
-  String buildWhatsAppMessage() {
+  String buildWhatsAppMessage(BuildContext context) {
     final buffer = StringBuffer();
     final amount = double.tryParse(payment['amount'].toString()) ?? 0;
 
@@ -26,7 +26,13 @@ class PaymentDetailScreen extends StatelessWidget {
     buffer.writeln('Date: ${payment['payment_date']}');
     buffer.writeln('');
     buffer.writeln('Payment Amount:');
-    buffer.writeln('YER ${currencyFormatter.format(amount)}');
+    buffer.writeln(
+      AppFormatters.currency(
+        context,
+        amount,
+        context.read<ShopProvider>().currency,
+      ),
+    );
 
     if ((payment['notes'] ?? '').toString().trim().isNotEmpty) {
       buffer.writeln('');
@@ -55,7 +61,7 @@ class PaymentDetailScreen extends StatelessWidget {
 
             onPressed: () {
               SharePlus.instance.share(
-                ShareParams(text: buildWhatsAppMessage()),
+                ShareParams(text: buildWhatsAppMessage(context)),
               );
             },
           ),
@@ -108,7 +114,12 @@ class PaymentDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   Text(
-                    'YER ${currencyFormatter.format(amount)}',
+                    // 'YER ${currencyFormatter.format(amount)}',
+                    AppFormatters.currency(
+                      context,
+                      amount,
+                      context.read<ShopProvider>().currency,
+                    ),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -124,10 +135,16 @@ class PaymentDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.calendar_today),
-
               title: Text(context.l10n.paymentDate),
 
-              subtitle: Text(payment['payment_date']?.toString() ?? '-'),
+              subtitle: Text(
+                payment['payment_date'] == null
+                    ? '-'
+                    : AppFormatters.date(
+                        context,
+                        DateTime.parse(payment['payment_date'].toString()),
+                      ),
+              ),
             ),
           ),
 
@@ -137,7 +154,11 @@ class PaymentDetailScreen extends StatelessWidget {
 
               title: Text(context.l10n.paymentId),
 
-              subtitle: Text(payment['id']?.toString() ?? '-'),
+              subtitle: Text(
+                payment['id'] == null
+                    ? '-'
+                    : AppFormatters.number(context, payment['id']),
+              ),
             ),
           ),
 

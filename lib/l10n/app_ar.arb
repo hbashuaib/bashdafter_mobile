@@ -912,5 +912,85 @@
 
 "searchDebtor": "البحث عن مدين",
 
-"noDebtorsFound": "لا يوجد مدينون"
+"noDebtorsFound": "لا يوجد مدينون",
+
+"only": "فقط",
+
+"inactiveUsers": "المستخدمون غير النشطين",
+"noInactiveUsersFound": "لا يوجد مستخدمون غير نشطين",
+"failedToLoadInactiveUsers": "فشل في تحميل المستخدمين غير النشطين",
+"failedToRestoreUser": "فشل في استعادة المستخدم",
+"restoreUser": "استعادة المستخدم",
+"restoreUserQuestion": "هل أنت متأكد من استعادة المستخدم {username}؟",
+"@restoreUserQuestion": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"userRestoredSuccessfully": "تمت استعادة المستخدم {username} بنجاح",
+"@userRestoredSuccessfully": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"userFormCreateTitle": "إضافة مستخدم",
+"userFormEditTitle": "تعديل مستخدم",
+
+"firstName": "الاسم الأول",
+"lastName": "اسم العائلة",
+
+"passwordMinLength": "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل",
+
+"userCreatedSuccessfully": "تم إنشاء المستخدم بنجاح",
+"userUpdatedSuccessfully": "تم تحديث المستخدم بنجاح",
+
+"failedToCreateUser": "فشل في إنشاء المستخدم",
+"failedToUpdateUser": "فشل في تحديث المستخدم",
+
+"createUser": "إنشاء مستخدم",
+
+"adminRole": "مدير النظام",
+"managerRole": "مدير",
+"cashierRole": "كاشير",
+
+"searchUsers": "البحث عن المستخدمين",
+"noUsersFound": "لم يتم العثور على مستخدمين",
+
+"editUser": "تعديل المستخدم",
+"resetPassword": "إعادة تعيين كلمة المرور",
+"deactivateUser": "تعطيل المستخدم",
+
+"failedToLoadUsers": "فشل في تحميل المستخدمين",
+"failedToResetPassword": "فشل في إعادة تعيين كلمة المرور",
+"failedToDeactivateUser": "فشل في تعطيل المستخدم",
+
+"resetUserPassword": "إعادة تعيين كلمة مرور {username}",
+"@resetUserPassword": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"resetPasswordSuccess": "تمت إعادة تعيين كلمة مرور {username} بنجاح",
+"@resetPasswordSuccess": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"deactivateUserQuestion": "هل أنت متأكد من تعطيل المستخدم {username}؟",
+"@deactivateUserQuestion": {
+  "placeholders": {
+    "username": {}
+  }
+},
+
+"userDeactivated": "تم تعطيل المستخدم {username}",
+"@userDeactivated": {
+  "placeholders": {
+    "username": {}
+  }
+}
 }

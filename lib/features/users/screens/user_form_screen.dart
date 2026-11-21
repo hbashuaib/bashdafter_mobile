@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
 import '../services/user_service.dart';
+import '../../../core/localization/localization_extension.dart';
 
 class UserFormScreen extends StatefulWidget {
   final UserModel? user;
@@ -16,21 +17,13 @@ class UserFormScreen extends StatefulWidget {
 
 class _UserFormScreenState extends State<UserFormScreen> {
   final UserService _userService = UserService();
-
   final usernameController = TextEditingController();
-
   final firstNameController = TextEditingController();
-
   final lastNameController = TextEditingController();
-
   final emailController = TextEditingController();
-
   final phoneController = TextEditingController();
-
   final passwordController = TextEditingController();
-
   String selectedRole = 'CASHIER';
-
   bool isLoading = false;
 
   @override
@@ -39,15 +32,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
     if (widget.user != null) {
       usernameController.text = widget.user!.username;
-
       firstNameController.text = widget.user!.firstName ?? '';
-
       lastNameController.text = widget.user!.lastName ?? '';
-
       emailController.text = widget.user!.email ?? '';
-
       phoneController.text = widget.user!.phoneNumber ?? '';
-
       selectedRole = widget.user!.role;
     }
   }
@@ -67,15 +55,15 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Future<void> saveUser() async {
     if (usernameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Username is required')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.usernameRequired)));
 
       return;
     }
 
     if (!widget.isEdit && passwordController.text.trim().length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 6 characters')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.passwordMinLength)));
 
       return;
     }
@@ -111,8 +99,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
         SnackBar(
           content: Text(
             widget.isEdit
-                ? 'User updated successfully'
-                : 'User created successfully',
+                ? context.l10n.userUpdatedSuccessfully
+                : context.l10n.userCreatedSuccessfully,
           ),
         ),
       );
@@ -124,7 +112,9 @@ class _UserFormScreenState extends State<UserFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            widget.isEdit ? 'Failed to update user' : 'Failed to create user',
+            widget.isEdit
+                ? context.l10n.failedToUpdateUser
+                : context.l10n.failedToCreateUser,
           ),
         ),
       );
@@ -140,15 +130,21 @@ class _UserFormScreenState extends State<UserFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isEdit ? 'Edit User' : 'Create User')),
+      appBar: AppBar(
+        title: Text(
+          widget.isEdit
+              ? context.l10n.userFormEditTitle
+              : context.l10n.userFormCreateTitle,
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           TextField(
             controller: usernameController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Username',
+            decoration: InputDecoration(
+              labelText: context.l10n.username,
               border: OutlineInputBorder(),
             ),
           ),
@@ -158,8 +154,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
           TextField(
             controller: firstNameController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'First Name',
+            decoration: InputDecoration(
+              labelText: context.l10n.firstName,
               border: OutlineInputBorder(),
             ),
           ),
@@ -169,8 +165,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
           TextField(
             controller: lastNameController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Last Name',
+            decoration: InputDecoration(
+              labelText: context.l10n.lastName,
               border: OutlineInputBorder(),
             ),
           ),
@@ -180,8 +176,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
           TextField(
             controller: emailController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Email',
+            decoration: InputDecoration(
+              labelText: context.l10n.email,
               border: OutlineInputBorder(),
             ),
           ),
@@ -191,8 +187,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
           TextField(
             controller: phoneController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Phone Number',
+            decoration: InputDecoration(
+              labelText: context.l10n.phoneNumber,
               border: OutlineInputBorder(),
             ),
           ),
@@ -206,8 +202,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
               enableSuggestions: false,
               autocorrect: false,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Password',
+              decoration: InputDecoration(
+                labelText: context.l10n.password,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -216,15 +212,26 @@ class _UserFormScreenState extends State<UserFormScreen> {
           const SizedBox(height: 16),
 
           DropdownButtonFormField<String>(
-            value: selectedRole,
-            decoration: const InputDecoration(
-              labelText: 'Role',
+            initialValue: selectedRole,
+            decoration: InputDecoration(
+              labelText: context.l10n.role,
               border: OutlineInputBorder(),
             ),
-            items: const [
-              DropdownMenuItem(value: 'ADMIN', child: Text('ADMIN')),
-              DropdownMenuItem(value: 'MANAGER', child: Text('MANAGER')),
-              DropdownMenuItem(value: 'CASHIER', child: Text('CASHIER')),
+            items: [
+              DropdownMenuItem(
+                value: 'ADMIN',
+                child: Text(context.l10n.adminRole),
+              ),
+
+              DropdownMenuItem(
+                value: 'MANAGER',
+                child: Text(context.l10n.managerRole),
+              ),
+
+              DropdownMenuItem(
+                value: 'CASHIER',
+                child: Text(context.l10n.cashierRole),
+              ),
             ],
             onChanged: (value) {
               setState(() {
@@ -248,7 +255,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : Text(widget.isEdit ? 'Save Changes' : 'Create User'),
+                  : Text(
+                      widget.isEdit
+                          ? context.l10n.saveChanges
+                          : context.l10n.createUser,
+                    ),
             ),
           ),
 

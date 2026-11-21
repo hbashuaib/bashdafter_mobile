@@ -118,7 +118,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
         child: products.isEmpty
             ? ListView(
                 children: [
-                  SizedBox(height: 150),
+                  const SizedBox(height: 150),
                   Center(child: Text(context.l10n.noInactiveProducts)),
                 ],
               )

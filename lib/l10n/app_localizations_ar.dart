@@ -1196,4 +1196,116 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noDebtorsFound => 'لا يوجد مدينون';
+
+  @override
+  String get only => 'فقط';
+
+  @override
+  String get inactiveUsers => 'المستخدمون غير النشطين';
+
+  @override
+  String get noInactiveUsersFound => 'لا يوجد مستخدمون غير نشطين';
+
+  @override
+  String get failedToLoadInactiveUsers => 'فشل في تحميل المستخدمين غير النشطين';
+
+  @override
+  String get failedToRestoreUser => 'فشل في استعادة المستخدم';
+
+  @override
+  String get restoreUser => 'استعادة المستخدم';
+
+  @override
+  String restoreUserQuestion(Object username) {
+    return 'هل أنت متأكد من استعادة المستخدم $username؟';
+  }
+
+  @override
+  String userRestoredSuccessfully(Object username) {
+    return 'تمت استعادة المستخدم $username بنجاح';
+  }
+
+  @override
+  String get userFormCreateTitle => 'إضافة مستخدم';
+
+  @override
+  String get userFormEditTitle => 'تعديل مستخدم';
+
+  @override
+  String get firstName => 'الاسم الأول';
+
+  @override
+  String get lastName => 'اسم العائلة';
+
+  @override
+  String get passwordMinLength =>
+      'يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل';
+
+  @override
+  String get userCreatedSuccessfully => 'تم إنشاء المستخدم بنجاح';
+
+  @override
+  String get userUpdatedSuccessfully => 'تم تحديث المستخدم بنجاح';
+
+  @override
+  String get failedToCreateUser => 'فشل في إنشاء المستخدم';
+
+  @override
+  String get failedToUpdateUser => 'فشل في تحديث المستخدم';
+
+  @override
+  String get createUser => 'إنشاء مستخدم';
+
+  @override
+  String get adminRole => 'مدير النظام';
+
+  @override
+  String get managerRole => 'مدير';
+
+  @override
+  String get cashierRole => 'كاشير';
+
+  @override
+  String get searchUsers => 'البحث عن المستخدمين';
+
+  @override
+  String get noUsersFound => 'لم يتم العثور على مستخدمين';
+
+  @override
+  String get editUser => 'تعديل المستخدم';
+
+  @override
+  String get resetPassword => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get deactivateUser => 'تعطيل المستخدم';
+
+  @override
+  String get failedToLoadUsers => 'فشل في تحميل المستخدمين';
+
+  @override
+  String get failedToResetPassword => 'فشل في إعادة تعيين كلمة المرور';
+
+  @override
+  String get failedToDeactivateUser => 'فشل في تعطيل المستخدم';
+
+  @override
+  String resetUserPassword(Object username) {
+    return 'إعادة تعيين كلمة مرور $username';
+  }
+
+  @override
+  String resetPasswordSuccess(Object username) {
+    return 'تمت إعادة تعيين كلمة مرور $username بنجاح';
+  }
+
+  @override
+  String deactivateUserQuestion(Object username) {
+    return 'هل أنت متأكد من تعطيل المستخدم $username؟';
+  }
+
+  @override
+  String userDeactivated(Object username) {
+    return 'تم تعطيل المستخدم $username';
+  }
 }
