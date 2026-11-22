@@ -992,5 +992,24 @@
   "placeholders": {
     "username": {}
   }
-}
+},
+
+"purchaseReceiptStatement": "إيصال شراء",
+"customerLabel": "العميل",
+"dateLabel": "التاريخ",
+"itemsLabel": "الأصناف",
+"quantityLabel": "الكمية",
+"totalAmountLabel": "إجمالي المبلغ",
+"thankYouForBusiness": "شكراً لتعاملكم معنا.",
+"poweredByBashDafter": "تم الإنشاء بواسطة بش دفتر",
+
+"paymentReceiptStatement": "إيصال سداد",
+"paymentAmountLabel": "مبلغ السداد",
+"thankYouForPayment": "شكراً لسدادكم.",
+
+"customerStatementTitle": "كشف حساب العميل",
+"currentBalanceLabel": "الرصيد الحالي",
+"transactionsLabel": "الحركات",
+"purchaseReceiptType": "مشتريات",
+"paymentReceiptType": "سداد"
 }

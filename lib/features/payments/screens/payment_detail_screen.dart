@@ -6,46 +6,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/utils/whatsapp_receipt_builder.dart';
 
 class PaymentDetailScreen extends StatelessWidget {
   final Map<String, dynamic> payment;
   const PaymentDetailScreen({super.key, required this.payment});
-
-  String buildWhatsAppMessage(BuildContext context) {
-    final buffer = StringBuffer();
-    final amount = double.tryParse(payment['amount'].toString()) ?? 0;
-
-    buffer.writeln('💰 ${payment['shop_name'] ?? 'Shop'}');
-    buffer.writeln('Payment Receipt Statement');
-    buffer.writeln('');
-
-    if (payment['customer_name'] != null) {
-      buffer.writeln('Customer: ${payment['customer_name']}');
-    }
-
-    buffer.writeln('Date: ${payment['payment_date']}');
-    buffer.writeln('');
-    buffer.writeln('Payment Amount:');
-    buffer.writeln(
-      AppFormatters.currency(
-        context,
-        amount,
-        context.read<ShopProvider>().currency,
-      ),
-    );
-
-    if ((payment['notes'] ?? '').toString().trim().isNotEmpty) {
-      buffer.writeln('');
-      buffer.writeln('Notes:');
-      buffer.writeln(payment['notes']);
-    }
-
-    buffer.writeln('');
-    buffer.writeln('Thank you for your payment.');
-    buffer.writeln('');
-    buffer.writeln('Powered by BashDafter');
-    return buffer.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +26,9 @@ class PaymentDetailScreen extends StatelessWidget {
 
             onPressed: () {
               SharePlus.instance.share(
-                ShareParams(text: buildWhatsAppMessage(context)),
+                ShareParams(
+                  text: WhatsAppReceiptBuilder.paymentReceipt(context, payment),
+                ),
               );
             },
           ),

@@ -52,6 +52,8 @@ dependencies:
   path_provider: ^2.1.5
   audioplayers: ^6.5.0
   speech_to_text: ^7.5.0
+  bidi: ^2.0.13
+  arabic_reshaper: ^0.0.1
   
 
 dev_dependencies:
@@ -79,6 +81,10 @@ flutter:
   assets:
     - assets/images/bashsoft_logo.png
     - assets/images/logo.png
+    - assets/fonts/NotoNaskhArabic-Bold.ttf
+    - assets/fonts/NotoNaskhArabic-Medium.ttf
+    - assets/fonts/NotoNaskhArabic-Regular.ttf
+    - assets/fonts/NotoNaskhArabic-SemiBold.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

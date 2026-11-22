@@ -1308,4 +1308,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String userDeactivated(Object username) {
     return 'تم تعطيل المستخدم $username';
   }
+
+  @override
+  String get purchaseReceiptStatement => 'إيصال شراء';
+
+  @override
+  String get customerLabel => 'العميل';
+
+  @override
+  String get dateLabel => 'التاريخ';
+
+  @override
+  String get itemsLabel => 'الأصناف';
+
+  @override
+  String get quantityLabel => 'الكمية';
+
+  @override
+  String get totalAmountLabel => 'إجمالي المبلغ';
+
+  @override
+  String get thankYouForBusiness => 'شكراً لتعاملكم معنا.';
+
+  @override
+  String get poweredByBashDafter => 'تم الإنشاء بواسطة بش دفتر';
+
+  @override
+  String get paymentReceiptStatement => 'إيصال سداد';
+
+  @override
+  String get paymentAmountLabel => 'مبلغ السداد';
+
+  @override
+  String get thankYouForPayment => 'شكراً لسدادكم.';
+
+  @override
+  String get customerStatementTitle => 'كشف حساب العميل';
+
+  @override
+  String get currentBalanceLabel => 'الرصيد الحالي';
+
+  @override
+  String get transactionsLabel => 'الحركات';
+
+  @override
+  String get purchaseReceiptType => 'مشتريات';
+
+  @override
+  String get paymentReceiptType => 'سداد';
 }

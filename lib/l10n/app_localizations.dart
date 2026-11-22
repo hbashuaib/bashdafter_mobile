@@ -2641,6 +2641,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{username} deactivated'**
   String userDeactivated(Object username);
+
+  /// No description provided for @purchaseReceiptStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Receipt Statement'**
+  String get purchaseReceiptStatement;
+
+  /// No description provided for @customerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get customerLabel;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
+
+  /// No description provided for @itemsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get itemsLabel;
+
+  /// No description provided for @quantityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get quantityLabel;
+
+  /// No description provided for @totalAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Amount'**
+  String get totalAmountLabel;
+
+  /// No description provided for @thankYouForBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your business.'**
+  String get thankYouForBusiness;
+
+  /// No description provided for @poweredByBashDafter.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by BashDafter'**
+  String get poweredByBashDafter;
+
+  /// No description provided for @paymentReceiptStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Receipt Statement'**
+  String get paymentReceiptStatement;
+
+  /// No description provided for @paymentAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Amount'**
+  String get paymentAmountLabel;
+
+  /// No description provided for @thankYouForPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your payment.'**
+  String get thankYouForPayment;
+
+  /// No description provided for @customerStatementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Statement'**
+  String get customerStatementTitle;
+
+  /// No description provided for @currentBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Balance'**
+  String get currentBalanceLabel;
+
+  /// No description provided for @transactionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactionsLabel;
+
+  /// No description provided for @purchaseReceiptType.
+  ///
+  /// In en, this message translates to:
+  /// **'PURCHASE'**
+  String get purchaseReceiptType;
+
+  /// No description provided for @paymentReceiptType.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT'**
+  String get paymentReceiptType;
 }
 
 class _AppLocalizationsDelegate

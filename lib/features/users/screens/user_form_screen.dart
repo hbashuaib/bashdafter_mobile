@@ -142,6 +142,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
         children: [
           TextField(
             controller: usernameController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               labelText: context.l10n.username,
@@ -153,6 +154,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: firstNameController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               labelText: context.l10n.firstName,
@@ -164,6 +166,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: lastNameController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               labelText: context.l10n.lastName,
@@ -175,6 +178,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: emailController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               labelText: context.l10n.email,
@@ -186,6 +190,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: phoneController,
+            textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               labelText: context.l10n.phoneNumber,
@@ -198,6 +203,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
             TextField(
               controller: passwordController,
+              textDirection: Directionality.of(context),
               obscureText: true,
               enableSuggestions: false,
               autocorrect: false,

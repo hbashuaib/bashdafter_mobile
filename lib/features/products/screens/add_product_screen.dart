@@ -206,6 +206,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         children: [
           TextField(
             controller: nameController,
+            textDirection: Directionality.of(context),
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(labelText: context.l10n.productName),
@@ -215,6 +216,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
           TextField(
             controller: barcodeController,
+            textDirection: Directionality.of(context),
             keyboardType: TextInputType.number,
             autocorrect: false,
             enableSuggestions: false,
@@ -288,6 +290,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
           TextField(
             controller: costPriceController,
+            textDirection: Directionality.of(context),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             autocorrect: false,
             enableSuggestions: false,
@@ -299,6 +302,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
           TextField(
             controller: sellingPriceController,
+            textDirection: Directionality.of(context),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             autocorrect: false,
             enableSuggestions: false,
@@ -310,6 +314,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
           TextField(
             controller: minimumStockController,
+            textDirection: Directionality.of(context),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             autocorrect: false,
             enableSuggestions: false,
@@ -362,6 +367,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
           TextField(
             controller: descriptionController,
+            textDirection: Directionality.of(context),
             maxLines: 3,
             decoration: InputDecoration(labelText: context.l10n.description),
             textInputAction: TextInputAction.done,

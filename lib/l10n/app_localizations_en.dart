@@ -1315,4 +1315,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String userDeactivated(Object username) {
     return '$username deactivated';
   }
+
+  @override
+  String get purchaseReceiptStatement => 'Purchase Receipt Statement';
+
+  @override
+  String get customerLabel => 'Customer';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get itemsLabel => 'Items';
+
+  @override
+  String get quantityLabel => 'Qty';
+
+  @override
+  String get totalAmountLabel => 'Total Amount';
+
+  @override
+  String get thankYouForBusiness => 'Thank you for your business.';
+
+  @override
+  String get poweredByBashDafter => 'Powered by BashDafter';
+
+  @override
+  String get paymentReceiptStatement => 'Payment Receipt Statement';
+
+  @override
+  String get paymentAmountLabel => 'Payment Amount';
+
+  @override
+  String get thankYouForPayment => 'Thank you for your payment.';
+
+  @override
+  String get customerStatementTitle => 'Customer Statement';
+
+  @override
+  String get currentBalanceLabel => 'Current Balance';
+
+  @override
+  String get transactionsLabel => 'Transactions';
+
+  @override
+  String get purchaseReceiptType => 'PURCHASE';
+
+  @override
+  String get paymentReceiptType => 'PAYMENT';
 }

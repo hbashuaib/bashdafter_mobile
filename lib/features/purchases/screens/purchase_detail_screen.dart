@@ -5,47 +5,11 @@ import 'package:provider/provider.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/utils/whatsapp_receipt_builder.dart';
 
 class PurchaseDetailScreen extends StatelessWidget {
   final Map<String, dynamic> purchase;
   const PurchaseDetailScreen({super.key, required this.purchase});
-
-  String buildWhatsAppMessage(BuildContext context) {
-    final buffer = StringBuffer();
-    final totalAmount =
-        double.tryParse(purchase['total_amount'].toString()) ?? 0;
-
-    buffer.writeln('🧾 ${purchase['shop_name'] ?? 'Shop'}');
-    buffer.writeln('Purchase Receipt Statement');
-    buffer.writeln('');
-
-    if (purchase['customer_name'] != null) {
-      buffer.writeln('Customer: ${purchase['customer_name']}');
-    }
-
-    buffer.writeln('Date: ${purchase['purchase_date']}');
-    buffer.writeln('');
-    buffer.writeln('Items:');
-
-    for (final item in purchase['items']) {
-      buffer.writeln(
-        '- ${item['item_name']}'
-        ' x ${item['quantity']}',
-      );
-    }
-
-    buffer.writeln('');
-
-    buffer.writeln(
-      'Total Amount: '
-      '${AppFormatters.currency(context, totalAmount, context.read<ShopProvider>().currency)}',
-    );
-
-    buffer.writeln('');
-    buffer.writeln('Thank you for your business.');
-    buffer.writeln('BashDafter');
-    return buffer.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +26,12 @@ class PurchaseDetailScreen extends StatelessWidget {
 
             onPressed: () {
               SharePlus.instance.share(
-                ShareParams(text: buildWhatsAppMessage(context)),
+                ShareParams(
+                  text: WhatsAppReceiptBuilder.purchaseReceipt(
+                    context,
+                    purchase,
+                  ),
+                ),
               );
             },
           ),

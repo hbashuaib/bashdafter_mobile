@@ -24,29 +24,36 @@ class AppFormatters {
     'EUR': '€',
   };
 
-  static String number(
-    BuildContext context,
-    num value,
-  ) {
-    final locale =
-        Localizations.localeOf(context).languageCode;
+  static const Map<String, String> arabicDigits = {
+    '0': '٠',
+    '1': '١',
+    '2': '٢',
+    '3': '٣',
+    '4': '٤',
+    '5': '٥',
+    '6': '٦',
+    '7': '٧',
+    '8': '٨',
+    '9': '٩',
+  };
 
-    return NumberFormat.decimalPattern(
-      locale,
-    ).format(value);
+  static String _toArabicDigits(String value) {
+    return value.replaceAllMapped(
+      RegExp(r'\d'),
+      (match) => arabicDigits[match.group(0)]!,
+    );
   }
 
-  static String decimal(
-    BuildContext context,
-    num value,
-  ) {
-    final locale =
-        Localizations.localeOf(context).languageCode;
+  static String number(BuildContext context, num value) {
+    final locale = Localizations.localeOf(context).languageCode;
+    final formatted = NumberFormat.decimalPattern(locale).format(value);
+    return locale == 'ar' ? _toArabicDigits(formatted) : formatted;
+  }
 
-    return NumberFormat(
-      '#,##0.00',
-      locale,
-    ).format(value);
+  static String decimal(BuildContext context, num value) {
+    final locale = Localizations.localeOf(context).languageCode;
+    final formatted = NumberFormat('#,##0.00', locale).format(value);
+    return locale == 'ar' ? _toArabicDigits(formatted) : formatted;
   }
 
   static String currency(
@@ -54,55 +61,36 @@ class AppFormatters {
     num amount,
     String currencyCode,
   ) {
-    final locale =
-        Localizations.localeOf(context).languageCode;
+    final locale = Localizations.localeOf(context).languageCode;
 
     final symbol = locale == 'ar'
-        ? arabicSymbols[currencyCode] ??
-            currencyCode
+        ? arabicSymbols[currencyCode] ?? currencyCode
         : currencyCode;
 
-    return NumberFormat.currency(
+    final formatted = NumberFormat.currency(
       locale: locale,
       symbol: '$symbol ',
       decimalDigits: 2,
     ).format(amount);
+
+    return locale == 'ar' ? _toArabicDigits(formatted) : formatted;
   }
 
-  static String date(
-    BuildContext context,
-    DateTime date,
-  ) {
-    final locale =
-        Localizations.localeOf(context).languageCode;
+  static String date(BuildContext context, DateTime date) {
+    final locale = Localizations.localeOf(context).languageCode;
 
-    return DateFormat.yMMMMd(
-      locale,
-    ).format(date);
+    return DateFormat.yMMMMd(locale).format(date);
   }
 
-  static String shortDate(
-    BuildContext context,
-    DateTime date,
-  ) {
-    final locale =
-        Localizations.localeOf(context).languageCode;
+  static String shortDate(BuildContext context, DateTime date) {
+    final locale = Localizations.localeOf(context).languageCode;
 
-    return DateFormat.yMd(
-      locale,
-    ).format(date);
+    return DateFormat.yMd(locale).format(date);
   }
 
-  static String dateTime(
-    BuildContext context,
-    DateTime date,
-  ) {
-    final locale =
-        Localizations.localeOf(context).languageCode;
+  static String dateTime(BuildContext context, DateTime date) {
+    final locale = Localizations.localeOf(context).languageCode;
 
-    return DateFormat.yMd(
-      locale,
-    ).add_jm()
-        .format(date);
+    return DateFormat.yMd(locale).add_jm().format(date);
   }
 }

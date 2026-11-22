@@ -975,5 +975,24 @@
   "placeholders": {
     "username": {}
   }
-}
+},
+
+"purchaseReceiptStatement": "Purchase Receipt Statement",
+"customerLabel": "Customer",
+"dateLabel": "Date",
+"itemsLabel": "Items",
+"quantityLabel": "Qty",
+"totalAmountLabel": "Total Amount",
+"thankYouForBusiness": "Thank you for your business.",
+"poweredByBashDafter": "Powered by BashDafter",
+
+"paymentReceiptStatement": "Payment Receipt Statement",
+"paymentAmountLabel": "Payment Amount",
+"thankYouForPayment": "Thank you for your payment.",
+
+"customerStatementTitle": "Customer Statement",
+"currentBalanceLabel": "Current Balance",
+"transactionsLabel": "Transactions",
+"purchaseReceiptType": "PURCHASE",
+"paymentReceiptType": "PAYMENT"
 }
