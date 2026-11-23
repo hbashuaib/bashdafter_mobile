@@ -2803,6 +2803,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No transactions available'**
   String get customerStatementNoTransactions;
+
+  /// No description provided for @englishName.
+  ///
+  /// In en, this message translates to:
+  /// **'English Name'**
+  String get englishName;
+
+  /// No description provided for @arabicName.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Name'**
+  String get arabicName;
 }
 
 class _AppLocalizationsDelegate

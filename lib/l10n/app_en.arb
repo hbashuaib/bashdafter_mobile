@@ -1022,5 +1022,8 @@
   }
 },
 
-"customerStatementNoTransactions": "No transactions available"
+"customerStatementNoTransactions": "No transactions available",
+
+"englishName": "English Name",
+"arabicName": "Arabic Name"
 }

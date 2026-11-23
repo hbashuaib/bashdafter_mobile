@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/product_service.dart';
+import '../models/product_model.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../../../core/theme/app_colors.dart';
@@ -10,6 +11,7 @@ import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
@@ -25,18 +27,16 @@ class ProductsScreen extends StatefulWidget {
 
 class _ProductsScreenState extends State<ProductsScreen> {
   final searchController = TextEditingController();
-  List<dynamic> products = [];
-  List<dynamic> filteredProducts = [];
+  List<ProductModel> products = [];
+  List<ProductModel> filteredProducts = [];
   bool isLoading = true;
   String activeFilter = 'all';
   String searchQuery = '';
   UserProfile? currentUser;
 
   int get totalProducts => products.length;
-  int get activeProducts =>
-      products.where((p) => p['is_active'] == true).length;
-  int get inactiveProducts =>
-      products.where((p) => p['is_active'] == false).length;
+  int get activeProducts => products.where((p) => p.isActive).length;
+  int get inactiveProducts => products.where((p) => !p.isActive).length;
 
   @override
   void initState() {
@@ -93,11 +93,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     setState(() {
       filteredProducts = products.where((product) {
-        final name = product['name'].toString().toLowerCase();
-
-        final category = product['category_name'].toString().toLowerCase();
-
-        final barcode = (product['barcode'] ?? '').toString().toLowerCase();
+        final name = product.name.toLowerCase();
+        final category = product.categoryName.toLowerCase();
+        final barcode = (product.barcode ?? '').toLowerCase();
 
         final matchesSearch =
             name.contains(query) ||
@@ -107,8 +105,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
         final matchesFilter = activeFilter == 'all'
             ? true
             : activeFilter == 'active'
-            ? product['is_active'] == true
-            : product['is_active'] == false;
+            ? product.isActive
+            : !product.isActive;
 
         return matchesSearch && matchesFilter;
       }).toList();
@@ -338,7 +336,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       padding: const EdgeInsets.fromLTRB(8, 8, 8, 90),
                       itemCount: filteredProducts.length,
                       itemBuilder: (context, index) {
-                        final product = filteredProducts[index];
+                        final ProductModel product = filteredProducts[index];
 
                         return Card(
                           child: ListTile(
@@ -358,22 +356,29 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               }
                             },
 
-                            title: Text(product['name']),
+                            title: Text(
+                              AppLocalizedName.resolve(
+                                context: context,
+                                name: product.name,
+                                nameEn: product.nameEn,
+                                nameAr: product.nameAr,
+                              ),
+                            ),
 
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
 
                               children: [
                                 Text(
-                                  '${product['category_name']} • ${product['unit_name']}',
+                                  '${product.categoryName} • ${product.unitName}',
                                 ),
 
-                                if ((product['barcode'] ?? '')
+                                if ((product.barcode ?? '')
                                     .toString()
                                     .trim()
                                     .isNotEmpty)
                                   Text(
-                                    '${context.l10n.barcode}: ${product['barcode']}',
+                                    '${context.l10n.barcode}: ${product.barcode}',
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -387,10 +392,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             trailing: Text(
                               AppFormatters.currency(
                                 context,
-                                double.tryParse(
-                                      product['selling_price'].toString(),
-                                    ) ??
-                                    0,
+                                double.tryParse(product.sellingPrice) ?? 0,
                                 context.read<ShopProvider>().currency,
                               ),
 

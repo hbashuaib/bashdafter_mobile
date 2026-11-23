@@ -1398,4 +1398,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customerStatementNoTransactions => 'No transactions available';
+
+  @override
+  String get englishName => 'English Name';
+
+  @override
+  String get arabicName => 'Arabic Name';
 }

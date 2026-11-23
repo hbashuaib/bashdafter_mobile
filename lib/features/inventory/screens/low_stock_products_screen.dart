@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../products/services/product_service.dart';
+import '../../products/models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
@@ -18,8 +19,8 @@ class LowStockProductsScreen extends StatefulWidget {
 
 class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
   final searchController = TextEditingController();
-  List<dynamic> lowStockProducts = [];
-  List<dynamic> filteredProducts = [];
+  List<ProductModel> lowStockProducts = [];
+  List<ProductModel> filteredProducts = [];
   bool isLoading = true;
 
   @override
@@ -32,9 +33,7 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
   Future<void> loadProducts() async {
     try {
       final products = await ProductService().getProducts();
-      final lowStock = products
-          .where((product) => product['is_low_stock'] == true)
-          .toList();
+      final lowStock = products.where((product) => product.isLowStock).toList();
 
       if (!mounted) return;
 
@@ -63,12 +62,8 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
 
     setState(() {
       filteredProducts = lowStockProducts.where((product) {
-        final name = product['name'].toString().toLowerCase();
-
-        final category = (product['category_name'] ?? '')
-            .toString()
-            .toLowerCase();
-
+        final name = product.name.toLowerCase();
+        final category = product.categoryName.toLowerCase();
         return name.contains(query) || category.contains(query);
       }).toList();
     });
@@ -203,15 +198,16 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                               ),
                             ),
                             title: Text(
-                              product['name']?.toString() ??
-                                  context.l10n.unknownProduct,
+                              product.name.isNotEmpty
+                                  ? product.name
+                                  : context.l10n.unknownProduct,
                             ),
 
                             subtitle: Text(
                               '${context.l10n.current}: '
-                              '${AppFormatters.number(context, double.tryParse(product['current_stock'].toString()) ?? 0)}'
+                              '${AppFormatters.number(context, double.tryParse(product.currentStock) ?? 0)}'
                               '\n${context.l10n.minimum}: '
-                              '${AppFormatters.number(context, double.tryParse(product['minimum_stock'].toString()) ?? 0)}',
+                              '${AppFormatters.number(context, double.tryParse(product.minimumStock) ?? 0)}',
                             ),
 
                             trailing: const Icon(Icons.arrow_forward_ios),

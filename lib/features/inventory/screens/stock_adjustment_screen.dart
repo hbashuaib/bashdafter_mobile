@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../products/services/product_service.dart';
+import '../../products/models/product_model.dart';
 import '../services/stock_adjustment_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 
 class StockAdjustmentScreen extends StatefulWidget {
-  final Map<String, dynamic>? product;
+  final ProductModel? product;
 
   const StockAdjustmentScreen({super.key, this.product});
 
@@ -16,8 +17,8 @@ class StockAdjustmentScreen extends StatefulWidget {
 }
 
 class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
-  List<dynamic> products = [];
-  dynamic selectedProduct;
+  List<ProductModel> products = [];
+  ProductModel? selectedProduct;
   String adjustmentType = 'IN';
 
   final quantityController = TextEditingController();
@@ -42,7 +43,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
         isLoading = false;
 
         if (widget.product != null) {
-          final matches = data.where((p) => p['id'] == widget.product!['id']);
+          final matches = data.where((p) => p.id == widget.product!.id);
 
           if (matches.isNotEmpty) {
             selectedProduct = matches.first;
@@ -91,8 +92,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
     }
 
     if (adjustmentType == 'OUT' || adjustmentType == 'DAMAGE') {
-      final currentStock =
-          double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
+      final currentStock = double.tryParse(selectedProduct!.currentStock) ?? 0;
 
       if (quantity > currentStock) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +115,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
     try {
       await StockAdjustmentService().createAdjustment(
-        productId: selectedProduct['id'],
+        productId: selectedProduct!.id,
         adjustmentType: adjustmentType,
         quantity: quantityController.text,
         reason: reasonController.text,
@@ -157,7 +157,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
   Widget build(BuildContext context) {
     final currentStock = selectedProduct == null
         ? 0.0
-        : double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
+        : double.tryParse(selectedProduct!.currentStock) ?? 0;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.stockAdjustment)),
@@ -173,14 +173,14 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                   padding: EdgeInsets.all(20),
                   child: Center(child: CircularProgressIndicator()),
                 ),
-            DropdownButtonFormField<dynamic>(
+            DropdownButtonFormField<ProductModel>(
               initialValue: selectedProduct,
               decoration: InputDecoration(labelText: context.l10n.product),
 
               items: products.map((product) {
                 return DropdownMenuItem(
                   value: product,
-                  child: Text(product['name']),
+                  child: Text(product.name),
                 );
               }).toList(),
 
@@ -195,9 +195,7 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
               Card(
                 child: ListTile(
                   leading: const Icon(Icons.inventory_2),
-
-                  title: Text(selectedProduct?['name'] ?? ''),
-
+                  title: Text(selectedProduct?.name ?? ''),
                   subtitle: Text(context.l10n.selectedFromBarcodeLookup),
                 ),
               ),

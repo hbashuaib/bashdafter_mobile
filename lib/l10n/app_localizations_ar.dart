@@ -1391,4 +1391,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get customerStatementNoTransactions => 'لا توجد حركات متاحة';
+
+  @override
+  String get englishName => 'الاسم الإنجليزي';
+
+  @override
+  String get arabicName => 'الاسم العربي';
 }

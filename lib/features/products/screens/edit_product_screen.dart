@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
+import '../models/product_model.dart';
+import '../models/category_model.dart';
+import '../models/unit_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 
 import 'barcode_scanner_screen.dart';
 
 class EditProductScreen extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final ProductModel product;
   const EditProductScreen({super.key, required this.product});
 
   @override
@@ -18,14 +21,16 @@ class EditProductScreen extends StatefulWidget {
 
 class _EditProductScreenState extends State<EditProductScreen> {
   final nameController = TextEditingController();
+  final nameEnController = TextEditingController();
+  final nameArController = TextEditingController();
   final barcodeController = TextEditingController();
   final descriptionController = TextEditingController();
   final costPriceController = TextEditingController();
   final sellingPriceController = TextEditingController();
   final minimumStockController = TextEditingController();
 
-  List<dynamic> categories = [];
-  List<dynamic> units = [];
+  List<CategoryModel> categories = [];
+  List<UnitModel> units = [];
   int? selectedCategory;
   int? selectedUnit;
   DateTime? expiryDate;
@@ -37,22 +42,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     super.initState();
-    nameController.text = widget.product['name']?.toString() ?? '';
-    barcodeController.text = widget.product['barcode']?.toString() ?? '';
-    descriptionController.text =
-        widget.product['description']?.toString() ?? '';
-    costPriceController.text = widget.product['cost_price']?.toString() ?? '';
-    sellingPriceController.text =
-        widget.product['selling_price']?.toString() ?? '';
-    minimumStockController.text =
-        widget.product['minimum_stock']?.toString() ?? '';
-    selectedCategory = widget.product['category'];
-    selectedUnit = widget.product['unit'];
-    isActive = widget.product['is_active'];
-    hasExpiry = widget.product['has_expiry'] ?? false;
+    nameController.text = widget.product.name;
+    nameEnController.text = widget.product.nameEn;
+    nameArController.text = widget.product.nameAr;
+    barcodeController.text = widget.product.barcode ?? '';
+    descriptionController.text = widget.product.description;
+    costPriceController.text = widget.product.costPrice;
+    sellingPriceController.text = widget.product.sellingPrice;
+    minimumStockController.text = widget.product.minimumStock;
+    selectedCategory = widget.product.category;
+    selectedUnit = widget.product.unit;
+    isActive = widget.product.isActive;
+    hasExpiry = widget.product.hasExpiry;
 
-    if (widget.product['expiry_date'] != null) {
-      expiryDate = DateTime.tryParse(widget.product['expiry_date'].toString());
+    if (widget.product.expiryDate != null) {
+      expiryDate = DateTime.tryParse(widget.product.expiryDate!);
     }
 
     loadDropdowns();
@@ -163,10 +167,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     try {
       await ProductService().updateProduct(
-        id: widget.product['id'],
+        id: widget.product.id,
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),
+        nameEn: nameEnController.text,
+        nameAr: nameArController.text,
         barcode: barcodeController.text.trim().isEmpty
             ? null
             : barcodeController.text.trim(),
@@ -239,6 +245,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
           const SizedBox(height: 12),
 
           TextField(
+            controller: nameEnController,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(labelText: context.l10n.englishName),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
+            controller: nameArController,
+            textDirection: TextDirection.rtl,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(labelText: context.l10n.arabicName),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
             controller: barcodeController,
             textDirection: Directionality.of(context),
             keyboardType: TextInputType.number,
@@ -275,8 +298,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
             items: categories.map((item) {
               return DropdownMenuItem<int>(
-                value: item['id'],
-                child: Text(item['name']),
+                value: item.id,
+                child: Text(item.name),
               );
             }).toList(),
 
@@ -295,8 +318,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
             items: units.map((item) {
               return DropdownMenuItem<int>(
-                value: item['id'],
-                child: Text(item['name']),
+                value: item.id,
+                child: Text(item.name),
               );
             }).toList(),
 

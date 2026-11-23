@@ -1038,5 +1038,8 @@
   }
 },
 
-"customerStatementNoTransactions": "لا توجد حركات متاحة"
+"customerStatementNoTransactions": "لا توجد حركات متاحة",
+
+"englishName": "الاسم الإنجليزي",
+"arabicName": "الاسم العربي"
 }

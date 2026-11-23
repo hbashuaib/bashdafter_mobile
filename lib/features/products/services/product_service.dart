@@ -1,15 +1,19 @@
 import 'package:dio/dio.dart';
 
+import '../models/product_model.dart';
+
 import '../../../core/api/api_client.dart';
 
 class ProductService {
-  Future<List<dynamic>> getProducts() async {
+  Future<List<ProductModel>> getProducts() async {
     final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get('/products/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => ProductModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {
@@ -17,10 +21,12 @@ class ProductService {
     }
   }
 
-  Future<void> createProduct({    
+  Future<void> createProduct({
     required int categoryId,
     required int unitId,
     required String name,
+    String? nameEn,
+    String? nameAr,
     String? barcode,
     String? description,
     required String costPrice,
@@ -38,6 +44,8 @@ class ProductService {
 
         data: {
           'name': name.trim(),
+          'name_en': nameEn?.trim() ?? '',
+          'name_ar': nameAr?.trim() ?? '',
 
           'barcode': (barcode == null || barcode.trim().isEmpty)
               ? null
@@ -49,7 +57,7 @@ class ProductService {
           'minimum_stock': minimumStock.trim(),
           'has_expiry': hasExpiry,
           'expiry_date': expiryDate,
-          'is_active': isActive,          
+          'is_active': isActive,
           'category': categoryId,
           'unit': unitId,
         },
@@ -62,10 +70,12 @@ class ProductService {
   }
 
   Future<void> updateProduct({
-    required int id,    
+    required int id,
     required int categoryId,
     required int unitId,
     required String name,
+    String? nameEn,
+    String? nameAr,
     String? barcode,
     String? description,
     required String costPrice,
@@ -83,6 +93,8 @@ class ProductService {
 
         data: {
           'name': name.trim(),
+          'name_en': nameEn?.trim() ?? '',
+          'name_ar': nameAr?.trim() ?? '',
 
           'barcode': (barcode == null || barcode.trim().isEmpty)
               ? null
@@ -94,7 +106,7 @@ class ProductService {
           'minimum_stock': minimumStock.trim(),
           'has_expiry': hasExpiry,
           'expiry_date': expiryDate,
-          'is_active': isActive,          
+          'is_active': isActive,
           'category': categoryId,
           'unit': unitId,
         },
@@ -118,5 +130,3 @@ class ProductService {
     }
   }
 }
-
-

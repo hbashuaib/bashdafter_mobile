@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../services/category_service.dart';
+import '../models/category_model.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -12,8 +14,10 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
   final nameController = TextEditingController();
+  final nameEnController = TextEditingController();
+  final nameArController = TextEditingController();
   final descriptionController = TextEditingController();
-  List<dynamic> categories = [];
+  List<CategoryModel> categories = [];
   bool isLoading = true;
 
   @override
@@ -44,6 +48,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Future<void> showAddCategoryDialog() async {
     nameController.clear();
+    nameEnController.clear();
+    nameArController.clear();
     descriptionController.clear();
 
     final result = await showDialog<bool>(
@@ -63,6 +69,25 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 decoration: InputDecoration(
                   labelText: context.l10n.categoryName,
                 ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameEnController,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: context.l10n.englishName,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameArController,
+                textDirection: TextDirection.rtl,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(labelText: context.l10n.arabicName),
               ),
 
               const SizedBox(height: 12),
@@ -111,6 +136,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     try {
       await CategoryService().createCategory(
         name: nameController.text,
+        nameEn: nameEnController.text,
+        nameAr: nameArController.text,
         description: descriptionController.text,
       );
 
@@ -126,10 +153,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     }
   }
 
-  Future<void> showEditCategoryDialog(dynamic category) async {
-    nameController.text = category['name'] ?? '';
-
-    descriptionController.text = category['description'] ?? '';
+  Future<void> showEditCategoryDialog(CategoryModel category) async {
+    nameController.text = category.name;
+    nameEnController.text = category.nameEn;
+    nameArController.text = category.nameAr;
+    descriptionController.text = category.description;
 
     final result = await showDialog<bool>(
       context: context,
@@ -145,7 +173,26 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               TextField(
                 controller: nameController,
 
-                decoration: InputDecoration(labelText: context.l10n.categoryName),
+                decoration: InputDecoration(
+                  labelText: context.l10n.categoryName,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameEnController,
+                decoration: InputDecoration(
+                  labelText: context.l10n.englishName,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameArController,
+                textDirection: TextDirection.rtl,
+                decoration: InputDecoration(labelText: context.l10n.arabicName),
               ),
 
               const SizedBox(height: 12),
@@ -153,7 +200,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               TextField(
                 controller: descriptionController,
 
-                decoration: InputDecoration(labelText: context.l10n.description),
+                decoration: InputDecoration(
+                  labelText: context.l10n.description,
+                ),
               ),
             ],
           ),
@@ -180,7 +229,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
 
     if (result == true) {
-      await updateCategory(category['id']);
+      await updateCategory(category.id);
     }
   }
 
@@ -189,6 +238,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       await CategoryService().updateCategory(
         id: categoryId,
         name: nameController.text,
+        nameEn: nameEnController.text,
+        nameAr: nameArController.text,
         description: descriptionController.text,
       );
 
@@ -204,7 +255,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     }
   }
 
-  Future<void> confirmDeleteCategory(dynamic category) async {
+  Future<void> confirmDeleteCategory(CategoryModel category) async {
     final confirmed = await showDialog<bool>(
       context: context,
 
@@ -214,7 +265,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
           content: Text(
             '${context.l10n.deleteCategoryQuestion}\n\n'
-            '${category['name']}',
+            '${AppLocalizedName.resolve(context: context, name: category.name, nameEn: category.nameEn, nameAr: category.nameAr)}',
           ),
 
           actions: [
@@ -239,7 +290,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
 
     if (confirmed == true) {
-      await deleteCategory(category['id']);
+      await deleteCategory(category.id);
     }
   }
 
@@ -268,6 +319,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   void dispose() {
     nameController.dispose();
+    nameEnController.dispose();
+    nameArController.dispose();
     descriptionController.dispose();
     super.dispose();
   }
@@ -295,14 +348,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
                 return Card(
                   child: ListTile(
-                    title: Text(category['name']),
-                    subtitle:
-                        (category['description'] ?? '')
-                            .toString()
-                            .trim()
-                            .isEmpty
+                    title: Text(
+                      AppLocalizedName.resolve(
+                        context: context,
+                        name: category.name,
+                        nameEn: category.nameEn,
+                        nameAr: category.nameAr,
+                      ),
+                    ),
+                    subtitle: category.description.trim().isEmpty
                         ? null
-                        : Text(category['description']),
+                        : Text(category.description),
 
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

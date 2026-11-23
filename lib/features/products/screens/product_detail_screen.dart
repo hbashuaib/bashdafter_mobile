@@ -4,15 +4,17 @@ import 'package:provider/provider.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../services/product_service.dart';
+import '../models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 import 'edit_product_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final ProductModel product;
 
   const ProductDetailScreen({super.key, required this.product});
 
@@ -50,7 +52,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           content: Text(
             '${context.l10n.deactivateProductQuestion}\n\n'
-            '${widget.product['name']}',
+            '${AppLocalizedName.resolve(context: context, name: widget.product.name, nameEn: widget.product.nameEn, nameAr: widget.product.nameAr)}',
           ),
 
           actions: [
@@ -79,7 +81,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     try {
-      await _productService.deleteProduct(widget.product['id']);
+      await _productService.deleteProduct(widget.product.id);
 
       if (!mounted) return;
 
@@ -99,29 +101,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentStock =
-        double.tryParse(widget.product['current_stock'].toString()) ?? 0;
+    final currentStock = double.tryParse(widget.product.currentStock) ?? 0;
 
-    final minimumStock =
-        double.tryParse(widget.product['minimum_stock'].toString()) ?? 0;
+    final minimumStock = double.tryParse(widget.product.minimumStock) ?? 0;
 
     final isLowStock = currentStock <= minimumStock;
 
-    final costPrice =
-        double.tryParse(widget.product['cost_price'].toString()) ?? 0;
+    final costPrice = double.tryParse(widget.product.costPrice) ?? 0;
 
-    final sellingPrice =
-        double.tryParse(widget.product['selling_price'].toString()) ?? 0;
+    final sellingPrice = double.tryParse(widget.product.sellingPrice) ?? 0;
 
-    final totalSold =
-        double.tryParse(widget.product['total_sold'].toString()) ?? 0;
+    final totalSold = double.tryParse(widget.product.totalSold.toString()) ?? 0;
 
     final totalAdjustments =
-        double.tryParse(widget.product['total_adjustments'].toString()) ?? 0;
+        double.tryParse(widget.product.totalAdjustments.toString()) ?? 0;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.product['name']?.toString() ?? ''),
+        title: Text(
+          AppLocalizedName.resolve(
+            context: context,
+            name: widget.product.name,
+            nameEn: widget.product.nameEn,
+            nameAr: widget.product.nameAr,
+          ),
+        ),
 
         actions: [
           if (currentUser != null &&
@@ -163,14 +167,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Card(
             child: ListTile(
               title: Text(context.l10n.category),
-              subtitle: Text(widget.product['category_name'] ?? ''),
+              subtitle: Text(widget.product.categoryName),
             ),
           ),
 
           Card(
             child: ListTile(
               title: Text(context.l10n.unit),
-              subtitle: Text(widget.product['unit_name'] ?? ''),
+              subtitle: Text(widget.product.unitName),
             ),
           ),
 
@@ -178,9 +182,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: ListTile(
               title: Text(context.l10n.barcodeLabel),
               subtitle: Text(
-                (widget.product['barcode'] ?? '').toString().trim().isEmpty
+                (widget.product.barcode ?? '').toString().trim().isEmpty
                     ? '-'
-                    : widget.product['barcode'].toString(),
+                    : widget.product.barcode.toString(),
               ),
             ),
           ),
@@ -189,9 +193,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: ListTile(
               title: Text(context.l10n.description),
               subtitle: Text(
-                (widget.product['description'] ?? '').toString().trim().isEmpty
+                (widget.product.description).toString().trim().isEmpty
                     ? context.l10n.noDescription
-                    : widget.product['description'],
+                    : widget.product.description,
               ),
             ),
           ),
@@ -287,34 +291,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: ListTile(
               title: Text(context.l10n.hasExpiry),
               subtitle: Text(
-                widget.product['has_expiry']
-                    ? context.l10n.yes
-                    : context.l10n.no,
+                widget.product.hasExpiry ? context.l10n.yes : context.l10n.no,
               ),
             ),
           ),
-          if (widget.product['has_expiry'] == true)
+          if (widget.product.hasExpiry == true)
             Card(
               child: ListTile(
                 title: Text(context.l10n.expiryDate),
 
                 subtitle: Text(
-                  widget.product['expiry_date'] == null
+                  widget.product.expiryDate == null
                       ? '-'
                       : AppFormatters.date(
                           context,
-                          DateTime.parse(widget.product['expiry_date']),
+                          DateTime.parse(widget.product.expiryDate!),
                         ),
                 ),
               ),
             ),
-          if (widget.product['has_expiry'] == true &&
-              widget.product['expiry_date'] != null)
+          if (widget.product.hasExpiry == true &&
+              widget.product.expiryDate != null)
             Builder(
               builder: (_) {
-                final expiryDate = DateTime.parse(
-                  widget.product['expiry_date'],
-                );
+                final expiryDate = DateTime.parse(widget.product.expiryDate!);
 
                 final remaining = expiryDate.difference(DateTime.now()).inDays;
 
@@ -372,7 +372,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.cardTint(
                     context,
-                    widget.product['is_active']
+                    widget.product.isActive
                         ? Colors.green.shade100
                         : Colors.red.shade100,
                   ),
@@ -381,14 +381,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
 
                 child: Text(
-                  widget.product['is_active']
+                  widget.product.isActive
                       ? context.l10n.active
                       : context.l10n.inactive,
 
                   style: TextStyle(
-                    color: widget.product['is_active']
-                        ? Colors.green
-                        : Colors.red,
+                    color: widget.product.isActive ? Colors.green : Colors.red,
 
                     fontWeight: FontWeight.bold,
                   ),

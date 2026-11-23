@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../services/unit_service.dart';
+import '../models/unit_model.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 class UnitsScreen extends StatefulWidget {
   const UnitsScreen({super.key});
@@ -12,8 +14,10 @@ class UnitsScreen extends StatefulWidget {
 
 class _UnitsScreenState extends State<UnitsScreen> {
   final nameController = TextEditingController();
+  final nameEnController = TextEditingController();
+  final nameArController = TextEditingController();
   final descriptionController = TextEditingController();
-  List<dynamic> units = [];
+  List<UnitModel> units = [];
   bool isLoading = true;
 
   @override
@@ -44,6 +48,8 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
   Future<void> showAddUnitDialog() async {
     nameController.clear();
+    nameEnController.clear();
+    nameArController.clear();
     descriptionController.clear();
 
     final result = await showDialog<bool>(
@@ -61,6 +67,23 @@ class _UnitsScreenState extends State<UnitsScreen> {
                 controller: nameController,
                 textDirection: Directionality.of(context),
                 decoration: InputDecoration(labelText: context.l10n.unitName),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameEnController,
+                decoration: InputDecoration(
+                  labelText: context.l10n.englishName,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameArController,
+                textDirection: TextDirection.rtl,
+                decoration: InputDecoration(labelText: context.l10n.arabicName),
               ),
 
               const SizedBox(height: 12),
@@ -109,6 +132,8 @@ class _UnitsScreenState extends State<UnitsScreen> {
     try {
       await UnitService().createUnit(
         name: nameController.text,
+        nameEn: nameEnController.text,
+        nameAr: nameArController.text,
         description: descriptionController.text,
       );
 
@@ -124,10 +149,11 @@ class _UnitsScreenState extends State<UnitsScreen> {
     }
   }
 
-  Future<void> showEditUnitDialog(dynamic unit) async {
-    nameController.text = unit['name'] ?? '';
-
-    descriptionController.text = unit['description'] ?? '';
+  Future<void> showEditUnitDialog(UnitModel unit) async {
+    nameController.text = unit.name;
+    nameEnController.text = unit.nameEn;
+    nameArController.text = unit.nameAr;
+    descriptionController.text = unit.description;
 
     final result = await showDialog<bool>(
       context: context,
@@ -143,6 +169,23 @@ class _UnitsScreenState extends State<UnitsScreen> {
               TextField(
                 controller: nameController,
                 decoration: InputDecoration(labelText: context.l10n.unitName),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameEnController,
+                decoration: InputDecoration(
+                  labelText: context.l10n.englishName,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: nameArController,
+                textDirection: TextDirection.rtl,
+                decoration: InputDecoration(labelText: context.l10n.arabicName),
               ),
 
               const SizedBox(height: 12),
@@ -178,7 +221,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
     );
 
     if (result == true) {
-      await updateUnit(unit['id']);
+      await updateUnit(unit.id);
     }
   }
 
@@ -186,9 +229,9 @@ class _UnitsScreenState extends State<UnitsScreen> {
     try {
       await UnitService().updateUnit(
         id: unitId,
-
         name: nameController.text,
-
+        nameEn: nameEnController.text,
+        nameAr: nameArController.text,
         description: descriptionController.text,
       );
 
@@ -204,7 +247,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
     }
   }
 
-  Future<void> confirmDeleteUnit(dynamic unit) async {
+  Future<void> confirmDeleteUnit(UnitModel unit) async {
     final confirmed = await showDialog<bool>(
       context: context,
 
@@ -214,7 +257,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
           content: Text(
             '${context.l10n.deleteUnitQuestion}\n\n'
-            '${unit['name']}',
+            '${AppLocalizedName.resolve(context: context, name: unit.name, nameEn: unit.nameEn, nameAr: unit.nameAr)}',
           ),
 
           actions: [
@@ -239,7 +282,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
     );
 
     if (confirmed == true) {
-      await deleteUnit(unit['id']);
+      await deleteUnit(unit.id);
     }
   }
 
@@ -268,6 +311,8 @@ class _UnitsScreenState extends State<UnitsScreen> {
   @override
   void dispose() {
     nameController.dispose();
+    nameEnController.dispose();
+    nameArController.dispose();
     descriptionController.dispose();
     super.dispose();
   }
@@ -295,12 +340,18 @@ class _UnitsScreenState extends State<UnitsScreen> {
 
                 return Card(
                   child: ListTile(
-                    title: Text(unit['name']),
+                    title: Text(
+                      AppLocalizedName.resolve(
+                        context: context,
+                        name: unit.name,
+                        nameEn: unit.nameEn,
+                        nameAr: unit.nameAr,
+                      ),
+                    ),
 
-                    subtitle:
-                        (unit['description'] ?? '').toString().trim().isEmpty
+                    subtitle: unit.description.trim().isEmpty
                         ? null
-                        : Text(unit['description']),
+                        : Text(unit.description),
 
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

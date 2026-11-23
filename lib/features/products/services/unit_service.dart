@@ -1,15 +1,19 @@
 import 'package:dio/dio.dart';
 
+import '../models/unit_model.dart';
+
 import '../../../core/api/api_client.dart';
 
 class UnitService {
-  Future<List<dynamic>> getUnits() async {
+  Future<List<UnitModel>> getUnits() async {
     final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get('/units/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => UnitModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {
@@ -19,6 +23,8 @@ class UnitService {
 
   Future<void> createUnit({
     required String name,
+    String? nameEn,
+    String? nameAr,
     required String description,
   }) async {
     final dio = await ApiClient.instance;
@@ -26,7 +32,12 @@ class UnitService {
     try {
       await dio.post(
         '/units/',
-        data: {'name': name.trim(), 'description': description.trim()},
+        data: {
+          'name': name.trim(),
+          'name_en': nameEn?.trim() ?? '',
+          'name_ar': nameAr?.trim() ?? '',
+          'description': description.trim(),
+        },
       );
     } on DioException {
       rethrow;
@@ -38,6 +49,8 @@ class UnitService {
   Future<void> updateUnit({
     required int id,
     required String name,
+    String? nameEn,
+    String? nameAr,
     required String description,
   }) async {
     final dio = await ApiClient.instance;
@@ -45,7 +58,12 @@ class UnitService {
     try {
       await dio.put(
         '/units/$id/',
-        data: {'name': name.trim(), 'description': description.trim()},
+        data: {
+          'name': name.trim(),
+          'name_en': nameEn?.trim() ?? '',
+          'name_ar': nameAr?.trim() ?? '',
+          'description': description.trim(),
+        },
       );
     } on DioException {
       rethrow;

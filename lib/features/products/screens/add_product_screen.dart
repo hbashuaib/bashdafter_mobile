@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import '../services/category_service.dart';
 import '../services/product_service.dart';
 import '../services/unit_service.dart';
+import '../models/category_model.dart';
+import '../models/unit_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -17,14 +20,16 @@ class AddProductScreen extends StatefulWidget {
 
 class _AddProductScreenState extends State<AddProductScreen> {
   final nameController = TextEditingController();
+  final nameEnController = TextEditingController();
+  final nameArController = TextEditingController();
   final barcodeController = TextEditingController();
   final descriptionController = TextEditingController();
   final costPriceController = TextEditingController();
   final sellingPriceController = TextEditingController();
   final minimumStockController = TextEditingController();
 
-  List<dynamic> categories = [];
-  List<dynamic> units = [];
+  List<CategoryModel> categories = [];
+  List<UnitModel> units = [];
   int? selectedCategory;
   int? selectedUnit;
   DateTime? expiryDate;
@@ -146,6 +151,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
         name: nameController.text.trim(),
+        nameEn: nameEnController.text,
+        nameAr: nameArController.text,
         description: descriptionController.text.trim(),
         costPrice: costPriceController.text.trim(),
         sellingPrice: sellingPriceController.text.trim(),
@@ -215,6 +222,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
           const SizedBox(height: 12),
 
           TextField(
+            controller: nameEnController,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(labelText: context.l10n.englishName),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
+            controller: nameArController,
+            textDirection: TextDirection.rtl,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(labelText: context.l10n.arabicName),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
             controller: barcodeController,
             textDirection: Directionality.of(context),
             keyboardType: TextInputType.number,
@@ -250,8 +274,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
             items: categories.map((item) {
               return DropdownMenuItem<int>(
-                value: item['id'],
-                child: Text(item['name']),
+                value: item.id,
+                child: Text(
+                  AppLocalizedName.resolve(
+                    context: context,
+                    name: item.name,
+                    nameEn: item.nameEn,
+                    nameAr: item.nameAr,
+                  ),
+                ),
               );
             }).toList(),
 
@@ -271,9 +302,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
             items: units.map((item) {
               return DropdownMenuItem<int>(
-                value: item['id'],
-
-                child: Text(item['name']),
+                value: item.id,
+                child: Text(
+                  AppLocalizedName.resolve(
+                    context: context,
+                    name: item.name,
+                    nameEn: item.nameEn,
+                    nameAr: item.nameAr,
+                  ),
+                ),
               );
             }).toList(),
 

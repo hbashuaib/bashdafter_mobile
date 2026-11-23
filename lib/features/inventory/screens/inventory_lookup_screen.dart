@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../products/screens/barcode_scanner_screen.dart';
 import '../../products/services/barcode_lookup_service.dart';
+import '../../products/models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
@@ -18,7 +19,7 @@ class InventoryLookupScreen extends StatefulWidget {
 }
 
 class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
-  Map<String, dynamic>? product;
+  ProductModel? product;
   bool isLoading = false;
 
   Future<void> scanBarcode() async {
@@ -43,12 +44,14 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
         barcode.toString(),
       );
 
+      final productModel = ProductModel.fromJson(result);
+
       if (!mounted) {
         return;
       }
 
       setState(() {
-        product = result;
+        product = productModel;
         isLoading = false;
       });
     } catch (_) {
@@ -69,15 +72,15 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
   Widget build(BuildContext context) {
     final currentStock = product == null
         ? 0.0
-        : double.tryParse(product!['current_stock'].toString()) ?? 0;
+        : double.tryParse(product!.currentStock.toString()) ?? 0;
 
     final minimumStock = product == null
         ? 0.0
-        : double.tryParse(product!['minimum_stock'].toString()) ?? 0;
+        : double.tryParse(product!.minimumStock.toString()) ?? 0;
 
     final sellingPrice = product == null
         ? 0.0
-        : double.tryParse(product!['selling_price'].toString()) ?? 0;
+        : double.tryParse(product!.sellingPrice.toString()) ?? 0;
 
     final isLowStock = currentStock <= minimumStock;
 
@@ -130,7 +133,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                     children: [
                       Text(
-                        product!['name'],
+                        product!.name,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -140,7 +143,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                       const SizedBox(height: 10),
 
                       Text(
-                        '${context.l10n.barcodeLabel}: ${product!['barcode'] ?? '-'}',
+                        '${context.l10n.barcodeLabel}: ${product!.barcode ?? '-'}',
                       ),
                       Text(
                         '${context.l10n.stock}: '
@@ -196,7 +199,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                           onPressed: () async {
                             final messenger = ScaffoldMessenger.of(context);
                             final stockUpdatedText = context.l10n.stockUpdated;
-                            final currentStockText = context.l10n.currentStock;                            
+                            final currentStockText = context.l10n.currentStock;
 
                             final result = await Navigator.push(
                               context,
@@ -212,14 +215,18 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                             if (result == true && product != null) {
                               debugPrint(
-                                'Current barcode: ${product?['barcode']}',
+                                'Current barcode: ${product?.barcode}',
                               );
 
                               try {
+                                if (product?.barcode == null) {
+                                  return;
+                                }
+
                                 final updatedProduct =
                                     await BarcodeLookupService()
                                         .findProductByBarcode(
-                                          product!['barcode'],
+                                          product!.barcode!,
                                         );
 
                                 final updatedStock =
@@ -234,7 +241,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                                 }
 
                                 setState(() {
-                                  product = updatedProduct;
+                                  product = ProductModel.fromJson(
+                                    updatedProduct,
+                                  );
                                 });
 
                                 messenger.showSnackBar(

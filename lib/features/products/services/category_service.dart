@@ -1,15 +1,19 @@
 import 'package:dio/dio.dart';
 
+import '../models/category_model.dart';
+
 import '../../../core/api/api_client.dart';
 
 class CategoryService {
-  Future<List<dynamic>> getCategories() async {
+  Future<List<CategoryModel>> getCategories() async {
     final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get('/categories/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => CategoryModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {
@@ -19,6 +23,8 @@ class CategoryService {
 
   Future<void> createCategory({
     required String name,
+    String? nameEn,
+    String? nameAr,
     required String description,
   }) async {
     final dio = await ApiClient.instance;
@@ -26,7 +32,12 @@ class CategoryService {
     try {
       await dio.post(
         '/categories/',
-        data: {'name': name.trim(), 'description': description.trim()},
+        data: {
+          'name': name.trim(),
+          'name_en': nameEn?.trim() ?? '',
+          'name_ar': nameAr?.trim() ?? '',
+          'description': description.trim(),
+        },
       );
     } on DioException {
       rethrow;
@@ -38,6 +49,8 @@ class CategoryService {
   Future<void> updateCategory({
     required int id,
     required String name,
+    String? nameEn,
+    String? nameAr,
     required String description,
   }) async {
     final dio = await ApiClient.instance;
@@ -45,7 +58,12 @@ class CategoryService {
     try {
       await dio.put(
         '/categories/$id/',
-        data: {'name': name.trim(), 'description': description.trim()},
+        data: {
+          'name': name.trim(),
+          'name_en': nameEn?.trim() ?? '',
+          'name_ar': nameAr?.trim() ?? '',
+          'description': description.trim(),
+        },
       );
     } on DioException {
       rethrow;
