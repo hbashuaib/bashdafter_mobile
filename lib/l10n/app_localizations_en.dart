@@ -1363,4 +1363,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paymentReceiptType => 'PAYMENT';
+
+  @override
+  String get customer => 'Customer';
+
+  @override
+  String get statementNumber => 'Statement #';
+
+  @override
+  String get generatedDate => 'Generated';
+
+  @override
+  String get transactionDate => 'Date';
+
+  @override
+  String get transactionType => 'Type';
+
+  @override
+  String get transactionAmount => 'Amount';
+
+  @override
+  String get totalTransactions => 'Total Transactions';
+
+  @override
+  String get preparedBy => 'Prepared By';
+
+  @override
+  String get authorizedSignature => 'Authorized Signature';
+
+  @override
+  String pageOf(int current, int total) {
+    return 'Page $current of $total';
+  }
+
+  @override
+  String get customerStatementNoTransactions => 'No transactions available';
 }

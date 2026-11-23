@@ -1356,4 +1356,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get paymentReceiptType => 'سداد';
+
+  @override
+  String get customer => 'العميل';
+
+  @override
+  String get statementNumber => 'رقم الكشف';
+
+  @override
+  String get generatedDate => 'تاريخ الإنشاء';
+
+  @override
+  String get transactionDate => 'التاريخ';
+
+  @override
+  String get transactionType => 'النوع';
+
+  @override
+  String get transactionAmount => 'المبلغ';
+
+  @override
+  String get totalTransactions => 'إجمالي الحركات';
+
+  @override
+  String get preparedBy => 'أُعد بواسطة';
+
+  @override
+  String get authorizedSignature => 'التوقيع المعتمد';
+
+  @override
+  String pageOf(int current, int total) {
+    return 'الصفحة $current من $total';
+  }
+
+  @override
+  String get customerStatementNoTransactions => 'لا توجد حركات متاحة';
 }

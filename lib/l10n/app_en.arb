@@ -994,5 +994,33 @@
 "currentBalanceLabel": "Current Balance",
 "transactionsLabel": "Transactions",
 "purchaseReceiptType": "PURCHASE",
-"paymentReceiptType": "PAYMENT"
+"paymentReceiptType": "PAYMENT",
+
+"customer": "Customer",
+"statementNumber": "Statement #",
+"generatedDate": "Generated",
+
+"transactionDate": "Date",
+"transactionType": "Type",
+"transactionAmount": "Amount",
+
+
+"totalTransactions": "Total Transactions",
+
+"preparedBy": "Prepared By",
+"authorizedSignature": "Authorized Signature",
+
+"pageOf": "Page {current} of {total}",
+"@pageOf": {
+  "placeholders": {
+    "current": {
+      "type": "int"
+    },
+    "total": {
+      "type": "int"
+    }
+  }
+},
+
+"customerStatementNoTransactions": "No transactions available"
 }

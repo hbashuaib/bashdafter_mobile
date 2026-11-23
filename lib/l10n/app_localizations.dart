@@ -2737,6 +2737,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PAYMENT'**
   String get paymentReceiptType;
+
+  /// No description provided for @customer.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get customer;
+
+  /// No description provided for @statementNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement #'**
+  String get statementNumber;
+
+  /// No description provided for @generatedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated'**
+  String get generatedDate;
+
+  /// No description provided for @transactionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get transactionDate;
+
+  /// No description provided for @transactionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get transactionType;
+
+  /// No description provided for @transactionAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get transactionAmount;
+
+  /// No description provided for @totalTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Transactions'**
+  String get totalTransactions;
+
+  /// No description provided for @preparedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepared By'**
+  String get preparedBy;
+
+  /// No description provided for @authorizedSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorized Signature'**
+  String get authorizedSignature;
+
+  /// No description provided for @pageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String pageOf(int current, int total);
+
+  /// No description provided for @customerStatementNoTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions available'**
+  String get customerStatementNoTransactions;
 }
 
 class _AppLocalizationsDelegate

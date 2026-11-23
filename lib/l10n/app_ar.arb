@@ -1011,5 +1011,32 @@
 "currentBalanceLabel": "الرصيد الحالي",
 "transactionsLabel": "الحركات",
 "purchaseReceiptType": "مشتريات",
-"paymentReceiptType": "سداد"
+"paymentReceiptType": "سداد",
+
+"customer": "العميل",
+"statementNumber": "رقم الكشف",
+"generatedDate": "تاريخ الإنشاء",
+
+"transactionDate": "التاريخ",
+"transactionType": "النوع",
+"transactionAmount": "المبلغ",
+
+"totalTransactions": "إجمالي الحركات",
+
+"preparedBy": "أُعد بواسطة",
+"authorizedSignature": "التوقيع المعتمد",
+
+"pageOf": "الصفحة {current} من {total}",
+"@pageOf": {
+  "placeholders": {
+    "current": {
+      "type": "int"
+    },
+    "total": {
+      "type": "int"
+    }
+  }
+},
+
+"customerStatementNoTransactions": "لا توجد حركات متاحة"
 }
