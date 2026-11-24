@@ -11,6 +11,8 @@ import '../../customers/services/customer_service.dart';
 import '../../products/services/product_service.dart';
 import '../../purchases/services/create_purchase_service.dart';
 import '../../purchases/services/create_purchase_item_service.dart';
+import '../../customers/models/customer_model.dart';
+import '../../products/models/product_model.dart';
 import '../models/voice_purchase_item.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/app_formatters.dart';
@@ -37,10 +39,10 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
   String recognizedText = '';
   DateTime? recordingStartedAt;
   Duration? recordingDuration;
-  List<dynamic> customers = [];
-  List<dynamic> products = [];
+  List<CustomerModel> customers = [];
+  List<ProductModel> products = [];
   List<VoicePurchaseItem> parsedItems = [];
-  Map<String, dynamic>? selectedCustomer;
+  CustomerModel? selectedCustomer;
 
   Future<void> loadCustomers() async {
     try {
@@ -95,8 +97,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
     if (await _audioRecorder.hasPermission()) {
       final baseDir = await getApplicationDocumentsDirectory();
-      final customerId = selectedCustomer!['id'];
-      final customerName = sanitizeFolderName(selectedCustomer!['name']);
+      final customerId = selectedCustomer!.id;
+      final customerName = sanitizeFolderName(selectedCustomer!.name);
 
       final customerFolder = Directory(
         '${baseDir.path}/voices/customer_${customerId}_$customerName',
@@ -223,12 +225,12 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
     return value;
   }
 
-  List<dynamic> getSuggestedProducts(String productName) {
+  List<ProductModel> getSuggestedProducts(String productName) {
     final search = normalizeProductName(productName);
 
     return products
         .where((product) {
-          final name = normalizeProductName(product['name'].toString());
+          final name = normalizeProductName(product.name);
 
           return name.contains(search) ||
               search.contains(name) ||
@@ -263,7 +265,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       final search = normalizeProductName(item.productName);
 
       final matches = products.where((product) {
-        final productName = normalizeProductName(product['name'].toString());
+        final productName = normalizeProductName(product.name);
 
         return productName.contains(search);
       }).toList();
@@ -299,7 +301,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  Text('Customer: ${selectedCustomer?['name']}'),
+                  Text('Customer: ${selectedCustomer?.name}'),
 
                   const SizedBox(height: 16),
 
@@ -310,7 +312,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 4),
 
                           child: Text(
-                            '${item.matchedProduct!['name']} x ${item.quantity}',
+                            '${item.matchedProduct!.name} x ${item.quantity}',
                           ),
                         ),
                       ),
@@ -371,17 +373,17 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
     try {
       final purchaseId = await CreatePurchaseService().createPurchase(
-        customerId: selectedCustomer!['id'],
+        customerId: selectedCustomer!.id,
         notes: 'Created from Voice Purchase',
       );
 
       for (final item in validItems) {
         await CreatePurchaseItemService().createItem(
           purchaseId: purchaseId,
-          productId: item.matchedProduct!['id'],
-          itemName: item.matchedProduct!['name'],
+          productId: item.matchedProduct!.id,
+          itemName: item.matchedProduct!.name,
           quantity: item.quantity.toString(),
-          unitPrice: item.matchedProduct!['selling_price'].toString(),
+          unitPrice: item.matchedProduct!.sellingPrice,
         );
       }
 
@@ -423,9 +425,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
     for (final item in parsedItems) {
       if (item.matchedProduct != null) {
-        final price =
-            double.tryParse(item.matchedProduct!['selling_price'].toString()) ??
-            0;
+        final price = double.tryParse(item.matchedProduct!.sellingPrice) ?? 0;
 
         total += price * item.quantity;
       }
@@ -439,8 +439,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       return 0;
     }
 
-    final price =
-        double.tryParse(item.matchedProduct!['selling_price'].toString()) ?? 0;
+    final price = double.tryParse(item.matchedProduct!.sellingPrice) ?? 0;
 
     return price * item.quantity;
   }
@@ -450,8 +449,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       return false;
     }
 
-    final stock =
-        double.tryParse(item.matchedProduct!['current_stock'].toString()) ?? 0;
+    final stock = double.tryParse(item.matchedProduct!.currentStock) ?? 0;
 
     return item.quantity > stock;
   }
@@ -537,7 +535,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
               if (isLoadingCustomers)
                 const CircularProgressIndicator()
               else
-                DropdownButtonFormField<Map<String, dynamic>>(
+                DropdownButtonFormField<CustomerModel>(
                   initialValue: selectedCustomer,
 
                   decoration: const InputDecoration(
@@ -546,9 +544,9 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                   ),
 
                   items: customers.map((customer) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
+                    return DropdownMenuItem(
                       value: customer,
-                      child: Text(customer['name'] ?? ''),
+                      child: Text(customer.name),
                     );
                   }).toList(),
 
@@ -612,7 +610,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
                             Expanded(
                               child: Text(
-                                selectedCustomer?['name'] ?? '',
+                                selectedCustomer?.name ?? '',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -781,13 +779,13 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                             },
                           ),
                           title: Text(
-                            item.matchedProduct?['name'] ?? item.productName,
+                            item.matchedProduct?.name ?? item.productName,
                           ),
 
                           subtitle: item.matchedProduct != null
                               ? Text(
-                                  'Price: ${AppFormatters.currency(context, double.tryParse(item.matchedProduct!['selling_price'].toString()) ?? 0, context.read<ShopProvider>().currency)}'
-                                  '\nStock: ${AppFormatters.number(context, double.tryParse(item.matchedProduct!['current_stock'].toString()) ?? 0)}'
+                                  'Price: ${AppFormatters.currency(context, double.tryParse(item.matchedProduct!.sellingPrice) ?? 0, context.read<ShopProvider>().currency)}'
+                                  '\nStock: ${AppFormatters.number(context, double.tryParse(item.matchedProduct!.currentStock) ?? 0)}'
                                   '${hasInsufficientStock(item) ? '\n⚠ Insufficient Stock' : ''}',
                                   style: TextStyle(
                                     color: hasInsufficientStock(item)
@@ -840,11 +838,11 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                                 child: ListTile(
                                                   dense: true,
 
-                                                  title: Text(product['name']),
+                                                  title: Text(product.name),
 
                                                   subtitle: Text(
-                                                    'Stock: ${AppFormatters.number(context, double.tryParse(product['current_stock'].toString()) ?? 0)}'
-                                                    ' | Price: ${AppFormatters.currency(context, double.tryParse(product['selling_price'].toString()) ?? 0, context.read<ShopProvider>().currency)}',
+                                                    'Stock: ${AppFormatters.number(context, double.tryParse(product.currentStock) ?? 0)}'
+                                                    ' | Price: ${AppFormatters.currency(context, double.tryParse(product.sellingPrice) ?? 0, context.read<ShopProvider>().currency)}',
                                                   ),
 
                                                   onTap: () {
@@ -925,7 +923,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                         const Divider(),
 
                         Text(
-                          'Customer: ${selectedCustomer?['name'] ?? ''}',
+                          'Customer: ${selectedCustomer?.name ?? ''}',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
@@ -936,8 +934,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                             .map((item) {
                               final price =
                                   double.tryParse(
-                                    item.matchedProduct!['selling_price']
-                                        .toString(),
+                                    item.matchedProduct!.sellingPrice,
                                   ) ??
                                   0;
 
@@ -949,7 +946,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(item.matchedProduct!['name']),
+                                      child: Text(item.matchedProduct!.name),
                                     ),
 
                                     Text(

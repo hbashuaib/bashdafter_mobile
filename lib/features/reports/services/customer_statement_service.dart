@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 
+import '../models/customer_statement_model.dart';
 import '../../../core/api/api_client.dart';
 
 class CustomerStatementService {
-  Future<Map<String, dynamic>> getStatement(int customerId) async {
+  Future<CustomerStatementModel> getStatement(int customerId) async {
     final dio = await ApiClient.instance;
 
     try {
@@ -11,7 +12,7 @@ class CustomerStatementService {
         '/reports/customer-statement/$customerId/',
       );
 
-      return response.data;
+      return CustomerStatementModel.fromJson(response.data);
     } on DioException {
       rethrow;
     } catch (_) {

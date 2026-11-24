@@ -32,10 +32,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
     if (widget.user != null) {
       usernameController.text = widget.user!.username;
-      firstNameController.text = widget.user!.firstName ?? '';
-      lastNameController.text = widget.user!.lastName ?? '';
-      emailController.text = widget.user!.email ?? '';
-      phoneController.text = widget.user!.phoneNumber ?? '';
+      firstNameController.text = widget.user!.firstName;
+      lastNameController.text = widget.user!.lastName;
+      emailController.text = widget.user!.email;
+      phoneController.text = widget.user!.phoneNumber;
       selectedRole = widget.user!.role;
     }
   }

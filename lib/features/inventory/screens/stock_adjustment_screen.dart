@@ -180,7 +180,11 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
               items: products.map((product) {
                 return DropdownMenuItem(
                   value: product,
-                  child: Text(product.name),
+                  child: Text(
+                    product.name.isEmpty
+                        ? context.l10n.unknownProduct
+                        : product.name,
+                  ),
                 );
               }).toList(),
 
@@ -195,7 +199,13 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
               Card(
                 child: ListTile(
                   leading: const Icon(Icons.inventory_2),
-                  title: Text(selectedProduct?.name ?? ''),
+                  title: Text(
+                    selectedProduct == null
+                        ? ''
+                        : selectedProduct!.name.isEmpty
+                        ? context.l10n.unknownProduct
+                        : selectedProduct!.name,
+                  ),
                   subtitle: Text(context.l10n.selectedFromBarcodeLookup),
                 ),
               ),

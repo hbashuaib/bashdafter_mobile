@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../models/user_profile.dart';
 import '../../../core/api/api_client.dart';
 
 class AuthService {
@@ -21,9 +22,11 @@ class AuthService {
     }
   }
 
-  Future<Response> getProfile() async {
+  Future<UserProfile> getProfile() async {
     final dio = await ApiClient.instance;
 
-    return await dio.get('/auth/profile/');
+    final response = await dio.get('/auth/profile/');
+
+    return UserProfile.fromJson(response.data);
   }
 }

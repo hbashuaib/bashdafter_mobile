@@ -1,16 +1,21 @@
+import '../models/user_model.dart';
 import '../../../core/api/api_client.dart';
 
 class UserService {
-  Future<List<dynamic>> getUsers() async {
+  Future<List<UserModel>> getUsers() async {
     final dio = await ApiClient.instance;
     final response = await dio.get('/users/');
-    return response.data;
+    return (response.data as List)
+        .map((item) => UserModel.fromJson(item))
+        .toList();
   }
 
-  Future<List<dynamic>> getInactiveUsers() async {
+  Future<List<UserModel>> getInactiveUsers() async {
     final dio = await ApiClient.instance;
     final response = await dio.get('/users/inactive/');
-    return response.data;
+    return (response.data as List)
+        .map((item) => UserModel.fromJson(item))
+        .toList();
   }
 
   Future<void> createUser({

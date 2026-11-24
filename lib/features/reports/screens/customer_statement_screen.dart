@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../services/customer_statement_service.dart';
 import '../services/customer_statement_pdf_service.dart';
+import '../models/customer_statement_model.dart';
+import '../models/customer_statement_transaction_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
@@ -24,8 +26,8 @@ class CustomerStatementScreen extends StatefulWidget {
 
 class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   final searchController = TextEditingController();
-  Map<String, dynamic>? statement;
-  List<dynamic> filteredTransactions = [];
+  CustomerStatementModel? statement;
+  List<CustomerStatementTransactionModel> filteredTransactions = [];
   bool isLoading = true;
 
   @override
@@ -48,7 +50,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
       setState(() {
         statement = data;
-        filteredTransactions = List<dynamic>.from(data['transactions']);
+        filteredTransactions = List.from(data.transactions);
         isLoading = false;
       });
     } catch (e) {
@@ -70,17 +72,15 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
     final query = value.toLowerCase().trim();
 
     setState(() {
-      filteredTransactions = (statement!['transactions'] as List<dynamic>)
-          .where((item) {
-            final type = item['type'].toString().toLowerCase();
-            final date = item['date'].toString().toLowerCase();
-            final amount = item['amount'].toString().toLowerCase();
+      filteredTransactions = statement!.transactions.where((item) {
+        final type = item.type.toLowerCase();
+        final date = item.date.toLowerCase();
+        final amount = item.amount.toString().toLowerCase();
 
-            return type.contains(query) ||
-                date.contains(query) ||
-                amount.contains(query);
-          })
-          .toList();
+        return type.contains(query) ||
+            date.contains(query) ||
+            amount.contains(query);
+      }).toList();
     });
   }
 
@@ -108,12 +108,16 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
       );
     }
 
-    final balance = double.tryParse(statement!['balance'].toString()) ?? 0;
-    final transactions = statement!['transactions'] as List<dynamic>;
+    final balance = statement!.balance.toDouble();
+    final transactions = statement!.transactions;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(statement!['customer']?.toString() ?? 'Customer Statement'),
+        title: Text(
+          statement!.customer.isEmpty
+              ? context.l10n.customerStatement
+              : statement!.customer,
+        ),
 
         actions: [
           IconButton(
@@ -129,8 +133,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
               try {
                 await CustomerStatementPdfService().generatePdf(
                   context: context,
-                  customer: statement!['customer'],
-                  balance: statement!['balance'],
+                  customer: statement!.customer,
+                  balance: statement!.balance,
                   transactions: transactions,
                 );
 
@@ -142,7 +146,9 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                 if (!mounted) return;
 
-                messenger.showSnackBar(SnackBar(content: Text('$pdfFailedText\n$e')));
+                messenger.showSnackBar(
+                  SnackBar(content: Text('$pdfFailedText\n$e')),
+                );
               }
             },
           ),
@@ -156,7 +162,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                   text: WhatsAppReceiptBuilder.customerStatement(
                     context,
                     statement!,
-                    statement!['transactions'],
+                    statement!.transactions,
                   ),
                 ),
               );
@@ -215,12 +221,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
 
-                            color:
-                                (double.tryParse(
-                                          statement!['balance'].toString(),
-                                        ) ??
-                                        0) >
-                                    0
+                            color: statement!.balance > 0
                                 ? Colors.red
                                 : Colors.green,
                           ),
@@ -293,14 +294,8 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
                         itemBuilder: (context, index) {
                           final item = filteredTransactions[index];
-
-                          final runningBalance =
-                              double.tryParse(
-                                item['running_balance'].toString(),
-                              ) ??
-                              0;
-
-                          final isPurchase = item['type'] == 'purchase';
+                          final runningBalance = item.runningBalance.toDouble();
+                          final isPurchase = item.type == 'purchase';
 
                           return Card(
                             child: ListTile(
@@ -312,7 +307,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                               subtitle: Text(
                                 AppFormatters.date(
                                   context,
-                                  DateTime.parse(item['date'].toString()),
+                                  DateTime.parse(item.date),
                                 ),
                               ),
 
@@ -323,7 +318,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                                 children: [
                                   Text(
                                     '${isPurchase ? '+' : '-'}'
-                                    '${AppFormatters.currency(context, double.tryParse(item['amount'].toString()) ?? 0, context.read<ShopProvider>().currency)}',
+                                    '${AppFormatters.currency(context, item.amount.toDouble(), context.read<ShopProvider>().currency)}',
                                     style: TextStyle(
                                       color: isPurchase
                                           ? Colors.red

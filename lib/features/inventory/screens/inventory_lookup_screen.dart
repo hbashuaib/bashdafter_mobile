@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -40,11 +41,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
     });
 
     try {
-      final result = await BarcodeLookupService().findProductByBarcode(
+      final productModel = await BarcodeLookupService().findProductByBarcode(
         barcode.toString(),
       );
-
-      final productModel = ProductModel.fromJson(result);
 
       if (!mounted) {
         return;
@@ -72,15 +71,15 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
   Widget build(BuildContext context) {
     final currentStock = product == null
         ? 0.0
-        : double.tryParse(product!.currentStock.toString()) ?? 0;
+        : double.tryParse(product!.currentStock) ?? 0;
 
     final minimumStock = product == null
         ? 0.0
-        : double.tryParse(product!.minimumStock.toString()) ?? 0;
+        : double.tryParse(product!.minimumStock) ?? 0;
 
     final sellingPrice = product == null
         ? 0.0
-        : double.tryParse(product!.sellingPrice.toString()) ?? 0;
+        : double.tryParse(product!.sellingPrice) ?? 0;
 
     final isLowStock = currentStock <= minimumStock;
 
@@ -133,7 +132,12 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                     children: [
                       Text(
-                        product!.name,
+                        AppLocalizedName.resolve(
+                          context: context,
+                          name: product!.name,
+                          nameEn: product!.nameEn,
+                          nameAr: product!.nameAr,
+                        ),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -231,8 +235,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
 
                                 final updatedStock =
                                     double.tryParse(
-                                      updatedProduct['current_stock']
-                                          .toString(),
+                                      updatedProduct.currentStock,
                                     ) ??
                                     0;
 
@@ -241,9 +244,7 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
                                 }
 
                                 setState(() {
-                                  product = ProductModel.fromJson(
-                                    updatedProduct,
-                                  );
+                                  product = updatedProduct;
                                 });
 
                                 messenger.showSnackBar(

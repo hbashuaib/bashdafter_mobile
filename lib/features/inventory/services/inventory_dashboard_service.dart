@@ -1,17 +1,17 @@
 import 'package:dio/dio.dart';
 
+import '../models/inventory_dashboard_model.dart';
+
 import '../../../core/api/api_client.dart';
 
 class InventoryDashboardService {
-  Future<Map<String, dynamic>> getDashboard() async {
+  Future<InventoryDashboardModel> getDashboard() async {
     final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get(
-        '/inventory-dashboard/',
-      );
+      final response = await dio.get('/inventory-dashboard/');
 
-      return response.data;
+      return InventoryDashboardModel.fromJson(response.data);
     } on DioException {
       rethrow;
     } catch (_) {

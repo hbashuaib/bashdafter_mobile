@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../services/update_customer_service.dart';
+import '../models/customer_model.dart';
 import '../../../core/localization/localization_extension.dart';
 
 class EditCustomerScreen extends StatefulWidget {
-  final Map<String, dynamic> customer;
+  final CustomerModel customer;
   const EditCustomerScreen({super.key, required this.customer});
 
   @override
@@ -23,11 +24,11 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.customer['name']);
-    phoneController = TextEditingController(text: widget.customer['phone']);
-    addressController = TextEditingController(text: widget.customer['address']);
-    notesController = TextEditingController(text: widget.customer['notes']);
-    isActive = widget.customer['is_active'];
+    nameController = TextEditingController(text: widget.customer.name);
+    phoneController = TextEditingController(text: widget.customer.phone);
+    addressController = TextEditingController(text: widget.customer.address);
+    notesController = TextEditingController(text: widget.customer.notes);
+    isActive = widget.customer.isActive;
   }
 
   Future<void> saveChanges() async {
@@ -61,7 +62,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
 
     try {
       await UpdateCustomerService().updateCustomer(
-        customerId: widget.customer['id'],
+        customerId: widget.customer.id,
         name: nameController.text.trim(),
         phone: phoneController.text.trim(),
         address: addressController.text.trim(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/reports_service.dart';
+import '../models/top_debtor_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -17,8 +18,8 @@ class TopDebtorsScreen extends StatefulWidget {
 
 class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
   final searchController = TextEditingController();
-  List<dynamic> debtors = [];
-  List<dynamic> filteredDebtors = [];
+  List<TopDebtorModel> debtors = [];
+  List<TopDebtorModel> filteredDebtors = [];
   bool isLoading = true;
 
   @override
@@ -78,8 +79,8 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
 
     setState(() {
       filteredDebtors = debtors.where((debtor) {
-        final name = debtor['name'].toString().toLowerCase();
-        final balance = debtor['balance'].toString().toLowerCase();
+        final name = debtor.name.toLowerCase();
+        final balance = debtor.balance.toString().toLowerCase();
         return name.contains(query) || balance.contains(query);
       }).toList();
     });
@@ -137,10 +138,7 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                               )
                             : AppFormatters.currency(
                                 context,
-                                double.tryParse(
-                                      debtors.first['balance'].toString(),
-                                    ) ??
-                                    0,
+                                debtors.first.balance.toDouble(),
                                 context.read<ShopProvider>().currency,
                               ),
 
@@ -216,10 +214,9 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
 
                       itemBuilder: (context, index) {
                         final debtor = filteredDebtors[index];
-                        final rank = debtor['rank'] ?? 0;
+                        final rank = debtor.rank;
 
-                        final balance =
-                            double.tryParse(debtor['balance'].toString()) ?? 0;
+                        final balance = debtor.balance.toDouble();
 
                         return Card(
                           child: ListTile(
@@ -236,8 +233,9 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
                             ),
 
                             title: Text(
-                              debtor['name']?.toString() ??
-                                  context.l10n.unknownCustomer,
+                              debtor.name.isEmpty
+                                  ? context.l10n.unknownCustomer
+                                  : debtor.name,
                             ),
 
                             trailing: Text(

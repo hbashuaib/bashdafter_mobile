@@ -6,10 +6,12 @@ import '../services/create_purchase_item_service.dart';
 import '../../products/services/product_service.dart';
 import '../../products/services/barcode_lookup_service.dart';
 import '../../products/screens/barcode_scanner_screen.dart';
+import '../../products/models/product_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -27,8 +29,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   final FocusNode quantityFocusNode = FocusNode();
   bool isSaving = false;
   List<Map<String, dynamic>> purchaseItems = [];
-  List<dynamic> products = [];
-  dynamic selectedProduct;
+  List<ProductModel> products = [];
+  ProductModel? selectedProduct;
 
   @override
   void initState() {
@@ -98,7 +100,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     }
 
     final exists = purchaseItems.any(
-      (item) => item['product_id'] == selectedProduct['id'],
+      (item) => item['product_id'] == selectedProduct!.id,
     );
 
     if (exists) {
@@ -109,8 +111,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       return;
     }
 
-    final currentStock =
-        double.tryParse(selectedProduct['current_stock'].toString()) ?? 0;
+    final currentStock = double.tryParse(selectedProduct!.currentStock) ?? 0;
 
     if (quantity > currentStock) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,8 +128,8 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
     }
 
     purchaseItems.add({
-      'product_id': selectedProduct['id'],
-      'item_name': selectedProduct['name'],
+      'product_id': selectedProduct!.id,
+      'item_name': selectedProduct!.name,
       'quantity': quantityController.text.trim(),
       'unit_price': unitPriceController.text.trim(),
     });
@@ -252,8 +253,9 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   try {
                     final product = await BarcodeLookupService()
                         .findProductByBarcode(barcode.toString());
+
                     final selected = products.firstWhere(
-                      (p) => p['id'] == product['id'],
+                      (p) => p.id == product.id,
                       orElse: () => product,
                     );
 
@@ -265,8 +267,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                       selectedProduct = selected;
                       quantityController.text = '1';
 
-                      unitPriceController.text = selected['selling_price']
-                          .toString();
+                      unitPriceController.text = selected.sellingPrice;
                     });
 
                     quantityFocusNode.requestFocus();
@@ -276,7 +277,16 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     }
 
                     messenger.showSnackBar(
-                      SnackBar(content: Text(product['name'])),
+                      SnackBar(
+                        content: Text(
+                          AppLocalizedName.resolve(
+                            context: context,
+                            name: product.name,
+                            nameEn: product.nameEn,
+                            nameAr: product.nameAr,
+                          ),
+                        ),
+                      ),
                     );
                   } catch (_) {
                     if (!mounted) {
@@ -293,7 +303,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             const SizedBox(height: 15),
 
-            DropdownButtonFormField<dynamic>(
+            DropdownButtonFormField<ProductModel>(
               initialValue: selectedProduct,
               decoration: InputDecoration(labelText: context.l10n.product),
 
@@ -301,14 +311,21 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                 return DropdownMenuItem(
                   value: product,
 
-                  child: Text(product['name']),
+                  child: Text(
+                    AppLocalizedName.resolve(
+                      context: context,
+                      name: product.name,
+                      nameEn: product.nameEn,
+                      nameAr: product.nameAr,
+                    ),
+                  ),
                 );
               }).toList(),
 
               onChanged: (value) {
                 setState(() {
                   selectedProduct = value;
-                  unitPriceController.text = value['selling_price'].toString();
+                  unitPriceController.text = value?.sellingPrice ?? '';
                 });
               },
             ),

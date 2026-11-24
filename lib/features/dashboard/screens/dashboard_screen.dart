@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/dashboard_service.dart';
+import '../models/dashboard_model.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../inventory/screens/inventory_menu_screen.dart';
@@ -19,7 +20,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  Map<String, dynamic>? dashboardData;
+  DashboardModel? dashboardData;
   bool isLoading = true;
 
   @override
@@ -59,10 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalBalance =
-        double.tryParse(dashboardData?['total_balance']?.toString() ?? '0') ??
-        0;
-
+    final totalBalance = dashboardData?.totalBalance.toDouble() ?? 0;
     final hasBalance = totalBalance > 0;
 
     return Scaffold(
@@ -150,10 +148,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Text(context.l10n.customersCount),
 
                               Text(
-                                // dashboardData!['customers'].toString(),
                                 AppFormatters.number(
                                   context,
-                                  dashboardData!['customers'] ?? 0,
+                                  dashboardData!.customers,
                                 ),
 
                                 style: const TextStyle(
@@ -210,11 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       leading: const Icon(Icons.people, color: Colors.blue),
                       title: Text(context.l10n.customersCount),
                       trailing: Text(
-                        // dashboardData!['customers'].toString(),
-                        AppFormatters.number(
-                          context,
-                          dashboardData!['customers'] ?? 0,
-                        ),
+                        AppFormatters.number(context, dashboardData!.customers),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -229,13 +222,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       title: Text(context.l10n.totalPurchases),
                       trailing: Text(
-                        // 'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_purchases'].toString()) ?? 0)}',
                         AppFormatters.currency(
                           context,
-                          double.tryParse(
-                                dashboardData!['total_purchases'].toString(),
-                              ) ??
-                              0,
+                          dashboardData!.totalPurchases.toDouble(),
                           context.read<ShopProvider>().currency,
                         ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -249,13 +238,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       leading: const Icon(Icons.payments, color: Colors.green),
                       title: Text(context.l10n.totalPayments),
                       trailing: Text(
-                        // 'YER ${currencyFormatter.format(double.tryParse(dashboardData!['total_payments'].toString()) ?? 0)}',
                         AppFormatters.currency(
                           context,
-                          double.tryParse(
-                                dashboardData!['total_payments'].toString(),
-                              ) ??
-                              0,
+                          dashboardData!.totalPayments.toDouble(),
                           context.read<ShopProvider>().currency,
                         ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -347,7 +332,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       },
                     ),
-                  ),                  
+                  ),
 
                   const SizedBox(height: 140),
                 ],

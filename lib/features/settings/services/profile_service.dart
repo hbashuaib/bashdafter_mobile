@@ -1,15 +1,16 @@
 import 'package:dio/dio.dart';
 
+import '../../auth/models/user_profile.dart';
 import '../../../core/api/api_client.dart';
 
 class ProfileService {
-  Future<Map<String, dynamic>> getProfile() async {
+  Future<UserProfile> getProfile() async {
     final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get('/auth/profile/',);
+      final response = await dio.get('/auth/profile/');
 
-      return response.data;
+      return UserProfile.fromJson(response.data);
     } on DioException {
       rethrow;
     } catch (_) {

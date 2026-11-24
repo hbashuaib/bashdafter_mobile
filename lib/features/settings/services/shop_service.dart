@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 
+import '../models/shop_model.dart';
 import '../../../core/api/api_client.dart';
 
 class ShopService {
-  Future<Map<String, dynamic>> getShop() async {
+  Future<ShopModel> getShop() async {
     final dio = await ApiClient.instance;
 
     try {
@@ -14,7 +15,7 @@ class ShopService {
         throw Exception('No shop profile found');
       }
 
-      return data.first as Map<String, dynamic>;
+      return ShopModel.fromJson(data.first as Map<String, dynamic>);
     } on DioException {
       rethrow;
     } catch (_) {
@@ -46,7 +47,6 @@ class ShopService {
           'is_active': isActive,
           'owner': owner,
         },
-        
       );
     } on DioException {
       rethrow;

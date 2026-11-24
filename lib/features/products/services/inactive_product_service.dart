@@ -1,15 +1,18 @@
 import 'package:dio/dio.dart';
 
+import '../../products/models/product_model.dart';
 import '../../../core/api/api_client.dart';
 
 class InactiveProductService {
-  Future<List<dynamic>> getInactiveProducts() async {
+  Future<List<ProductModel>> getInactiveProducts() async {
     final dio = await ApiClient.instance;
 
     try {
       final response = await dio.get('/products/inactive/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => ProductModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {

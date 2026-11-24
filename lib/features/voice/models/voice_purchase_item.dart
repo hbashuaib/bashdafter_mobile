@@ -1,9 +1,10 @@
+import '../../products/models/product_model.dart';
+
 class VoicePurchaseItem {
   final String productName;
   int quantity;
-  List<dynamic> candidateProducts;
-
-  Map<String, dynamic>? matchedProduct;
+  List<ProductModel> candidateProducts;
+  ProductModel? matchedProduct;
 
   VoicePurchaseItem({
     required this.productName,

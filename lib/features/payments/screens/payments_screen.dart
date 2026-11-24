@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/payment_service.dart';
+import '../models/payment_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -21,8 +22,8 @@ class PaymentsScreen extends StatefulWidget {
 
 class _PaymentsScreenState extends State<PaymentsScreen> {
   final searchController = TextEditingController();
-  List<dynamic> payments = [];
-  List<dynamic> filteredPayments = [];
+  List<PaymentModel> payments = [];
+  List<PaymentModel> filteredPayments = [];
   bool isLoading = true;
 
   @override
@@ -35,7 +36,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     try {
       final data = await PaymentService().getPayments();
       final customerPayments = data
-          .where((payment) => payment['customer'] == widget.customerId)
+          .where((payment) => payment.customer == widget.customerId)
           .toList();
 
       if (!mounted) return;
@@ -65,9 +66,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
     setState(() {
       filteredPayments = payments.where((payment) {
-        final amount = payment['amount'].toString().toLowerCase();
-        final date = payment['payment_date'].toString().toLowerCase();
-        final notes = (payment['notes'] ?? '').toString().toLowerCase();
+        final amount = payment.amount.toLowerCase();
+        final date = payment.paymentDate.toLowerCase();
+        final notes = payment.notes.toLowerCase();
 
         return amount.contains(query) ||
             date.contains(query) ||
@@ -83,8 +84,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
     final total = payments.fold(
       0.0,
-      (sum, payment) =>
-          sum + (double.tryParse(payment['amount'].toString()) ?? 0),
+      (sum, payment) => sum + (double.tryParse(payment.amount) ?? 0),
     );
 
     return total / payments.length;
@@ -93,8 +93,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   double get totalPaymentsAmount {
     return payments.fold(
       0.0,
-      (sum, payment) =>
-          sum + (double.tryParse(payment['amount'].toString()) ?? 0),
+      (sum, payment) => sum + (double.tryParse(payment.amount) ?? 0),
     );
   }
 
@@ -226,8 +225,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
                       itemBuilder: (context, index) {
                         final payment = filteredPayments[index];
-                        final amount =
-                            double.tryParse(payment['amount'].toString()) ?? 0;
+                        final amount = double.tryParse(payment.amount) ?? 0;
 
                         return Card(
                           child: ListTile(
@@ -264,16 +262,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                 Text(
                                   AppFormatters.date(
                                     context,
-                                    DateTime.parse(
-                                      payment['payment_date'].toString(),
-                                    ),
+                                    DateTime.parse(payment.paymentDate),
                                   ),
                                 ),
 
-                                if ((payment['notes'] ?? '')
-                                    .toString()
-                                    .isNotEmpty)
-                                  Text(payment['notes']),
+                                if (payment.notes.isNotEmpty)
+                                  Text(payment.notes),
                               ],
                             ),
 

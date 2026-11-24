@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/shop_service.dart';
+import '../models/shop_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/providers/shop_provider.dart';
 import '../../../core/constants/supported_currencies.dart';
-
 
 class ShopProfileScreen extends StatefulWidget {
   const ShopProfileScreen({super.key});
@@ -15,7 +15,7 @@ class ShopProfileScreen extends StatefulWidget {
 }
 
 class _ShopProfileScreenState extends State<ShopProfileScreen> {
-  Map<String, dynamic>? shop;
+  ShopModel? shop;
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final addressController = TextEditingController();
@@ -41,16 +41,16 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
       if (!mounted) return;
 
-      nameController.text = data['name']?.toString() ?? '';
-      phoneController.text = data['phone']?.toString() ?? '';
-      addressController.text = data['address']?.toString() ?? '';
-      cityController.text = data['city']?.toString() ?? '';
-      selectedCurrency = data['currency']?.toString() ?? 'YER';
-      context.read<ShopProvider>().setShop(data);
+      nameController.text = data.name;
+      phoneController.text = data.phone;
+      addressController.text = data.address;
+      cityController.text = data.city;
+      selectedCurrency = data.currency;
+      context.read<ShopProvider>().setShop(data.toJson());
 
       setState(() {
-        shop = data;        
-        isActive = data['is_active'] ?? true;
+        shop = data;
+        isActive = data.isActive;
         isLoading = false;
       });
     } catch (e) {
@@ -82,21 +82,21 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
 
       return;
     }
-    
+
     setState(() {
       isSaving = true;
     });
 
     try {
       await ShopService().updateShop(
-        id: shop!['id'],
+        id: shop!.id,
         name: nameController.text,
         phone: phoneController.text,
         address: addressController.text,
         city: cityController.text,
         currency: selectedCurrency,
         isActive: isActive,
-        owner: shop!['owner'],
+        owner: shop!.owner,
       );
 
       if (!mounted) return;
@@ -245,7 +245,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
     phoneController.dispose();
     addressController.dispose();
     cityController.dispose();
-   
+
     super.dispose();
   }
 }

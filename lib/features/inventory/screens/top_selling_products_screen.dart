@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/top_selling_products_service.dart';
+import '../models/top_selling_product_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -16,8 +17,8 @@ class TopSellingProductsScreen extends StatefulWidget {
 
 class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
   final searchController = TextEditingController();
-  List<dynamic> products = [];
-  List<dynamic> filteredProducts = [];
+  List<TopSellingProductModel> products = [];
+  List<TopSellingProductModel> filteredProducts = [];
   bool isLoading = true;
 
   @override
@@ -73,7 +74,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
     setState(() {
       filteredProducts = products.where((product) {
-        final name = product['name'].toString().toLowerCase();
+        final name = product.name.toLowerCase();
 
         return name.contains(query);
       }).toList();
@@ -129,9 +130,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                         width: 100,
 
                         child: Text(
-                          products.isEmpty
-                              ? '-'
-                              : products.first['name'].toString(),
+                          products.isEmpty ? '-' : products.first.name,
 
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
@@ -208,17 +207,9 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                       itemBuilder: (context, index) {
                         final product = filteredProducts[index];
-                        final rank = product['rank'] ?? 0;
-
-                        final currentStock =
-                            double.tryParse(
-                              product['current_stock'].toString(),
-                            ) ??
-                            0;
-
-                        final totalSold =
-                            double.tryParse(product['total_sold'].toString()) ??
-                            0;
+                        final rank = product.rank;
+                        final currentStock = product.currentStock.toDouble();
+                        final totalSold = product.totalSold.toDouble();
 
                         return Card(
                           margin: const EdgeInsets.symmetric(
@@ -240,8 +231,9 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
                             ),
 
                             title: Text(
-                              product['name']?.toString() ??
-                                  context.l10n.unknownProduct,
+                              product.name.isEmpty
+                                  ? context.l10n.unknownProduct
+                                  : product.name,
                             ),
 
                             subtitle: Text(

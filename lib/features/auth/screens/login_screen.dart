@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../../core/navigation/main_navigation_screen.dart';
-import '../models/user_profile.dart';
 import '../../../core/localization/localization_extension.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -50,8 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await TokenStorage.saveTokens(access: access, refresh: refresh);
 
-      final profileResponse = await AuthService().getProfile();
-      final profile = UserProfile.fromJson(profileResponse.data);
+      final profile = await AuthService().getProfile();
 
       await TokenStorage.saveProfile(profile);
 

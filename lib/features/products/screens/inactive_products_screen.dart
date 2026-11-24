@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../services/inactive_product_service.dart';
+import '../models/product_model.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 class InactiveProductsScreen extends StatefulWidget {
   const InactiveProductsScreen({super.key});
@@ -13,7 +15,7 @@ class InactiveProductsScreen extends StatefulWidget {
 class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
   final InactiveProductService _service = InactiveProductService();
 
-  List<dynamic> products = [];
+  List<ProductModel> products = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -45,7 +47,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
     }
   }
 
-  Future<void> showRestoreConfirmation(Map<String, dynamic> product) async {
+  Future<void> showRestoreConfirmation(ProductModel product) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -53,7 +55,7 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
           title: Text(context.l10n.restoreProduct),
           content: Text(
             '${context.l10n.restoreProductQuestion}\n\n'
-            '${product['name']}',
+            '${AppLocalizedName.resolve(context: context, name: product.name, nameEn: product.nameEn, nameAr: product.nameAr)}',
           ),
           actions: [
             TextButton(
@@ -78,9 +80,9 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
     }
   }
 
-  Future<void> restoreProduct(Map<String, dynamic> product) async {
+  Future<void> restoreProduct(ProductModel product) async {
     try {
-      await _service.restoreProduct(product['id']);
+      await _service.restoreProduct(product.id);
 
       if (!mounted) return;
 
@@ -136,15 +138,24 @@ class _InactiveProductsScreenState extends State<InactiveProductsScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                         child: Text(
-                          product['name'].toString().isNotEmpty
-                              ? product['name'].toString()[0].toUpperCase()
+                          product.name.isNotEmpty
+                              ? product.name[0].toUpperCase()
                               : '?',
                         ),
                       ),
-                      title: Text(product['name'].toString()),
+                      title: Text(
+                        AppLocalizedName.resolve(
+                          context: context,
+                          name: product.name,
+                          nameEn: product.nameEn,
+                          nameAr: product.nameAr,
+                        ),
+                      ),
+
                       subtitle: Text(
-                        (product['category_name'] ?? context.l10n.noCategory)
-                            .toString(),
+                        product.categoryName.isEmpty
+                            ? context.l10n.noCategory
+                            : product.categoryName,
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.restore, color: Colors.green),

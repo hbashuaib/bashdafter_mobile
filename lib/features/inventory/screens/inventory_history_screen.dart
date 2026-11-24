@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/inventory_transaction_service.dart';
+import '../models/inventory_transaction_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -15,8 +16,8 @@ class InventoryHistoryScreen extends StatefulWidget {
 
 class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
   final searchController = TextEditingController();
-  List<dynamic> transactions = [];
-  List<dynamic> filteredTransactions = [];
+  List<InventoryTransactionModel> transactions = [];
+  List<InventoryTransactionModel> filteredTransactions = [];
   bool isLoading = true;
 
   @override
@@ -104,9 +105,9 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
 
     setState(() {
       filteredTransactions = transactions.where((tx) {
-        final product = (tx['product_name'] ?? '').toString().toLowerCase();
-        final type = (tx['transaction_type'] ?? '').toString().toLowerCase();
-        final reference = (tx['reference'] ?? '').toString().toLowerCase();
+        final product = tx.productName.toLowerCase();
+        final type = tx.transactionType.toLowerCase();
+        final reference = tx.reference.toLowerCase();
 
         return product.contains(query) ||
             type.contains(query) ||
@@ -199,14 +200,9 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                         final transaction = filteredTransactions[index];
 
                         final quantity =
-                            double.tryParse(
-                              transaction['quantity'].toString(),
-                            ) ??
-                            0;
+                            double.tryParse(transaction.quantity) ?? 0;
 
-                        final transactionType =
-                            transaction['transaction_type']?.toString() ?? '';
-
+                        final transactionType = transaction.transactionType;
                         final color = getTransactionColor(transactionType);
 
                         return Card(
@@ -228,16 +224,14 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
                             ),
 
                             title: Text(
-                              transaction['product_name']?.toString() ??
-                                  context.l10n.unknownProduct,
+                              transaction.productName.isEmpty
+                                  ? context.l10n.unknownProduct
+                                  : transaction.productName,
                             ),
                             subtitle: Text(
-                              (transaction['reference'] ?? '')
-                                      .toString()
-                                      .trim()
-                                      .isEmpty
+                              transaction.reference.trim().isEmpty
                                   ? '-'
-                                  : transaction['reference'].toString(),
+                                  : transaction.reference,
                             ),
 
                             trailing: Column(

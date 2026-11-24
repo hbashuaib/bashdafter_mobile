@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/reports_service.dart';
+import '../models/customer_summary_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -17,8 +18,8 @@ class CustomerSummaryScreen extends StatefulWidget {
 
 class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
   final searchController = TextEditingController();
-  List<dynamic> customers = [];
-  List<dynamic> filteredCustomers = [];
+  List<CustomerSummaryModel> customers = [];
+  List<CustomerSummaryModel> filteredCustomers = [];
   bool isLoading = true;
 
   @override
@@ -60,8 +61,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
   double get totalOutstandingBalance {
     return customers.fold(
       0.0,
-      (sum, customer) =>
-          sum + (double.tryParse(customer['balance'].toString()) ?? 0),
+      (sum, customer) => sum + customer.balance.toDouble(),
     );
   }
 
@@ -70,9 +70,9 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
 
     setState(() {
       filteredCustomers = customers.where((customer) {
-        final name = customer['name'].toString().toLowerCase();
-        final phone = customer['phone'].toString().toLowerCase();
-        final balance = customer['balance'].toString().toLowerCase();
+        final name = customer.name.toLowerCase();
+        final phone = customer.phone.toLowerCase();
+        final balance = customer.balance.toString().toLowerCase();
 
         return name.contains(query) ||
             phone.contains(query) ||
@@ -180,7 +180,7 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
                 '${context.l10n.outOf} '
                 '${AppFormatters.number(context, customers.length)} '
                 '${context.l10n.customers}',
-                
+
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -203,19 +203,18 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
 
                       itemBuilder: (context, index) {
                         final customer = filteredCustomers[index];
-                        final balance =
-                            double.tryParse(customer['balance'].toString()) ??
-                            0;
+                        final balance = customer.balance.toDouble();
 
                         return Card(
                           child: ListTile(
                             title: Text(
-                              customer['name']?.toString() ??
-                                  context.l10n.unknownCustomer,
+                              customer.name.isEmpty
+                                  ? context.l10n.unknownCustomer
+                                  : customer.name,
                             ),
 
                             subtitle: Text(
-                              customer['phone']?.toString() ?? '-',
+                              customer.phone.isEmpty ? '-' : customer.phone,
                             ),
 
                             trailing: Text(

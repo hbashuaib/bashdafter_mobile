@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../services/purchase_service.dart';
+import '../models/purchase_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -23,8 +24,8 @@ class PurchasesScreen extends StatefulWidget {
 class _PurchasesScreenState extends State<PurchasesScreen> {
   final currencyFormatter = NumberFormat('#,##0.00');
   final searchController = TextEditingController();
-  List<dynamic> purchases = [];
-  List<dynamic> filteredPurchases = [];
+  List<PurchaseModel> purchases = [];
+  List<PurchaseModel> filteredPurchases = [];
   bool isLoading = true;
 
   @override
@@ -37,7 +38,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     try {
       final data = await PurchaseService().getPurchases();
       final customerPurchases = data
-          .where((purchase) => purchase['customer'] == widget.customerId)
+          .where((purchase) => purchase.customer == widget.customerId)
           .toList();
 
       if (!mounted) return;
@@ -67,9 +68,9 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
     setState(() {
       filteredPurchases = purchases.where((purchase) {
-        final notes = (purchase['notes'] ?? '').toString().toLowerCase();
-        final date = purchase['purchase_date'].toString().toLowerCase();
-        final amount = purchase['total_amount'].toString().toLowerCase();
+        final notes = purchase.notes.toLowerCase();
+        final date = purchase.purchaseDate.toLowerCase();
+        final amount = purchase.totalAmount.toLowerCase();
 
         return notes.contains(query) ||
             date.contains(query) ||
@@ -86,7 +87,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     final total = purchases.fold(
       0.0,
       (sum, purchase) =>
-          sum + (double.tryParse(purchase['total_amount'].toString()) ?? 0),
+          sum + (double.tryParse(purchase.totalAmount) ?? 0),
     );
 
     return total / purchases.length;
@@ -96,7 +97,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     return purchases.fold(
       0.0,
       (sum, purchase) =>
-          sum + (double.tryParse(purchase['total_amount'].toString()) ?? 0),
+          sum + (double.tryParse(purchase.totalAmount) ?? 0),
     );
   }
 
@@ -130,8 +131,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   Column(
                     children: [
                       Text(context.l10n.purchases),
-                      Text(
-                        // purchases.length.toString(),
+                      Text(                        
                         AppFormatters.number(context, purchases.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -243,7 +243,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                         final purchase = filteredPurchases[index];
                         final totalAmount =
                             double.tryParse(
-                              purchase['total_amount'].toString(),
+                              purchase.totalAmount,
                             ) ??
                             0;
 
@@ -274,7 +274,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                               ),
                             ),
 
-                            subtitle: Text(purchase['purchase_date']),
+                            subtitle: Text(purchase.purchaseDate),
                             trailing: const Icon(
                               Icons.arrow_forward_ios,
                               size: 16,

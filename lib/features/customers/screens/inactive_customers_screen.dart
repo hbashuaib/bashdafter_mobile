@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/inactive_customer_service.dart';
+import '../models/customer_model.dart';
 import '../../../core/localization/localization_extension.dart';
 
 class InactiveCustomersScreen extends StatefulWidget {
@@ -13,11 +14,8 @@ class InactiveCustomersScreen extends StatefulWidget {
 
 class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
   final InactiveCustomerService _service = InactiveCustomerService();
-
-  List<dynamic> customers = [];
-
+  List<CustomerModel> customers = [];
   bool isLoading = true;
-
   String? errorMessage;
 
   @override
@@ -48,7 +46,7 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
     }
   }
 
-  Future<void> showRestoreConfirmation(Map<String, dynamic> customer) async {
+  Future<void> showRestoreConfirmation(CustomerModel customer,) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -56,7 +54,7 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
           title: Text(context.l10n.restoreCustomer),
           content: Text(
             '${context.l10n.restoreCustomerQuestion}\n\n'
-            '${customer['name']}',
+            '${customer.name}',
           ),
           actions: [
             TextButton(
@@ -81,16 +79,16 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
     }
   }
 
-  Future<void> restoreCustomer(Map<String, dynamic> customer) async {
+  Future<void> restoreCustomer(CustomerModel customer,) async {
     try {
-      await _service.restoreCustomer(customer['id']);
+      await _service.restoreCustomer(customer.id,);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '${customer['name']} '
+            '${customer.name} '
             '${context.l10n.customerRestoredSuccessfully}',
           ),
         ),
@@ -144,13 +142,13 @@ class _InactiveCustomersScreenState extends State<InactiveCustomersScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                         child: Text(
-                          customer['name'].toString().isNotEmpty
-                              ? customer['name'].toString()[0].toUpperCase()
+                          customer.name.isNotEmpty
+                              ? customer.name[0].toUpperCase()
                               : '?',
                         ),
                       ),
-                      title: Text(customer['name'].toString()),
-                      subtitle: Text(customer['phone'].toString()),
+                      title: Text(customer.name),
+                      subtitle: Text(customer.phone),
                       trailing: IconButton(
                         icon: const Icon(Icons.restore, color: Colors.green),
                         onPressed: () {

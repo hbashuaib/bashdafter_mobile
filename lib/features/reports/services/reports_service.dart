@@ -1,17 +1,20 @@
 import 'package:dio/dio.dart';
 
+import '../models/customer_summary_model.dart';
+import '../models/top_debtor_model.dart';
+import '../models/recent_transaction_model.dart';
 import '../../../core/api/api_client.dart';
 
 class ReportsService {
-  Future<List<dynamic>> getCustomerSummary() async {
+  Future<List<CustomerSummaryModel>> getCustomerSummary() async {
     final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get(
-        '/reports/customer-summary/',
-      );
+      final response = await dio.get('/reports/customer-summary/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => CustomerSummaryModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {
@@ -19,15 +22,15 @@ class ReportsService {
     }
   }
 
-  Future<List<dynamic>> getTopDebtors() async {
+  Future<List<TopDebtorModel>> getTopDebtors() async {
     final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get(
-        '/reports/top-debtors/',
-      );
+      final response = await dio.get('/reports/top-debtors/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => TopDebtorModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {
@@ -35,15 +38,15 @@ class ReportsService {
     }
   }
 
-  Future<List<dynamic>> getRecentTransactions() async {
+  Future<List<RecentTransactionModel>> getRecentTransactions() async {
     final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get(
-        '/reports/recent-transactions/',
-      );
+      final response = await dio.get('/reports/recent-transactions/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => RecentTransactionModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {

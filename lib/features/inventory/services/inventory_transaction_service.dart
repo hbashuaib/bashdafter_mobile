@@ -1,17 +1,18 @@
 import 'package:dio/dio.dart';
 
+import '../models/inventory_transaction_model.dart';
 import '../../../core/api/api_client.dart';
 
 class InventoryTransactionService {
-  Future<List<dynamic>> getTransactions() async {
+  Future<List<InventoryTransactionModel>> getTransactions() async {
     final dio = await ApiClient.instance;
 
     try {
-      final response = await dio.get(
-        '/inventory-transactions/',
-      );
+      final response = await dio.get('/inventory-transactions/');
 
-      return response.data;
+      return (response.data as List)
+          .map((item) => InventoryTransactionModel.fromJson(item))
+          .toList();
     } on DioException {
       rethrow;
     } catch (_) {

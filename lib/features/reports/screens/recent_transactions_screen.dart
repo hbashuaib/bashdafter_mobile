@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/reports_service.dart';
+import '../models/recent_transaction_model.dart';
 import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -18,8 +19,8 @@ class RecentTransactionsScreen extends StatefulWidget {
 
 class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   final searchController = TextEditingController();
-  List<dynamic> transactions = [];
-  List<dynamic> filteredTransactions = [];
+  List<RecentTransactionModel> transactions = [];
+  List<RecentTransactionModel> filteredTransactions = [];
   bool isLoading = true;
 
   @override
@@ -63,10 +64,10 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
     setState(() {
       filteredTransactions = transactions.where((item) {
-        final customer = item['customer'].toString().toLowerCase();
-        final type = item['type'].toString().toLowerCase();
-        final date = item['date'].toString().toLowerCase();
-        final amount = item['amount'].toString().toLowerCase();
+        final customer = item.customer.toLowerCase();
+        final type = item.type.toLowerCase();
+        final date = item.date.toLowerCase();
+        final amount = item.amount.toString().toLowerCase();
 
         return customer.contains(query) ||
             type.contains(query) ||
@@ -96,10 +97,10 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   }
 
   int get purchaseCount =>
-      transactions.where((t) => t['type'] == 'purchase').length;
+      transactions.where((t) => t.type == 'purchase').length;
 
   int get paymentCount =>
-      transactions.where((t) => t['type'] == 'payment').length;
+      transactions.where((t) => t.type == 'payment').length;
 
   @override
   Widget build(BuildContext context) {
@@ -233,23 +234,24 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
                       itemBuilder: (context, index) {
                         final item = filteredTransactions[index];
-                        final purchase = item['type'] == 'purchase';
+                        final purchase = item.type == 'purchase';
 
                         return Card(
                           child: ListTile(
                             title: Text(
-                              item['customer']?.toString() ??
-                                  context.l10n.unknownCustomer,
-                            ),
+                              item.customer.isEmpty
+                              ? context.l10n.unknownCustomer
+                                  : item.customer,
+                            ),                            
 
                             subtitle: Text(
-                              '${getTransactionTypeLabel(item['type'].toString())} • '
-                              '${AppFormatters.date(context, DateTime.parse(item['date'].toString()))}',
+                              '${getTransactionTypeLabel(item.type)} • '
+                              '${AppFormatters.date(context, DateTime.parse(item.date))}',
                             ),
 
                             trailing: Text(
                               '${purchase ? '+' : '-'}'
-                              '${AppFormatters.currency(context, double.tryParse(item['amount'].toString()) ?? 0, context.read<ShopProvider>().currency)}',
+                              '${AppFormatters.currency(context, item.amount.toDouble(), context.read<ShopProvider>().currency)}',
 
                               style: TextStyle(
                                 color: purchase ? Colors.red : Colors.green,

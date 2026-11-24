@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../services/expiring_products_service.dart';
+import '../models/product_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/app_localized_name.dart';
 
 class ExpiringProductsScreen extends StatefulWidget {
   const ExpiringProductsScreen({super.key});
@@ -12,7 +14,7 @@ class ExpiringProductsScreen extends StatefulWidget {
 }
 
 class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
-  List<dynamic> products = [];
+  List<ProductModel> products = [];
 
   bool isLoading = true;
 
@@ -69,9 +71,9 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
 
               itemBuilder: (context, index) {
                 final product = products[index];
-                final expiryDate = DateTime.tryParse(
-                  product['expiry_date'].toString(),
-                );
+                final expiryDate = product.expiryDate == null
+                    ? null
+                    : DateTime.tryParse(product.expiryDate!);
 
                 if (expiryDate == null) {
                   return const SizedBox.shrink();
@@ -99,7 +101,15 @@ class _ExpiringProductsScreenState extends State<ExpiringProductsScreen> {
                 return Card(
                   child: ListTile(
                     leading: Icon(Icons.calendar_month, color: color),
-                    title: Text(product['name']),
+                    title: Text(
+                      AppLocalizedName.resolve(
+                        context: context,
+                        name: product.name,
+                        nameEn: product.nameEn,
+                        nameAr: product.nameAr,
+                      ),
+                    ),
+
                     subtitle: Text(
                       '${context.l10n.expiryDate}: '
                       '${AppFormatters.date(context, expiryDate)}',

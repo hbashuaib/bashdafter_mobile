@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
 
+import '../models/purchase_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
 import '../../../core/utils/whatsapp_receipt_builder.dart';
 
 class PurchaseDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> purchase;
+  final PurchaseModel purchase;
   const PurchaseDetailScreen({super.key, required this.purchase});
 
   @override
   Widget build(BuildContext context) {
-    final totalAmount =
-        double.tryParse(purchase['total_amount'].toString()) ?? 0;
+    final totalAmount = double.tryParse(purchase.totalAmount) ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +47,7 @@ class PurchaseDetailScreen extends StatelessWidget {
               subtitle: Text(
                 AppFormatters.date(
                   context,
-                  DateTime.parse(purchase['purchase_date'].toString()),
+                  DateTime.parse(purchase.purchaseDate),
                 ),
               ),
             ),
@@ -71,9 +71,9 @@ class PurchaseDetailScreen extends StatelessWidget {
             child: ListTile(
               title: Text(context.l10n.notes),
               subtitle: Text(
-                (purchase['notes'] ?? '').toString().trim().isEmpty
+                purchase.notes.trim().isEmpty
                     ? context.l10n.noNotes
-                    : purchase['notes'],
+                    : purchase.notes,
               ),
             ),
           ),
@@ -87,18 +87,15 @@ class PurchaseDetailScreen extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          ...((purchase['items'] as List? ?? [])).map((item) {
-            final unitPrice =
-                double.tryParse(item['unit_price'].toString()) ?? 0;
-
-            final totalPrice =
-                double.tryParse(item['total_price'].toString()) ?? 0;
+          ...purchase.items.map((item) {
+            final unitPrice = double.tryParse(item.unitPrice) ?? 0;
+            final totalPrice = double.tryParse(item.totalPrice) ?? 0;
 
             return Card(
               child: ListTile(
-                title: Text(item['item_name']),
+                title: Text(item.itemName),
                 subtitle: Text(
-                  '${item['quantity']} x ${
+                  '${item.quantity} x ${
                   // currencyFormatter.format(unitPrice)
                   AppFormatters.currency(context, unitPrice, context.read<ShopProvider>().currency)}',
                 ),

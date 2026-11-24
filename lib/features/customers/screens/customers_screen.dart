@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/customer_service.dart';
+import '../models/customer_model.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_profile.dart';
 import '../../../core/theme/app_colors.dart';
@@ -24,8 +25,8 @@ class CustomersScreen extends StatefulWidget {
 
 class _CustomersScreenState extends State<CustomersScreen> {
   final searchController = TextEditingController();
-  List<dynamic> customers = [];
-  List<dynamic> filteredCustomers = [];
+  List<CustomerModel> customers = [];
+  List<CustomerModel> filteredCustomers = [];
   bool isLoading = true;
   String currentFilter = 'active';
   String searchQuery = '';
@@ -43,15 +44,15 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
     setState(() {
       filteredCustomers = customers.where((customer) {
-        final name = customer['name'].toString().toLowerCase();
-        final phone = customer['phone'].toString().toLowerCase();
+        final name = customer.name.toLowerCase();
+        final phone = customer.phone.toLowerCase();
         final matchesSearch = name.contains(query) || phone.contains(query);
 
         final matchesFilter = currentFilter == 'all'
             ? true
             : currentFilter == 'active'
-            ? customer['is_active'] == true
-            : customer['is_active'] == false;
+            ? customer.isActive
+            : !customer.isActive;
 
         return matchesSearch && matchesFilter;
       }).toList();
@@ -263,7 +264,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
                                 MaterialPageRoute(
                                   builder: (_) => CustomerDetailScreen(
-                                    customerId: customer['id'],
+                                    customerId: customer.id,
                                   ),
                                 ),
                               );
@@ -271,14 +272,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               loadCustomers();
                             },
 
-                            title: Text(customer['name']),
-
-                            subtitle: Text(customer['phone']),
+                            title: Text(customer.name),
+                            subtitle: Text(customer.phone),
 
                             trailing: Chip(
                               backgroundColor: AppColors.cardTint(
                                 context,
-                                (customer['balance'] ?? 0) > 0
+                                customer.balance > 0
                                     ? Colors.orange.shade100
                                     : Colors.green.shade100,
                               ),
@@ -286,10 +286,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               label: Text(
                                 AppFormatters.currency(
                                   context,
-                                  double.tryParse(
-                                        customer['balance'].toString(),
-                                      ) ??
-                                      0,
+                                  customer.balance.toDouble(),
                                   context.read<ShopProvider>().currency,
                                 ),
                               ),

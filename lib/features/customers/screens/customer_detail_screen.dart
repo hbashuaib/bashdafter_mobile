@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/customer_detail_service.dart';
+import '../models/customer_model.dart';
 import '../services/update_customer_service.dart';
 import '../../purchases/screens/purchases_screen.dart';
 import '../../payments/screens/payments_screen.dart';
@@ -26,7 +27,7 @@ class CustomerDetailScreen extends StatefulWidget {
 }
 
 class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
-  Map<String, dynamic>? customer;
+  CustomerModel? customer;
   UserProfile? currentUser;
 
   @override
@@ -67,7 +68,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   }
 
   Future<void> deactivateCustomer() async {
-    final balance = double.tryParse(customer!['balance'].toString()) ?? 0;
+    final balance = customer!.balance.toDouble();
 
     if (balance != 0) {
       showDialog(
@@ -76,7 +77,6 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         builder: (_) {
           return AlertDialog(
             title: Text(context.l10n.cannotDeactivate),
-
             content: Text(context.l10n.customerBalanceMustBeZero),
 
             actions: [
@@ -102,7 +102,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         return AlertDialog(
           title: Text(context.l10n.deactivateCustomer),
           content: Text(
-            '${context.l10n.deactivateCustomerQuestion}\n\n${customer!['name']}',
+            '${context.l10n.deactivateCustomerQuestion}\n\n${customer!.name}',
           ),
 
           actions: [
@@ -130,11 +130,11 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
     try {
       await UpdateCustomerService().updateCustomer(
-        customerId: customer!['id'],
-        name: customer!['name'],
-        phone: customer!['phone'],
-        address: customer!['address'],
-        notes: customer!['notes'],
+        customerId: customer!.id,
+        name: customer!.name,
+        phone: customer!.phone,
+        address: customer!.address,
+        notes: customer!.notes,
         isActive: false,
       );
 
@@ -157,11 +157,11 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   Future<void> reactivateCustomer() async {
     try {
       await UpdateCustomerService().updateCustomer(
-        customerId: customer!['id'],
-        name: customer!['name'],
-        phone: customer!['phone'],
-        address: customer!['address'],
-        notes: customer!['notes'],
+        customerId: customer!.id,
+        name: customer!.name,
+        phone: customer!.phone,
+        address: customer!.address,
+        notes: customer!.notes,
         isActive: true,
       );
 
@@ -183,8 +183,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final customerBalance =
-        double.tryParse(customer?['balance']?.toString() ?? '0') ?? 0;
+    final customerBalance = customer?.balance.toDouble() ?? 0;
 
     final hasBalance = customerBalance > 0;
 
@@ -194,7 +193,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(customer!['name']),
+        title: Text(customer!.name),
 
         actions: [
           if (currentUser != null && !currentUser!.isCashier)
@@ -220,10 +219,10 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
               (currentUser!.isOwner || currentUser!.isAdmin))
             IconButton(
               icon: Icon(
-                customer!['is_active'] ? Icons.person_off : Icons.person,
+                customer!.isActive ? Icons.person_off : Icons.person,
               ),
 
-              onPressed: customer!['is_active']
+              onPressed: customer!.isActive
                   ? deactivateCustomer
                   : reactivateCustomer,
             ),
@@ -246,7 +245,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
                   children: [
                     Text(
-                      customer!['name'],
+                      customer!.name,
 
                       style: const TextStyle(
                         fontSize: 22,
@@ -259,7 +258,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.phone),
-                      title: Text(customer!['phone']),
+                      title: Text(customer!.phone),
                     ),
 
                     ListTile(
@@ -284,14 +283,14 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.location_on),
-                      title: Text(customer!['address']),
+                      title: Text(customer!.address),
                     ),
 
-                    if ((customer!['notes'] ?? '').toString().isNotEmpty)
+                    if (customer!.notes.toString().isNotEmpty)
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: const Icon(Icons.note),
-                        title: Text(customer!['notes']),
+                        title: Text(customer!.notes),
                       ),
                   ],
                 ),

@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 
+import '../models/product_model.dart';
 import '../../../core/api/api_client.dart';
 
 class BarcodeLookupService {
-  Future<Map<String, dynamic>> findProductByBarcode(String barcode) async {
+  Future<ProductModel> findProductByBarcode(String barcode) async {
     final dio = await ApiClient.instance;
 
     try {
@@ -12,7 +13,7 @@ class BarcodeLookupService {
         queryParameters: {'barcode': barcode},
       );
 
-      return response.data;
+      return ProductModel.fromJson(response.data);
     } on DioException {
       rethrow;
     } catch (_) {

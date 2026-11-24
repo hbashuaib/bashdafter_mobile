@@ -4,36 +4,35 @@ import 'package:provider/provider.dart';
 import '../localization/localization_extension.dart';
 import '../localization/app_formatters.dart';
 import '../providers/shop_provider.dart';
+import '../../features/purchases/models/purchase_model.dart';
+import '../../features/payments/models/payment_model.dart';
+import '../../features/reports/models/customer_statement_model.dart';
+import '../../features/reports/models/customer_statement_transaction_model.dart';
 
 class WhatsAppReceiptBuilder {
   WhatsAppReceiptBuilder._();
 
-  static String purchaseReceipt(
-    BuildContext context,
-    Map<String, dynamic> purchase,
-  ) {
+  static String purchaseReceipt(BuildContext context, PurchaseModel purchase) {
     final buffer = StringBuffer();
-
-    final totalAmount =
-        double.tryParse(purchase['total_amount'].toString()) ?? 0;
-
-    buffer.writeln('🧾 ${purchase['shop_name'] ?? 'BashDafter Shop'}');
-
+    final totalAmount = double.tryParse(purchase.totalAmount) ?? 0;
+    buffer.writeln(
+      '🧾 ${purchase.shopName.isEmpty ? 'BashDafter Shop' : purchase.shopName}',
+    );
     buffer.writeln(context.l10n.purchaseReceiptStatement);
 
     buffer.writeln('');
 
-    if (purchase['customer_name'] != null) {
+    if (purchase.customerName.isNotEmpty) {
       buffer.writeln(
         '${context.l10n.customerLabel}: '
-        '${purchase['customer_name']}',
+        '${purchase.customerName}',
       );
     }
 
-    if (purchase['purchase_date'] != null) {
+    if (purchase.purchaseDate.isNotEmpty) {
       buffer.writeln(
         '${context.l10n.dateLabel}: '
-        '${AppFormatters.date(context, DateTime.parse(purchase['purchase_date'].toString()))}',
+        '${AppFormatters.date(context, DateTime.parse(purchase.purchaseDate))}',
       );
     }
 
@@ -41,11 +40,11 @@ class WhatsAppReceiptBuilder {
     buffer.writeln(context.l10n.itemsLabel);
     buffer.writeln('');
 
-    for (final item in (purchase['items'] as List? ?? [])) {
-      final quantity = double.tryParse(item['quantity'].toString()) ?? 0;
+    for (final item in purchase.items) {
+      final quantity = double.tryParse(item.quantity) ?? 0;
 
       buffer.writeln(
-        '- ${item['item_name']} '
+        '- ${item.itemName} '
         '× '
         '${AppFormatters.number(context, quantity)}',
       );
@@ -58,7 +57,7 @@ class WhatsAppReceiptBuilder {
       '${AppFormatters.currency(context, totalAmount, context.read<ShopProvider>().currency)}',
     );
 
-    final notes = (purchase['notes'] ?? '').toString().trim();
+    final notes = purchase.notes.trim();
 
     if (notes.isNotEmpty) {
       buffer.writeln('');
@@ -75,27 +74,26 @@ class WhatsAppReceiptBuilder {
     return buffer.toString();
   }
 
-  static String paymentReceipt(
-    BuildContext context,
-    Map<String, dynamic> payment,
-  ) {
+  static String paymentReceipt(BuildContext context, PaymentModel payment) {
     final buffer = StringBuffer();
-    final amount = double.tryParse(payment['amount'].toString()) ?? 0;
-    buffer.writeln('💰 ${payment['shop_name'] ?? 'BashDafter'}');
+    final amount = double.tryParse(payment.amount) ?? 0;
+    buffer.writeln(
+      '💰 ${payment.shopName.isEmpty ? 'BashDafter' : payment.shopName}',
+    );
     buffer.writeln(context.l10n.paymentReceiptStatement);
     buffer.writeln('');
 
-    if (payment['customer_name'] != null) {
+    if (payment.customerName.isNotEmpty) {
       buffer.writeln(
         '${context.l10n.customerLabel}: '
-        '${payment['customer_name']}',
+        '${payment.customerName}',
       );
     }
 
-    if (payment['payment_date'] != null) {
+    if (payment.paymentDate.isNotEmpty) {
       buffer.writeln(
         '${context.l10n.dateLabel}: '
-        '${AppFormatters.date(context, DateTime.parse(payment['payment_date'].toString()))}',
+        '${AppFormatters.date(context, DateTime.parse(payment.paymentDate))}',
       );
     }
 
@@ -111,7 +109,7 @@ class WhatsAppReceiptBuilder {
       ),
     );
 
-    final notes = (payment['notes'] ?? '').toString().trim();
+    final notes = payment.notes.trim();
 
     if (notes.isNotEmpty) {
       buffer.writeln('');
@@ -132,14 +130,15 @@ class WhatsAppReceiptBuilder {
 
   static String customerStatement(
     BuildContext context,
-    Map<String, dynamic> statement,
-    List<dynamic> transactions,
+    CustomerStatementModel statement,
+    List<CustomerStatementTransactionModel> transactions,
   ) {
     final buffer = StringBuffer();
+    final balance = statement.balance.toDouble();
 
-    final balance = double.tryParse(statement['balance'].toString()) ?? 0;
-
-    buffer.writeln('📋 ${statement['shop_name'] ?? 'BashDafter'}');
+    buffer.writeln(
+      '📋 ${statement.shopName.isEmpty ? 'BashDafter' : statement.shopName}',
+    );
 
     buffer.writeln(context.l10n.customerStatementTitle);
 
@@ -147,14 +146,13 @@ class WhatsAppReceiptBuilder {
 
     buffer.writeln(
       '${context.l10n.customerLabel}: '
-      '${statement['customer']}',
+      '${statement.customer}',
     );
 
-    if (statement['phone'] != null &&
-        statement['phone'].toString().trim().isNotEmpty) {
+    if (statement.phone.trim().isNotEmpty) {
       buffer.writeln(
         '${context.l10n.phoneLabel}: '
-        '${statement['phone']}',
+        '${statement.phone}',
       );
     }
 
@@ -175,14 +173,12 @@ class WhatsAppReceiptBuilder {
     buffer.writeln('');
 
     for (final item in transactions) {
-      final isPurchase = item['type'] == 'purchase';
-
-      final amount = double.tryParse(item['amount'].toString()) ?? 0;
-
-      final transactionDate = DateTime.tryParse(item['date'].toString());
+      final isPurchase = item.type == 'purchase';
+      final amount = item.amount.toDouble();
+      final transactionDate = DateTime.tryParse(item.date);
 
       final dateText = transactionDate == null
-          ? item['date'].toString()
+          ? item.date
           : AppFormatters.date(context, transactionDate);
 
       buffer.writeln(

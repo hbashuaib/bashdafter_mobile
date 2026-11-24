@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/profile_service.dart';
+import '../../auth/models/user_profile.dart';
 import '../services/profile_image_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
@@ -17,7 +18,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, dynamic>? profile;
+  UserProfile? profile;
 
   bool isLoading = true;
   bool isUploadingImage = false;
@@ -105,9 +106,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final firstName = profile!['first_name']?.toString() ?? '';
-    final lastName = profile!['last_name']?.toString() ?? '';
-    final fullName = '$firstName $lastName'.trim();
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.profile)),
@@ -143,12 +141,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  backgroundImage:
-                      profile!['profile_image']?.toString().isNotEmpty == true
-                      ? NetworkImage(profile!['profile_image'].toString())
+                  backgroundImage: profile!.profileImage.isNotEmpty
+                      ? NetworkImage(profile!.profileImage)
                       : null,
 
-                  child: profile!['profile_image'] == null
+                  child: profile!.profileImage.isEmpty
                       ? const Icon(Icons.person, size: 55, color: Colors.white)
                       : null,
                 ),
@@ -205,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 20),
 
           Text(
-            fullName.isEmpty ? profile!['username'] : fullName,
+            profile!.fullName,
             textAlign: TextAlign.center,
 
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -214,7 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 6),
 
           Text(
-            profile!['role']?.toString() ?? context.l10n.user,
+            profile!.role.isEmpty ? context.l10n.user : profile!.role,
             textAlign: TextAlign.center,
 
             style: TextStyle(color: Colors.grey.shade600),
@@ -226,9 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ListTile(
               leading: const Icon(Icons.person, color: Colors.blue),
               title: Text(context.l10n.user),
-              subtitle: Text(
-                fullName.isEmpty ? profile!['username'] : fullName,
-              ),
+              subtitle: Text(profile!.fullName),
             ),
           ),
 
@@ -245,8 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.verified_user, color: Colors.orange),
               title: Text(context.l10n.role),
               subtitle: Text(
-                profile!['role']?.toString().replaceAll('_', ' ') ??
-                    context.l10n.user,
+                profile!.role.isEmpty ? context.l10n.user : profile!.role,
               ),
             ),
           ),
@@ -255,7 +249,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ListTile(
               leading: const Icon(Icons.alternate_email, color: Colors.cyan),
               title: Text(context.l10n.username),
-              subtitle: Text(profile!['username']?.toString() ?? ''),
+              subtitle: Text(profile!.username),
             ),
           ),
 
@@ -265,9 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text(context.l10n.email),
 
               subtitle: Text(
-                (profile!['email']?.toString().trim().isNotEmpty ?? false)
-                    ? profile!['email'].toString()
-                    : '-',
+                profile!.email.trim().isNotEmpty ? profile!.email : '-',
               ),
             ),
           ),
@@ -277,9 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.phone, color: Colors.green),
               title: Text(context.l10n.phoneNumber),
               subtitle: Text(
-                (profile!['phone_number']?.toString().trim().isNotEmpty ??
-                        false)
-                    ? profile!['phone_number'].toString()
+                profile!.phoneNumber.trim().isNotEmpty
+                    ? profile!.phoneNumber
                     : '-',
               ),
             ),

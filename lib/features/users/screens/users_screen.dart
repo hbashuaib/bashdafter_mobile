@@ -153,12 +153,8 @@ class _UsersScreenState extends State<UsersScreen> {
   }
 
   Future<void> loadUsers() async {
-    try {
-      final response = await _userService.getUsers();
-
-      final loadedUsers = response
-          .map((json) => UserModel.fromJson(json))
-          .toList();
+    try { 
+      final loadedUsers = await _userService.getUsers();
 
       if (!mounted) return;
 
@@ -357,10 +353,9 @@ class _UsersScreenState extends State<UsersScreen> {
                               children: [
                                 Text(user.role.replaceAll('_', ' ')),
 
-                                if (user.email != null &&
-                                    user.email!.isNotEmpty)
+                                if (user.email.isNotEmpty)
                                   Text(
-                                    user.email!,
+                                    user.email,
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                       fontSize: 12,

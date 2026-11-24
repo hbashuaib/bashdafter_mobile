@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/inventory_dashboard_service.dart';
+import '../models/inventory_dashboard_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
@@ -16,7 +17,7 @@ class InventoryDashboardScreen extends StatefulWidget {
 }
 
 class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
-  Map<String, dynamic>? dashboard;
+  InventoryDashboardModel? dashboard;
   bool isLoading = true;
 
   @override
@@ -56,7 +57,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
   Widget buildCard({
     required String title,
-    required dynamic value,
+    required num value,
     required IconData icon,
     required Color color,
     required bool isInventoryValue,
@@ -80,12 +81,12 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
           isInventoryValue
               ? AppFormatters.currency(
                   context,
-                  double.tryParse(value.toString()) ?? 0,
+                  value.toDouble(),
                   context.read<ShopProvider>().currency,
                 )
               : AppFormatters.number(
                   context,
-                  num.tryParse(value.toString()) ?? 0,
+                  value,
                 ),
           style: TextStyle(
             fontSize: 18,
@@ -135,7 +136,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                               Text(
                                 AppFormatters.number(
                                   context,
-                                  dashboard!['total_products'] ?? 0,
+                                  dashboard!.totalProducts,
                                 ),
 
                                 style: const TextStyle(
@@ -153,7 +154,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                               Text(
                                 AppFormatters.number(
                                   context,
-                                  dashboard!['low_stock_products'] ?? 0,
+                                  dashboard!.lowStockProducts,
                                 ),
 
                                 style: const TextStyle(
@@ -172,7 +173,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                               Text(
                                 AppFormatters.number(
                                   context,
-                                  dashboard!['expiring_products'] ?? 0,
+                                  dashboard!.expiringProducts,
                                 ),
 
                                 style: const TextStyle(
@@ -192,7 +193,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     title: context.l10n.totalProducts,
                     isInventoryValue: false,
                     isExpiring: false,
-                    value: dashboard!['total_products'],
+                    value: dashboard!.totalProducts,
                     icon: Icons.inventory_2,
                     color: Colors.blue,
                   ),
@@ -201,7 +202,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     title: context.l10n.lowStockProducts,
                     isInventoryValue: false,
                     isExpiring: false,
-                    value: dashboard!['low_stock_products'],
+                    value: dashboard!.lowStockProducts,
                     icon: Icons.warning,
                     color: Colors.orange,
                   ),
@@ -210,7 +211,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     title: context.l10n.expiringProducts,
                     isInventoryValue: false,
                     isExpiring: true,
-                    value: dashboard!['expiring_products'],
+                    value: dashboard!.expiringProducts,
                     icon: Icons.calendar_month,
                     color: Colors.red,
                   ),
@@ -219,7 +220,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     title: context.l10n.stockAdjustments,
                     isInventoryValue: false,
                     isExpiring: false,
-                    value: dashboard!['stock_adjustments'],
+                    value: dashboard!.stockAdjustments,
                     icon: Icons.swap_vert,
                     color: Colors.green,
                   ),
@@ -228,7 +229,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     title: context.l10n.inventoryTransactions,
                     isInventoryValue: false,
                     isExpiring: false,
-                    value: dashboard!['inventory_transactions'],
+                    value: dashboard!.inventoryTransactions,
                     icon: Icons.history,
                     color: Colors.purple,
                   ),
@@ -237,7 +238,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     title: context.l10n.inventoryValue,
                     isInventoryValue: true,
                     isExpiring: false,
-                    value: dashboard!['inventory_value'],
+                    value: dashboard!.inventoryValue,
                     icon: Icons.payments,
                     color: Colors.teal,
                   ),

@@ -27,11 +27,7 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
 
   Future<void> loadUsers() async {
     try {
-      final response = await _userService.getInactiveUsers();
-
-      final loadedUsers = response
-          .map((json) => UserModel.fromJson(json))
-          .toList();
+      final loadedUsers = await _userService.getInactiveUsers();
 
       if (!mounted) return;
 

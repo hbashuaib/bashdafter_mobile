@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
 
+import '../models/payment_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
@@ -9,12 +10,12 @@ import '../../../core/providers/shop_provider.dart';
 import '../../../core/utils/whatsapp_receipt_builder.dart';
 
 class PaymentDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> payment;
+  final PaymentModel payment;
   const PaymentDetailScreen({super.key, required this.payment});
 
   @override
   Widget build(BuildContext context) {
-    final amount = double.tryParse(payment['amount'].toString()) ?? 0;
+    final amount = double.tryParse(payment.amount) ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,11 +106,11 @@ class PaymentDetailScreen extends StatelessWidget {
               title: Text(context.l10n.paymentDate),
 
               subtitle: Text(
-                payment['payment_date'] == null
+                payment.paymentDate.isEmpty
                     ? '-'
                     : AppFormatters.date(
                         context,
-                        DateTime.parse(payment['payment_date'].toString()),
+                        DateTime.parse(payment.paymentDate),
                       ),
               ),
             ),
@@ -118,14 +119,8 @@ class PaymentDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.receipt_long),
-
               title: Text(context.l10n.paymentId),
-
-              subtitle: Text(
-                payment['id'] == null
-                    ? '-'
-                    : AppFormatters.number(context, payment['id']),
-              ),
+              subtitle: Text(AppFormatters.number(context, payment.id)),
             ),
           ),
 
@@ -136,9 +131,9 @@ class PaymentDetailScreen extends StatelessWidget {
               title: Text(context.l10n.notes),
 
               subtitle: Text(
-                (payment['notes'] ?? '').toString().trim().isEmpty
+                payment.notes.trim().isEmpty
                     ? context.l10n.noNotes
-                    : payment['notes'].toString(),
+                    : payment.notes,
               ),
             ),
           ),

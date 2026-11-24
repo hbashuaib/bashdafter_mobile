@@ -9,6 +9,7 @@ import '../../settings/services/shop_service.dart';
 import '../../../core/utils/pdf_formatters.dart';
 import '../../../core/utils/pdf_arabic_helper.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../models/customer_statement_transaction_model.dart';
 
 class CustomerStatementPdfService {
   pw.Widget pdfLabel({
@@ -103,20 +104,19 @@ class CustomerStatementPdfService {
   Future<void> generatePdf({
     required BuildContext context,
     required String customer,
-    required dynamic balance,
-    required List<dynamic> transactions,
+    required num balance,
+    required List<CustomerStatementTransactionModel> transactions,
   }) async {
     try {
       final shop = await ShopService().getShop();
-      final shopName = shop['name']?.toString() ?? '';
-      final phone = shop['phone']?.toString() ?? '';
-      final address = shop['address']
-          .toString()
+      final shopName = shop.name;
+      final phone = shop.phone;
+      final address = shop.address
           .replaceAll('\r\n', ', ')
           .replaceAll('\n', ', ');
 
-      final city = shop['city']?.toString() ?? '';
-      final currency = shop['currency'];
+      final city = shop.city;
+      final currency = shop.currency;
       final isArabic = Localizations.localeOf(context).languageCode == 'ar';
       final l10n = context.l10n;
       final logoBytes = await rootBundle.load(
@@ -132,7 +132,7 @@ class CustomerStatementPdfService {
       double totalPurchases = 0;
       double totalPayments = 0;
 
-      final balanceAmount = double.tryParse(balance.toString()) ?? 0;
+      final balanceAmount = balance.toDouble();
 
       final formattedBalance = PdfArabicHelper.display(
         PdfFormatters.currency(balanceAmount, currency, isArabic: isArabic),
@@ -140,9 +140,9 @@ class CustomerStatementPdfService {
       );
 
       for (final item in transactions) {
-        final amount = double.tryParse(item['amount'].toString()) ?? 0;
+        final amount = item.amount.toDouble();
 
-        if (item['type'] == 'purchase') {
+        if (item.type == 'purchase') {
           totalPurchases += amount;
         } else {
           totalPayments += amount;
@@ -419,7 +419,7 @@ class CustomerStatementPdfService {
                           ),
 
                           ...transactions.map((item) {
-                            final transactionType = item['type'] == 'purchase'
+                            final transactionType = item.type == 'purchase'
                                 ? l10n.purchase
                                 : l10n.payment;
 
@@ -431,10 +431,7 @@ class CustomerStatementPdfService {
                                         arabicFont: arabicFont,
                                         text: PdfArabicHelper.display(
                                           PdfFormatters.currency(
-                                            double.tryParse(
-                                                  item['amount'].toString(),
-                                                ) ??
-                                                0,
+                                            item.amount.toDouble(),
                                             currency,
                                             isArabic: isArabic,
                                           ),
@@ -455,9 +452,7 @@ class CustomerStatementPdfService {
                                         arabicFont: arabicFont,
                                         text: PdfArabicHelper.display(
                                           PdfFormatters.date(
-                                            DateTime.parse(
-                                              item['date'].toString(),
-                                            ),
+                                            DateTime.parse(item.date),
                                             isArabic: isArabic,
                                           ),
                                           isArabic,
@@ -470,9 +465,7 @@ class CustomerStatementPdfService {
                                         arabicFont: arabicFont,
                                         text: PdfArabicHelper.display(
                                           PdfFormatters.date(
-                                            DateTime.parse(
-                                              item['date'].toString(),
-                                            ),
+                                            DateTime.parse(item.date),
                                             isArabic: isArabic,
                                           ),
                                           isArabic,
@@ -490,10 +483,7 @@ class CustomerStatementPdfService {
                                         arabicFont: arabicFont,
                                         text: PdfArabicHelper.display(
                                           PdfFormatters.currency(
-                                            double.tryParse(
-                                                  item['amount'].toString(),
-                                                ) ??
-                                                0,
+                                            item.amount.toDouble(),
                                             currency,
                                             isArabic: isArabic,
                                           ),
