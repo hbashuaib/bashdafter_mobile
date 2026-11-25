@@ -23,4 +23,23 @@ class AppLocalizedName {
 
     return name;
   }
+
+  static String resolveByLanguage({
+    required bool isArabic,
+    required String name,
+    required String? nameEn,
+    required String? nameAr,
+  }) {
+    if (isArabic) {
+      if (nameAr != null && nameAr.trim().isNotEmpty) {
+        return nameAr;
+      }
+    } else {
+      if (nameEn != null && nameEn.trim().isNotEmpty) {
+        return nameEn;
+      }
+    }
+
+    return name;
+  }
 }

@@ -108,6 +108,8 @@ class CustomerStatementPdfService {
     required List<CustomerStatementTransactionModel> transactions,
   }) async {
     try {
+      final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+      final l10n = context.l10n;
       final shop = await ShopService().getShop();
       final shopName = shop.name;
       final phone = shop.phone;
@@ -117,8 +119,7 @@ class CustomerStatementPdfService {
 
       final city = shop.city;
       final currency = shop.currency;
-      final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-      final l10n = context.l10n;
+      
       final logoBytes = await rootBundle.load(
         'assets/images/bashsoft_logo.png',
       );

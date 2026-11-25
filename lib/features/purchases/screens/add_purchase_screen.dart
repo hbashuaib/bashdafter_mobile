@@ -232,21 +232,20 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                 label: Text(context.l10n.scanProductBarcode),
 
                 onPressed: () async {
+                  final navigator = Navigator.of(context);
                   final messenger = ScaffoldMessenger.of(context);
-                  final productNotFoundText = context.l10n.productNotFound;
+                  final l10n = context.l10n;
 
-                  final barcode = await Navigator.push(
-                    context,
+                  final isArabic =
+                      Localizations.localeOf(context).languageCode == 'ar';
+
+                  final barcode = await navigator.push(
                     MaterialPageRoute(
                       builder: (_) => const BarcodeScannerScreen(),
                     ),
                   );
 
-                  if (!mounted) {
-                    return;
-                  }
-
-                  if (barcode == null) {
+                  if (!mounted || barcode == null) {
                     return;
                   }
 
@@ -276,17 +275,16 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                       return;
                     }
 
+                    final localizedProductName =
+                        AppLocalizedName.resolveByLanguage(
+                          isArabic: isArabic,
+                          name: product.name,
+                          nameEn: product.nameEn,
+                          nameAr: product.nameAr,
+                        );
+
                     messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          AppLocalizedName.resolve(
-                            context: context,
-                            name: product.name,
-                            nameEn: product.nameEn,
-                            nameAr: product.nameAr,
-                          ),
-                        ),
-                      ),
+                      SnackBar(content: Text(localizedProductName)),
                     );
                   } catch (_) {
                     if (!mounted) {
@@ -294,7 +292,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                     }
 
                     messenger.showSnackBar(
-                      SnackBar(content: Text(productNotFoundText)),
+                      SnackBar(content: Text(l10n.productNotFound)),
                     );
                   }
                 },
