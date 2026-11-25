@@ -1397,4 +1397,173 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get arabicName => 'الاسم العربي';
+
+  @override
+  String get fieldRequired => 'هذا الحقل مطلوب';
+
+  @override
+  String get englishNameRequired => 'الاسم الإنجليزي مطلوب';
+
+  @override
+  String get voicePurchase => 'الشراء الصوتي';
+
+  @override
+  String get voicePurchaseInstructions =>
+      'قل اسم العميل وما الذي اشتراه. مثال: أحمد علي اشترى عبوتين حليب اليوم.';
+
+  @override
+  String get voicePurchaseAndroidOnly =>
+      'إدخال المشتريات بالصوت متاح حالياً على أجهزة أندرويد فقط.';
+
+  @override
+  String get voicePreparingSpeechRecognition =>
+      'جاري تهيئة التعرف على الصوت...';
+
+  @override
+  String get voiceListeningInstructions =>
+      'جاري الاستماع. اذكر العميل وتفاصيل المشتريات.';
+
+  @override
+  String voiceSpeakInEnglish(Object language) {
+    return 'تحدث باللغة الإنجليزية. اللغة الحالية: $language';
+  }
+
+  @override
+  String get voiceRecognitionNotReady => 'التعرف على الصوت غير جاهز.';
+
+  @override
+  String get voiceRecognitionUnavailable =>
+      'خدمة التعرف على الصوت غير متاحة. تحقق من خدمة الصوت والأذونات.';
+
+  @override
+  String get voiceNoEnglishLanguageInstalled =>
+      'لا توجد لغة إنجليزية مثبتة لخدمة التعرف على الصوت في هذا الجهاز.';
+
+  @override
+  String voiceStartFailed(Object error) {
+    return 'تعذر تشغيل التعرف على الصوت: $error';
+  }
+
+  @override
+  String voiceListeningFailed(Object error) {
+    return 'تعذر بدء الاستماع: $error';
+  }
+
+  @override
+  String voiceStopFailed(Object error) {
+    return 'تعذر إيقاف الاستماع: $error';
+  }
+
+  @override
+  String get voicePreparing => 'جاري التحضير...';
+
+  @override
+  String get voiceStartSpeaking => 'ابدأ التحدث';
+
+  @override
+  String get voiceStopListening => 'إيقاف الاستماع';
+
+  @override
+  String get voiceClearTranscript => 'مسح النص';
+
+  @override
+  String get voiceTranscript => 'النص المستخرج';
+
+  @override
+  String get voiceTranscriptHint => 'سيظهر النص المستخرج من الصوت هنا.';
+
+  @override
+  String get voiceRecording => 'التسجيل الصوتي';
+
+  @override
+  String get customerRequiredBeforeRecording => 'يرجى اختيار عميل أولاً';
+
+  @override
+  String get recording => 'جاري التسجيل...';
+
+  @override
+  String get ready => 'جاهز';
+
+  @override
+  String get startRecording => 'بدء التسجيل';
+
+  @override
+  String get stopRecording => 'إيقاف التسجيل';
+
+  @override
+  String get recordingSaved => 'تم حفظ التسجيل';
+
+  @override
+  String get playRecording => 'تشغيل التسجيل';
+
+  @override
+  String get newRecording => 'تسجيل جديد';
+
+  @override
+  String get listening => 'جاري الاستماع...';
+
+  @override
+  String get recognizedText => 'النص المستخرج';
+
+  @override
+  String get detectedItems => 'العناصر المكتشفة';
+
+  @override
+  String get removeItem => 'حذف العنصر';
+
+  @override
+  String removeItemQuestion(Object itemName) {
+    return 'حذف $itemName؟';
+  }
+
+  @override
+  String get remove => 'حذف';
+
+  @override
+  String get productNotFoundSuggested =>
+      'لم يتم العثور على المنتج. المنتجات المقترحة:';
+
+  @override
+  String multipleProductsFound(Object productName) {
+    return 'تم العثور على عدة منتجات لـ \"$productName\". يرجى اختيار واحد:';
+  }
+
+  @override
+  String get price => 'السعر';
+
+  @override
+  String get insufficientStock => 'مخزون غير كافٍ';
+
+  @override
+  String get purchaseSummary => 'ملخص الفاتورة';
+
+  @override
+  String get createPurchase => 'إنشاء فاتورة';
+
+  @override
+  String get purchaseDraft => 'مسودة الفاتورة';
+
+  @override
+  String get confirmPurchase => 'تأكيد الفاتورة';
+
+  @override
+  String get saving => 'جاري الحفظ...';
+
+  @override
+  String get noValidProductsFound => 'لم يتم العثور على منتجات صالحة';
+
+  @override
+  String get voicePurchaseSavedSuccessfully => 'تم حفظ الفاتورة الصوتية بنجاح';
+
+  @override
+  String get createdFromVoicePurchase => 'تم الإنشاء من الفاتورة الصوتية';
+
+  @override
+  String get speechRecognitionUnavailable => 'خدمة التعرف على الصوت غير متاحة';
+
+  @override
+  String get priceLabel => 'السعر';
+
+  @override
+  String get stockLabel => 'المخزون';
 }

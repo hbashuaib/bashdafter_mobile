@@ -8,6 +8,7 @@ import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 import 'payment_detail_screen.dart';
 
@@ -167,31 +168,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
           Padding(
             padding: const EdgeInsets.all(12),
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchPayments,
 
-              onChanged: (value) {
-                searchPayments(value);
+              onChanged: searchPayments,
 
-                setState(() {});
+              onClear: () {
+                searchController.clear();
+                searchPayments('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchPayments,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchPayments('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 

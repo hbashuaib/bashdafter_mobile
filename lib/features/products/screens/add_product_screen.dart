@@ -8,6 +8,7 @@ import '../models/unit_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -19,7 +20,6 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  final nameController = TextEditingController();
   final nameEnController = TextEditingController();
   final nameArController = TextEditingController();
   final barcodeController = TextEditingController();
@@ -71,10 +71,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Future<void> saveProduct() async {
-    if (nameController.text.trim().isEmpty) {
+    if (nameEnController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.productNameRequired)));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.englishNameRequired)));
 
       return;
     }
@@ -150,9 +150,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
       await ProductService().createProduct(
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
-        name: nameController.text.trim(),
-        nameEn: nameEnController.text,
-        nameAr: nameArController.text,
+        name: nameEnController.text.trim(),
+        nameEn: nameEnController.text.trim(),
+        nameAr: nameArController.text.trim(),
         description: descriptionController.text.trim(),
         costPrice: costPriceController.text.trim(),
         sellingPrice: sellingPriceController.text.trim(),
@@ -189,7 +189,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    nameEnController.dispose();
+    nameArController.dispose();
     barcodeController.dispose();
     descriptionController.dispose();
     costPriceController.dispose();
@@ -212,19 +213,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
         children: [
           TextField(
-            controller: nameController,
-            textDirection: Directionality.of(context),
+            controller: nameEnController,
+            textDirection: TextDirection.ltr,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.productName),
-          ),
-
-          const SizedBox(height: 12),
-
-          TextField(
-            controller: nameEnController,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.englishName),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.englishName,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -233,7 +230,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
             controller: nameArController,
             textDirection: TextDirection.rtl,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.arabicName),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.arabicName,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -245,8 +245,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
 
-            decoration: InputDecoration(
-              labelText: context.l10n.barcodeLabel,
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.barcodeLabel,
               prefixIcon: const Icon(Icons.qr_code),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.camera_alt),
@@ -286,7 +287,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
               );
             }).toList(),
 
-            decoration: InputDecoration(labelText: context.l10n.category),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.category,
+              required: true,
+            ),
 
             onChanged: (value) {
               setState(() {
@@ -314,7 +319,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
               );
             }).toList(),
 
-            decoration: InputDecoration(labelText: context.l10n.unit),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.unit,
+              required: true,
+            ),
 
             onChanged: (value) {
               setState(() {
@@ -332,7 +341,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.costPrice),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.costPrice,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -344,7 +357,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.sellingPrice),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.sellingPrice,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -356,7 +373,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.minimumStock),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.minimumStock,
+              required: true,
+            ),
           ),
 
           SwitchListTile(
@@ -406,7 +427,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
             controller: descriptionController,
             textDirection: Directionality.of(context),
             maxLines: 3,
-            decoration: InputDecoration(labelText: context.l10n.description),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.description,
+            ),
             textInputAction: TextInputAction.done,
 
             onSubmitted: (_) {

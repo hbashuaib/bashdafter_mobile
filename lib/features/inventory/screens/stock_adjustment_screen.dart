@@ -6,6 +6,8 @@ import '../services/stock_adjustment_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class StockAdjustmentScreen extends StatefulWidget {
   final ProductModel? product;
@@ -175,15 +177,22 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                 ),
             DropdownButtonFormField<ProductModel>(
               initialValue: selectedProduct,
-              decoration: InputDecoration(labelText: context.l10n.product),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.product,
+                required: true,
+              ),
 
               items: products.map((product) {
                 return DropdownMenuItem(
                   value: product,
                   child: Text(
-                    product.name.isEmpty
-                        ? context.l10n.unknownProduct
-                        : product.name,
+                    AppLocalizedName.resolve(
+                      context: context,
+                      name: product.name,
+                      nameEn: product.nameEn,
+                      nameAr: product.nameAr,
+                    ),
                   ),
                 );
               }).toList(),
@@ -202,9 +211,12 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
                   title: Text(
                     selectedProduct == null
                         ? ''
-                        : selectedProduct!.name.isEmpty
-                        ? context.l10n.unknownProduct
-                        : selectedProduct!.name,
+                        : AppLocalizedName.resolve(
+                            context: context,
+                            name: selectedProduct!.name,
+                            nameEn: selectedProduct!.nameEn,
+                            nameAr: selectedProduct!.nameAr,
+                          ),
                   ),
                   subtitle: Text(context.l10n.selectedFromBarcodeLookup),
                 ),
@@ -229,8 +241,10 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
             DropdownButtonFormField<String>(
               initialValue: adjustmentType,
 
-              decoration: InputDecoration(
-                labelText: context.l10n.adjustmentType,
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.adjustmentType,
+                required: true,
               ),
 
               items: [
@@ -271,14 +285,18 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
 
             TextField(
               controller: quantityController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(labelText: context.l10n.quantity),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.quantity,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -287,7 +305,12 @@ class _StockAdjustmentScreenState extends State<StockAdjustmentScreen> {
               controller: reasonController,
               textDirection: Directionality.of(context),
               maxLines: 2,
-              decoration: InputDecoration(labelText: context.l10n.reason),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.reason,
+                required: true,
+              ),
+
               textInputAction: TextInputAction.done,
 
               onSubmitted: (_) {

@@ -26,9 +26,9 @@ class _InventoryLookupScreenState extends State<InventoryLookupScreen> {
   Future<void> scanBarcode() async {
     final messenger = ScaffoldMessenger.of(context);
     final productNotFoundText = context.l10n.productNotFound;
+    final navigator = Navigator.of(context);
 
-    final barcode = await Navigator.push(
-      context,
+    final barcode = await navigator.push(
       MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
     );
 

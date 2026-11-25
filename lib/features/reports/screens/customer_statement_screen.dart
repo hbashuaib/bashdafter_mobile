@@ -13,6 +13,7 @@ import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
 import '../../../core/utils/whatsapp_receipt_builder.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 class CustomerStatementScreen extends StatefulWidget {
   final int customerId;
@@ -69,6 +70,10 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   }
 
   void searchTransactions(String value) {
+    if (statement == null) {
+      return;
+    }
+
     final query = value.toLowerCase().trim();
 
     setState(() {
@@ -235,30 +240,16 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
 
             const SizedBox(height: 20),
 
-            TextField(
+            AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchTransactions,
 
-              onChanged: (value) {
-                searchTransactions(value);
-                setState(() {});
+              onChanged: searchTransactions,
+
+              onClear: () {
+                searchController.clear();
+                searchTransactions('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchTransactions,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchTransactions('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
 
             const SizedBox(height: 12),

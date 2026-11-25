@@ -6,6 +6,7 @@ import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 class InventoryHistoryScreen extends StatefulWidget {
   const InventoryHistoryScreen({super.key});
@@ -136,32 +137,16 @@ class _InventoryHistoryScreenState extends State<InventoryHistoryScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
-              onChanged: (value) {
-                searchTransactions(value);
+              hintText: context.l10n.searchInventoryHistory,
 
-                if (mounted) {
-                  setState(() {});
-                }
+              onChanged: searchTransactions,
+
+              onClear: () {
+                searchController.clear();
+                searchTransactions('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchInventoryHistory,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchTransactions('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 

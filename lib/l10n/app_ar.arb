@@ -1041,5 +1041,141 @@
 "customerStatementNoTransactions": "لا توجد حركات متاحة",
 
 "englishName": "الاسم الإنجليزي",
-"arabicName": "الاسم العربي"
+"arabicName": "الاسم العربي",
+
+"fieldRequired": "هذا الحقل مطلوب",
+"englishNameRequired": "الاسم الإنجليزي مطلوب",
+
+"voicePurchase": "الشراء الصوتي",
+
+"voicePurchaseInstructions": "قل اسم العميل وما الذي اشتراه. مثال: أحمد علي اشترى عبوتين حليب اليوم.",
+
+"voicePurchaseAndroidOnly": "إدخال المشتريات بالصوت متاح حالياً على أجهزة أندرويد فقط.",
+
+"voicePreparingSpeechRecognition": "جاري تهيئة التعرف على الصوت...",
+
+"voiceListeningInstructions": "جاري الاستماع. اذكر العميل وتفاصيل المشتريات.",
+
+"voiceSpeakInEnglish": "تحدث باللغة الإنجليزية. اللغة الحالية: {language}",
+"@voiceSpeakInEnglish": {
+  "placeholders": {
+    "language": {}
+  }
+},
+
+"voiceRecognitionNotReady": "التعرف على الصوت غير جاهز.",
+
+"voiceRecognitionUnavailable": "خدمة التعرف على الصوت غير متاحة. تحقق من خدمة الصوت والأذونات.",
+
+"voiceNoEnglishLanguageInstalled": "لا توجد لغة إنجليزية مثبتة لخدمة التعرف على الصوت في هذا الجهاز.",
+
+"voiceStartFailed": "تعذر تشغيل التعرف على الصوت: {error}",
+"@voiceStartFailed": {
+  "placeholders": {
+    "error": {}
+  }
+},
+
+"voiceListeningFailed": "تعذر بدء الاستماع: {error}",
+"@voiceListeningFailed": {
+  "placeholders": {
+    "error": {}
+  }
+},
+
+"voiceStopFailed": "تعذر إيقاف الاستماع: {error}",
+"@voiceStopFailed": {
+  "placeholders": {
+    "error": {}
+  }
+},
+
+"voicePreparing": "جاري التحضير...",
+
+"voiceStartSpeaking": "ابدأ التحدث",
+
+"voiceStopListening": "إيقاف الاستماع",
+
+"voiceClearTranscript": "مسح النص",
+
+"voiceTranscript": "النص المستخرج",
+
+"voiceTranscriptHint": "سيظهر النص المستخرج من الصوت هنا.",
+
+"voiceRecording": "التسجيل الصوتي",
+
+"customerRequiredBeforeRecording":
+    "يرجى اختيار عميل أولاً",
+
+"recording": "جاري التسجيل...",
+
+"ready": "جاهز",
+
+"startRecording": "بدء التسجيل",
+
+"stopRecording": "إيقاف التسجيل",
+
+"recordingSaved": "تم حفظ التسجيل",
+
+"playRecording": "تشغيل التسجيل",
+
+"newRecording": "تسجيل جديد",
+
+"listening": "جاري الاستماع...",
+
+"recognizedText": "النص المستخرج",
+
+"detectedItems": "العناصر المكتشفة",
+
+"removeItem": "حذف العنصر",
+
+"removeItemQuestion": "حذف {itemName}؟",
+"@removeItemQuestion": {
+  "placeholders": {
+    "itemName": {}
+  }
+},
+
+"remove": "حذف",
+
+"productNotFoundSuggested":
+    "لم يتم العثور على المنتج. المنتجات المقترحة:",
+
+"multipleProductsFound":
+    "تم العثور على عدة منتجات لـ \"{productName}\". يرجى اختيار واحد:",
+"@multipleProductsFound": {
+  "placeholders": {
+    "productName": {}
+  }
+},
+
+"price": "السعر",
+
+"insufficientStock": "مخزون غير كافٍ",
+
+"purchaseSummary": "ملخص الفاتورة",
+
+"createPurchase": "إنشاء فاتورة",
+
+"purchaseDraft": "مسودة الفاتورة",
+
+"confirmPurchase": "تأكيد الفاتورة",
+
+"saving": "جاري الحفظ...",
+
+"noValidProductsFound":
+    "لم يتم العثور على منتجات صالحة",
+
+"voicePurchaseSavedSuccessfully":
+    "تم حفظ الفاتورة الصوتية بنجاح",
+
+"createdFromVoicePurchase":
+    "تم الإنشاء من الفاتورة الصوتية",
+
+"speechRecognitionUnavailable":
+    "خدمة التعرف على الصوت غير متاحة",
+
+"priceLabel": "السعر",
+
+"stockLabel": "المخزون"
 }

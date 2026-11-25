@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/user_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class UserFormScreen extends StatefulWidget {
   final UserModel? user;
@@ -142,11 +143,12 @@ class _UserFormScreenState extends State<UserFormScreen> {
         children: [
           TextField(
             controller: usernameController,
-            textDirection: Directionality.of(context),
+            textDirection: TextDirection.ltr,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: context.l10n.username,
-              border: OutlineInputBorder(),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.username,
+              required: true,
             ),
           ),
 
@@ -155,10 +157,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
           TextField(
             controller: firstNameController,
             textDirection: Directionality.of(context),
+            textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: context.l10n.firstName,
-              border: OutlineInputBorder(),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.firstName,
             ),
           ),
 
@@ -167,10 +170,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
           TextField(
             controller: lastNameController,
             textDirection: Directionality.of(context),
+            textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: context.l10n.lastName,
-              border: OutlineInputBorder(),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.lastName,
             ),
           ),
 
@@ -178,11 +182,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: emailController,
-            textDirection: Directionality.of(context),
+            textDirection: TextDirection.ltr,
+            keyboardType: TextInputType.emailAddress,
+            autocorrect: false,
+            enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: context.l10n.email,
-              border: OutlineInputBorder(),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.email,
             ),
           ),
 
@@ -190,11 +197,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           TextField(
             controller: phoneController,
-            textDirection: Directionality.of(context),
+            textDirection: TextDirection.ltr,
+            keyboardType: TextInputType.phone,
+            autocorrect: false,
+            enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: context.l10n.phoneNumber,
-              border: OutlineInputBorder(),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.phoneNumber,
             ),
           ),
 
@@ -203,14 +213,15 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
             TextField(
               controller: passwordController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               obscureText: true,
               enableSuggestions: false,
               autocorrect: false,
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: context.l10n.password,
-                border: OutlineInputBorder(),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.password,
+                required: true,
               ),
             ),
           ],
@@ -219,9 +230,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
           DropdownButtonFormField<String>(
             initialValue: selectedRole,
-            decoration: InputDecoration(
-              labelText: context.l10n.role,
-              border: OutlineInputBorder(),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.role,
+              required: true,
             ),
             items: [
               DropdownMenuItem(

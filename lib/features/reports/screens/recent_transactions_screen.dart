@@ -8,6 +8,7 @@ import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 class RecentTransactionsScreen extends StatefulWidget {
   const RecentTransactionsScreen({super.key});
@@ -97,10 +98,10 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
   }
 
   int get purchaseCount =>
-      transactions.where((t) => t.type == 'purchase').length;
+      transactions.where((t) => t.type.toLowerCase() == 'purchase').length;
 
   int get paymentCount =>
-      transactions.where((t) => t.type == 'payment').length;
+      transactions.where((t) => t.type.toLowerCase() == 'payment').length;
 
   @override
   Widget build(BuildContext context) {
@@ -174,30 +175,16 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchTransactions,
 
-              onChanged: (value) {
-                searchTransactions(value);
-                setState(() {});
+              onChanged: searchTransactions,
+
+              onClear: () {
+                searchController.clear();
+                searchTransactions('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchTransactions,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchTransactions('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 
@@ -234,15 +221,15 @@ class _RecentTransactionsScreenState extends State<RecentTransactionsScreen> {
 
                       itemBuilder: (context, index) {
                         final item = filteredTransactions[index];
-                        final purchase = item.type == 'purchase';
+                        final purchase = item.type.toLowerCase() == 'purchase';
 
                         return Card(
                           child: ListTile(
                             title: Text(
                               item.customer.isEmpty
-                              ? context.l10n.unknownCustomer
+                                  ? context.l10n.unknownCustomer
                                   : item.customer,
-                            ),                            
+                            ),
 
                             subtitle: Text(
                               '${getTransactionTypeLabel(item.type)} • '

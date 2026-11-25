@@ -118,16 +118,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: AppColors.cardTint(context, Colors.blue.shade50),
 
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
 
               child: Column(
                 children: [
                   Text(
                     context.l10n.profileInformation,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
 
                   Text(context.l10n.profileInformationDescription),
                 ],

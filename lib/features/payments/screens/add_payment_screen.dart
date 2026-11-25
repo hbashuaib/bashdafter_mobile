@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class AddPaymentScreen extends StatefulWidget {
   final int customerId;
@@ -99,7 +100,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
           children: [
             TextField(
               controller: amountController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -111,7 +112,11 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 setState(() {});
               },
 
-              decoration: InputDecoration(labelText: context.l10n.amount),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.amount,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -150,7 +155,6 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
             TextField(
               controller: notesController,
               textDirection: Directionality.of(context),
-              decoration: InputDecoration(labelText: context.l10n.notes),
               textInputAction: TextInputAction.done,
 
               onSubmitted: (_) {
@@ -158,6 +162,11 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                   savePayment();
                 }
               },
+
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.notes,
+              ),
             ),
 
             const SizedBox(height: 30),

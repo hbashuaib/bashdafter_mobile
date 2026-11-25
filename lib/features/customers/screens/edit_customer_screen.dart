@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/update_customer_service.dart';
 import '../models/customer_model.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class EditCustomerScreen extends StatefulWidget {
   final CustomerModel customer;
@@ -117,19 +118,27 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
               textDirection: Directionality.of(context),
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(labelText: context.l10n.name),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.name,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: phoneController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               keyboardType: TextInputType.phone,
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(labelText: context.l10n.phone),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.phone,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -138,7 +147,10 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
               controller: addressController,
               textDirection: Directionality.of(context),
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(labelText: context.l10n.address),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.address,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -155,7 +167,10 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                 }
               },
 
-              decoration: InputDecoration(labelText: context.l10n.notes),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.notes,
+              ),
             ),
 
             const SizedBox(height: 15),

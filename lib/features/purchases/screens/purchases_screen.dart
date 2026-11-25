@@ -9,6 +9,7 @@ import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 import 'purchase_detail_screen.dart';
 
@@ -86,8 +87,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
     final total = purchases.fold(
       0.0,
-      (sum, purchase) =>
-          sum + (double.tryParse(purchase.totalAmount) ?? 0),
+      (sum, purchase) => sum + (double.tryParse(purchase.totalAmount) ?? 0),
     );
 
     return total / purchases.length;
@@ -96,8 +96,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   double get totalPurchasesAmount {
     return purchases.fold(
       0.0,
-      (sum, purchase) =>
-          sum + (double.tryParse(purchase.totalAmount) ?? 0),
+      (sum, purchase) => sum + (double.tryParse(purchase.totalAmount) ?? 0),
     );
   }
 
@@ -131,7 +130,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   Column(
                     children: [
                       Text(context.l10n.purchases),
-                      Text(                        
+                      Text(
                         AppFormatters.number(context, purchases.length),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -176,30 +175,16 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
-              onChanged: (value) {
-                searchPurchases(value);
-                setState(() {});
+              hintText: context.l10n.searchPurchases,
+
+              onChanged: searchPurchases,
+
+              onClear: () {
+                searchController.clear();
+                searchPurchases('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchPurchases,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchPurchases('');
-
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 
@@ -209,11 +194,10 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             child: Center(
               child: Text(
                 '${context.l10n.showing} '
-                '${filteredPurchases.length} '
+                '${AppFormatters.number(context, filteredPurchases.length)} '
                 '${context.l10n.outOf} '
-                '${purchases.length} '
+                '${AppFormatters.number(context, purchases.length)} '
                 '${context.l10n.showingPurchases}',
-
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -242,10 +226,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                       itemBuilder: (context, index) {
                         final purchase = filteredPurchases[index];
                         final totalAmount =
-                            double.tryParse(
-                              purchase.totalAmount,
-                            ) ??
-                            0;
+                            double.tryParse(purchase.totalAmount) ?? 0;
 
                         return Card(
                           child: ListTile(

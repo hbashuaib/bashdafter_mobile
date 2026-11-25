@@ -4,6 +4,7 @@ import '../services/category_service.dart';
 import '../models/category_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -12,8 +13,7 @@ class CategoriesScreen extends StatefulWidget {
   State<CategoriesScreen> createState() => _CategoriesScreenState();
 }
 
-class _CategoriesScreenState extends State<CategoriesScreen> {
-  final nameController = TextEditingController();
+class _CategoriesScreenState extends State<CategoriesScreen> {  
   final nameEnController = TextEditingController();
   final nameArController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -46,8 +46,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     }
   }
 
-  Future<void> showAddCategoryDialog() async {
-    nameController.clear();
+  Future<void> showAddCategoryDialog() async {    
     nameEnController.clear();
     nameArController.clear();
     descriptionController.clear();
@@ -59,47 +58,49 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         return AlertDialog(
           title: Text(context.l10n.addCategory),
 
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
 
-            children: [
-              TextField(
-                controller: nameController,
-                textDirection: Directionality.of(context),
-                decoration: InputDecoration(
-                  labelText: context.l10n.categoryName,
-                ),
+                children: [                  
+                  TextField(
+                    controller: nameEnController,
+                    textInputAction: TextInputAction.next,
+                    textDirection: TextDirection.ltr,
+                    decoration: AppFormFieldHelper.decoration(
+                      context: context,
+                      label: context.l10n.englishName,
+                      required: true,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: nameArController,
+                    textDirection: TextDirection.rtl,
+                    textInputAction: TextInputAction.next,
+                    decoration: AppFormFieldHelper.decoration(
+                      context: context,
+                      label: context.l10n.arabicName,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: descriptionController,
+                    textDirection: Directionality.of(context),
+                    decoration: AppFormFieldHelper.decoration(
+                      context: context,
+                      label: context.l10n.description,
+                    ),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: nameEnController,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  labelText: context.l10n.englishName,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: nameArController,
-                textDirection: TextDirection.rtl,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(labelText: context.l10n.arabicName),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: descriptionController,
-                textDirection: Directionality.of(context),
-                decoration: InputDecoration(
-                  labelText: context.l10n.description,
-                ),
-              ),
-            ],
+            ),
           ),
 
           actions: [
@@ -129,13 +130,21 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   Future<void> createCategory() async {
-    if (nameController.text.trim().isEmpty) {
+    if (nameEnController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${context.l10n.englishName} ${context.l10n.englishNameRequired}',
+          ),
+        ),
+      );
+
       return;
     }
 
     try {
       await CategoryService().createCategory(
-        name: nameController.text,
+        name: nameEnController.text,
         nameEn: nameEnController.text,
         nameAr: nameArController.text,
         description: descriptionController.text,
@@ -153,8 +162,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     }
   }
 
-  Future<void> showEditCategoryDialog(CategoryModel category) async {
-    nameController.text = category.name;
+  Future<void> showEditCategoryDialog(CategoryModel category) async {    
     nameEnController.text = category.nameEn;
     nameArController.text = category.nameAr;
     descriptionController.text = category.description;
@@ -166,45 +174,49 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         return AlertDialog(
           title: Text(context.l10n.editCategory),
 
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
 
-            children: [
-              TextField(
-                controller: nameController,
+                children: [                  
+                  TextField(
+                    controller: nameEnController,
+                    textDirection: TextDirection.ltr,
+                    textInputAction: TextInputAction.next,
+                    decoration: AppFormFieldHelper.decoration(
+                      context: context,
+                      label: context.l10n.englishName,
+                      required: true,
+                    ),
+                  ),
 
-                decoration: InputDecoration(
-                  labelText: context.l10n.categoryName,
-                ),
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: nameArController,
+                    textDirection: TextDirection.rtl,
+                    textInputAction: TextInputAction.next,
+                    decoration: AppFormFieldHelper.decoration(
+                      context: context,
+                      label: context.l10n.arabicName,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: descriptionController,
+                    textDirection: Directionality.of(context),
+                    decoration: AppFormFieldHelper.decoration(
+                      context: context,
+                      label: context.l10n.description,
+                    ),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: nameEnController,
-                decoration: InputDecoration(
-                  labelText: context.l10n.englishName,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: nameArController,
-                textDirection: TextDirection.rtl,
-                decoration: InputDecoration(labelText: context.l10n.arabicName),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: descriptionController,
-
-                decoration: InputDecoration(
-                  labelText: context.l10n.description,
-                ),
-              ),
-            ],
+            ),
           ),
 
           actions: [
@@ -237,7 +249,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     try {
       await CategoryService().updateCategory(
         id: categoryId,
-        name: nameController.text,
+        name: nameEnController.text,
         nameEn: nameEnController.text,
         nameAr: nameArController.text,
         description: descriptionController.text,
@@ -297,7 +309,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Future<void> deleteCategory(int categoryId) async {
     try {
       await CategoryService().deleteCategory(categoryId);
-
       await loadCategories();
 
       if (!mounted) return;
@@ -317,8 +328,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   @override
-  void dispose() {
-    nameController.dispose();
+  void dispose() {    
     nameEnController.dispose();
     nameArController.dispose();
     descriptionController.dispose();

@@ -6,6 +6,7 @@ import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 class TopSellingProductsScreen extends StatefulWidget {
   const TopSellingProductsScreen({super.key});
@@ -131,7 +132,7 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
 
                         child: Text(
                           products.isEmpty ? '-' : products.first.name,
-
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                         ),
@@ -146,30 +147,16 @@ class _TopSellingProductsScreenState extends State<TopSellingProductsScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchProduct,
 
-              onChanged: (value) {
-                searchProducts(value);
-                setState(() {});
+              onChanged: searchProducts,
+
+              onClear: () {
+                searchController.clear();
+                searchProducts('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchProduct,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchProducts('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 

@@ -7,6 +7,8 @@ import '../../../core/widgets/app_loading_scaffold.dart';
 import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 import 'stock_adjustment_screen.dart';
 
@@ -63,8 +65,13 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
     setState(() {
       filteredProducts = lowStockProducts.where((product) {
         final name = product.name.toLowerCase();
+        final nameEn = product.nameEn.toLowerCase();
+        final nameAr = product.nameAr.toLowerCase();
         final category = product.categoryName.toLowerCase();
-        return name.contains(query) || category.contains(query);
+        return name.contains(query) ||
+            nameEn.contains(query) ||
+            nameAr.contains(query) ||
+            category.contains(query);
       }).toList();
     });
   }
@@ -119,30 +126,16 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchProduct,
 
-              onChanged: (value) {
-                searchProducts(value);
-                setState(() {});
+              onChanged: searchProducts,
+
+              onClear: () {
+                searchController.clear();
+                searchProducts('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchProduct,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchProducts('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 
@@ -198,9 +191,12 @@ class _LowStockProductsScreenState extends State<LowStockProductsScreen> {
                               ),
                             ),
                             title: Text(
-                              product.name.isNotEmpty
-                                  ? product.name
-                                  : context.l10n.unknownProduct,
+                              AppLocalizedName.resolve(
+                                context: context,
+                                name: product.name,
+                                nameEn: product.nameEn,
+                                nameAr: product.nameAr,
+                              ),
                             ),
 
                             subtitle: Text(

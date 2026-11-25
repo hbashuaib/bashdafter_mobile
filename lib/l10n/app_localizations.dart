@@ -2815,6 +2815,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arabic Name'**
   String get arabicName;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// No description provided for @englishNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'English name is required'**
+  String get englishNameRequired;
+
+  /// No description provided for @voicePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Purchase'**
+  String get voicePurchase;
+
+  /// No description provided for @voicePurchaseInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Say the customer name and what they bought. For example: \"Ahmed Ali bought 2 milks today.\"'**
+  String get voicePurchaseInstructions;
+
+  /// No description provided for @voicePurchaseAndroidOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice purchase input is currently enabled on Android.'**
+  String get voicePurchaseAndroidOnly;
+
+  /// No description provided for @voicePreparingSpeechRecognition.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing speech recognition...'**
+  String get voicePreparingSpeechRecognition;
+
+  /// No description provided for @voiceListeningInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening. Say the customer and purchase details.'**
+  String get voiceListeningInstructions;
+
+  /// No description provided for @voiceSpeakInEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak in English. Selected language: {language}'**
+  String voiceSpeakInEnglish(Object language);
+
+  /// No description provided for @voiceRecognitionNotReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech recognition is not ready.'**
+  String get voiceRecognitionNotReady;
+
+  /// No description provided for @voiceRecognitionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech recognition is unavailable. Check the Android speech service and microphone permission.'**
+  String get voiceRecognitionUnavailable;
+
+  /// No description provided for @voiceNoEnglishLanguageInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'No English speech language is installed on this device.'**
+  String get voiceNoEnglishLanguageInstalled;
+
+  /// No description provided for @voiceStartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start speech recognition: {error}'**
+  String voiceStartFailed(Object error);
+
+  /// No description provided for @voiceListeningFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start listening: {error}'**
+  String voiceListeningFailed(Object error);
+
+  /// No description provided for @voiceStopFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not stop listening: {error}'**
+  String voiceStopFailed(Object error);
+
+  /// No description provided for @voicePreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing...'**
+  String get voicePreparing;
+
+  /// No description provided for @voiceStartSpeaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Speaking'**
+  String get voiceStartSpeaking;
+
+  /// No description provided for @voiceStopListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Listening'**
+  String get voiceStopListening;
+
+  /// No description provided for @voiceClearTranscript.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Transcript'**
+  String get voiceClearTranscript;
+
+  /// No description provided for @voiceTranscript.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcript'**
+  String get voiceTranscript;
+
+  /// No description provided for @voiceTranscriptHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recognized words will appear here.'**
+  String get voiceTranscriptHint;
+
+  /// No description provided for @voiceRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Recording'**
+  String get voiceRecording;
+
+  /// No description provided for @customerRequiredBeforeRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a customer first'**
+  String get customerRequiredBeforeRecording;
+
+  /// No description provided for @recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording...'**
+  String get recording;
+
+  /// No description provided for @ready.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get ready;
+
+  /// No description provided for @startRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Recording'**
+  String get startRecording;
+
+  /// No description provided for @stopRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Recording'**
+  String get stopRecording;
+
+  /// No description provided for @recordingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording Saved'**
+  String get recordingSaved;
+
+  /// No description provided for @playRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Recording'**
+  String get playRecording;
+
+  /// No description provided for @newRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'New Recording'**
+  String get newRecording;
+
+  /// No description provided for @listening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening...'**
+  String get listening;
+
+  /// No description provided for @recognizedText.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognized Text'**
+  String get recognizedText;
+
+  /// No description provided for @detectedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected Items'**
+  String get detectedItems;
+
+  /// No description provided for @removeItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Item'**
+  String get removeItem;
+
+  /// No description provided for @removeItemQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {itemName}?'**
+  String removeItemQuestion(Object itemName);
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @productNotFoundSuggested.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Not Found. Suggested products:'**
+  String get productNotFoundSuggested;
+
+  /// No description provided for @multipleProductsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple products found for \"{productName}\". Please select one:'**
+  String multipleProductsFound(Object productName);
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
+  /// No description provided for @insufficientStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient Stock'**
+  String get insufficientStock;
+
+  /// No description provided for @purchaseSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Summary'**
+  String get purchaseSummary;
+
+  /// No description provided for @createPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Purchase'**
+  String get createPurchase;
+
+  /// No description provided for @purchaseDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Draft'**
+  String get purchaseDraft;
+
+  /// No description provided for @confirmPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Purchase'**
+  String get confirmPurchase;
+
+  /// No description provided for @saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// No description provided for @noValidProductsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No valid products found'**
+  String get noValidProductsFound;
+
+  /// No description provided for @voicePurchaseSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Purchase Saved Successfully'**
+  String get voicePurchaseSavedSuccessfully;
+
+  /// No description provided for @createdFromVoicePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Created from Voice Purchase'**
+  String get createdFromVoicePurchase;
+
+  /// No description provided for @speechRecognitionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech recognition unavailable'**
+  String get speechRecognitionUnavailable;
+
+  /// No description provided for @priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get priceLabel;
+
+  /// No description provided for @stockLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get stockLabel;
 }
 
 class _AppLocalizationsDelegate

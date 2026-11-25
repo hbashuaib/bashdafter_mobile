@@ -8,6 +8,8 @@ import '../models/category_model.dart';
 import '../models/unit_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 import 'barcode_scanner_screen.dart';
 
@@ -20,7 +22,6 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
-  final nameController = TextEditingController();
   final nameEnController = TextEditingController();
   final nameArController = TextEditingController();
   final barcodeController = TextEditingController();
@@ -42,7 +43,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     super.initState();
-    nameController.text = widget.product.name;
     nameEnController.text = widget.product.nameEn;
     nameArController.text = widget.product.nameAr;
     barcodeController.text = widget.product.barcode ?? '';
@@ -90,10 +90,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   Future<void> updateProduct() async {
-    if (nameController.text.trim().isEmpty) {
+    if (nameEnController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.productNameRequired)));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.englishNameRequired)));
 
       return;
     }
@@ -170,9 +170,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
         id: widget.product.id,
         categoryId: selectedCategory!,
         unitId: selectedUnit!,
-        name: nameController.text.trim(),
-        nameEn: nameEnController.text,
-        nameAr: nameArController.text,
+        name: nameEnController.text.trim(),
+        nameEn: nameEnController.text.trim(),
+        nameAr: nameArController.text.trim(),
         barcode: barcodeController.text.trim().isEmpty
             ? null
             : barcodeController.text.trim(),
@@ -212,7 +212,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    nameEnController.dispose();
+    nameArController.dispose();
     barcodeController.dispose();
     descriptionController.dispose();
     costPriceController.dispose();
@@ -235,19 +236,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
         children: [
           TextField(
-            controller: nameController,
-            textDirection: Directionality.of(context),
+            controller: nameEnController,
+            textDirection: TextDirection.ltr,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.productName),
-          ),
-
-          const SizedBox(height: 12),
-
-          TextField(
-            controller: nameEnController,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.englishName),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.englishName,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -256,7 +253,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
             controller: nameArController,
             textDirection: TextDirection.rtl,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.arabicName),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.arabicName,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -268,8 +268,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
 
-            decoration: InputDecoration(
-              labelText: context.l10n.barcodeLabel,
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.barcodeLabel,
               prefixIcon: const Icon(Icons.qr_code),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.camera_alt),
@@ -294,12 +295,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           DropdownButtonFormField<int>(
             initialValue: selectedCategory,
-            decoration: InputDecoration(labelText: context.l10n.category),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.category,
+              required: true,
+            ),
 
             items: categories.map((item) {
               return DropdownMenuItem<int>(
                 value: item.id,
-                child: Text(item.name),
+                child: Text(
+                  AppLocalizedName.resolve(
+                    context: context,
+                    name: item.name,
+                    nameEn: item.nameEn,
+                    nameAr: item.nameAr,
+                  ),
+                ),
               );
             }).toList(),
 
@@ -314,12 +326,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           DropdownButtonFormField<int>(
             initialValue: selectedUnit,
-            decoration: InputDecoration(labelText: context.l10n.unit),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.unit,
+              required: true,
+            ),
 
             items: units.map((item) {
               return DropdownMenuItem<int>(
                 value: item.id,
-                child: Text(item.name),
+                child: Text(
+                  AppLocalizedName.resolve(
+                    context: context,
+                    name: item.name,
+                    nameEn: item.nameEn,
+                    nameAr: item.nameAr,
+                  ),
+                ),
               );
             }).toList(),
 
@@ -339,7 +362,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.costPrice),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.costPrice,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -351,7 +378,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.sellingPrice),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.sellingPrice,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -363,7 +394,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.minimumStock),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.minimumStock,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -423,7 +458,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
               }
             },
 
-            decoration: InputDecoration(labelText: context.l10n.description),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.description,
+            ),
           ),
 
           const SizedBox(height: 20),

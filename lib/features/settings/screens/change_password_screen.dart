@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 
 import '../services/change_password_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -113,13 +114,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           children: [
             TextField(
               controller: oldPasswordController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               obscureText: obscureOldPassword,
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: context.l10n.currentPassword,
-                border: const OutlineInputBorder(),
-
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.currentPassword,
+                required: true,
                 suffixIcon: IconButton(
                   icon: Icon(
                     obscureOldPassword
@@ -139,14 +140,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
             TextField(
               controller: newPasswordController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               obscureText: obscureNewPassword,
               textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: context.l10n.newPassword,
-
-                border: const OutlineInputBorder(),
-
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.newPassword,
+                required: true,
                 suffixIcon: IconButton(
                   icon: Icon(
                     obscureNewPassword
@@ -166,14 +166,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
             TextField(
               controller: confirmPasswordController,
-              textDirection: Directionality.of(context),
+              textDirection: TextDirection.ltr,
               obscureText: obscureConfirmPassword,
               textInputAction: TextInputAction.done,
-              decoration: InputDecoration(
-                labelText: context.l10n.confirmPassword,
-
-                border: const OutlineInputBorder(),
-
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.confirmPassword,
+                required: true,
                 suffixIcon: IconButton(
                   icon: Icon(
                     obscureConfirmPassword
@@ -187,7 +186,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   },
                 ),
               ),
-
               onSubmitted: (_) {
                 if (!isLoading) {
                   changePassword();

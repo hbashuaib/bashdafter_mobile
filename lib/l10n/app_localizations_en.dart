@@ -1404,4 +1404,175 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get arabicName => 'Arabic Name';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get englishNameRequired => 'English name is required';
+
+  @override
+  String get voicePurchase => 'Voice Purchase';
+
+  @override
+  String get voicePurchaseInstructions =>
+      'Say the customer name and what they bought. For example: \"Ahmed Ali bought 2 milks today.\"';
+
+  @override
+  String get voicePurchaseAndroidOnly =>
+      'Voice purchase input is currently enabled on Android.';
+
+  @override
+  String get voicePreparingSpeechRecognition =>
+      'Preparing speech recognition...';
+
+  @override
+  String get voiceListeningInstructions =>
+      'Listening. Say the customer and purchase details.';
+
+  @override
+  String voiceSpeakInEnglish(Object language) {
+    return 'Speak in English. Selected language: $language';
+  }
+
+  @override
+  String get voiceRecognitionNotReady => 'Speech recognition is not ready.';
+
+  @override
+  String get voiceRecognitionUnavailable =>
+      'Speech recognition is unavailable. Check the Android speech service and microphone permission.';
+
+  @override
+  String get voiceNoEnglishLanguageInstalled =>
+      'No English speech language is installed on this device.';
+
+  @override
+  String voiceStartFailed(Object error) {
+    return 'Could not start speech recognition: $error';
+  }
+
+  @override
+  String voiceListeningFailed(Object error) {
+    return 'Could not start listening: $error';
+  }
+
+  @override
+  String voiceStopFailed(Object error) {
+    return 'Could not stop listening: $error';
+  }
+
+  @override
+  String get voicePreparing => 'Preparing...';
+
+  @override
+  String get voiceStartSpeaking => 'Start Speaking';
+
+  @override
+  String get voiceStopListening => 'Stop Listening';
+
+  @override
+  String get voiceClearTranscript => 'Clear Transcript';
+
+  @override
+  String get voiceTranscript => 'Transcript';
+
+  @override
+  String get voiceTranscriptHint => 'Your recognized words will appear here.';
+
+  @override
+  String get voiceRecording => 'Voice Recording';
+
+  @override
+  String get customerRequiredBeforeRecording =>
+      'Please select a customer first';
+
+  @override
+  String get recording => 'Recording...';
+
+  @override
+  String get ready => 'Ready';
+
+  @override
+  String get startRecording => 'Start Recording';
+
+  @override
+  String get stopRecording => 'Stop Recording';
+
+  @override
+  String get recordingSaved => 'Recording Saved';
+
+  @override
+  String get playRecording => 'Play Recording';
+
+  @override
+  String get newRecording => 'New Recording';
+
+  @override
+  String get listening => 'Listening...';
+
+  @override
+  String get recognizedText => 'Recognized Text';
+
+  @override
+  String get detectedItems => 'Detected Items';
+
+  @override
+  String get removeItem => 'Remove Item';
+
+  @override
+  String removeItemQuestion(Object itemName) {
+    return 'Remove $itemName?';
+  }
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get productNotFoundSuggested =>
+      'Product Not Found. Suggested products:';
+
+  @override
+  String multipleProductsFound(Object productName) {
+    return 'Multiple products found for \"$productName\". Please select one:';
+  }
+
+  @override
+  String get price => 'Price';
+
+  @override
+  String get insufficientStock => 'Insufficient Stock';
+
+  @override
+  String get purchaseSummary => 'Purchase Summary';
+
+  @override
+  String get createPurchase => 'Create Purchase';
+
+  @override
+  String get purchaseDraft => 'Purchase Draft';
+
+  @override
+  String get confirmPurchase => 'Confirm Purchase';
+
+  @override
+  String get saving => 'Saving...';
+
+  @override
+  String get noValidProductsFound => 'No valid products found';
+
+  @override
+  String get voicePurchaseSavedSuccessfully =>
+      'Voice Purchase Saved Successfully';
+
+  @override
+  String get createdFromVoicePurchase => 'Created from Voice Purchase';
+
+  @override
+  String get speechRecognitionUnavailable => 'Speech recognition unavailable';
+
+  @override
+  String get priceLabel => 'Price';
+
+  @override
+  String get stockLabel => 'Stock';
 }

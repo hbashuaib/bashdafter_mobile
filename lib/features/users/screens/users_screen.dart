@@ -4,6 +4,7 @@ import '../models/user_model.dart';
 import '../services/user_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 import 'inactive_users_screen.dart';
 import 'user_form_screen.dart';
@@ -153,7 +154,7 @@ class _UsersScreenState extends State<UsersScreen> {
   }
 
   Future<void> loadUsers() async {
-    try { 
+    try {
       final loadedUsers = await _userService.getUsers();
 
       if (!mounted) return;
@@ -253,6 +254,22 @@ class _UsersScreenState extends State<UsersScreen> {
     }
   }
 
+  String roleLabel(String role) {
+    switch (role) {
+      case 'ADMIN':
+        return context.l10n.adminRole;
+
+      case 'MANAGER':
+        return context.l10n.managerRole;
+
+      case 'CASHIER':
+        return context.l10n.cashierRole;
+
+      default:
+        return role;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -283,7 +300,7 @@ class _UsersScreenState extends State<UsersScreen> {
       ),
 
       appBar: AppBar(
-        title: const Text('User Management'),
+        title: Text(context.l10n.userManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.restore_from_trash),
@@ -300,16 +317,19 @@ class _UsersScreenState extends State<UsersScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
-              decoration: InputDecoration(
-                labelText: context.l10n.searchUsers,
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
+              hintText: context.l10n.searchUsers,
+
               onChanged: filterUsers,
+
+              onClear: () {
+                searchController.clear();
+                filterUsers('');
+              },
             ),
           ),
+
           Expanded(
             child: filteredUsers.isEmpty
                 ? ListView(
@@ -351,7 +371,7 @@ class _UsersScreenState extends State<UsersScreen> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(user.role.replaceAll('_', ' ')),
+                                Text(roleLabel(user.role)),
 
                                 if (user.email.isNotEmpty)
                                   Text(

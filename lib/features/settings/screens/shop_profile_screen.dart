@@ -6,6 +6,7 @@ import '../models/shop_model.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/providers/shop_provider.dart';
 import '../../../core/constants/supported_currencies.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class ShopProfileScreen extends StatefulWidget {
   const ShopProfileScreen({super.key});
@@ -90,10 +91,10 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
     try {
       await ShopService().updateShop(
         id: shop!.id,
-        name: nameController.text,
-        phone: phoneController.text,
-        address: addressController.text,
-        city: cityController.text,
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        address: addressController.text.trim(),
+        city: cityController.text.trim(),
         currency: selectedCurrency,
         isActive: isActive,
         owner: shop!.owner,
@@ -145,20 +146,29 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
           TextField(
             controller: nameController,
             textDirection: Directionality.of(context),
+            textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.shopName),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.shopName,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 15),
 
           TextField(
             controller: phoneController,
-            textDirection: Directionality.of(context),
+            textDirection: TextDirection.ltr,
             keyboardType: TextInputType.phone,
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.phoneNumber),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.phoneNumber,
+              required: true,
+            ),
           ),
 
           const SizedBox(height: 15),
@@ -167,7 +177,10 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
             controller: addressController,
             textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.address),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.address,
+            ),
           ),
 
           const SizedBox(height: 15),
@@ -176,14 +189,21 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
             controller: cityController,
             textDirection: Directionality.of(context),
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: context.l10n.city),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.city,
+            ),
           ),
 
           const SizedBox(height: 15),
 
           DropdownButtonFormField<String>(
             initialValue: selectedCurrency,
-            decoration: InputDecoration(labelText: context.l10n.currency),
+            decoration: AppFormFieldHelper.decoration(
+              context: context,
+              label: context.l10n.currency,
+              required: true,
+            ),
 
             items: SupportedCurrencies.all.map((currency) {
               return DropdownMenuItem<String>(

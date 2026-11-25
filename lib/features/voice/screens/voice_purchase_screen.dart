@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/speech_recognition_service.dart';
+import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class VoicePurchaseScreen extends StatefulWidget {
   const VoicePurchaseScreen({super.key});
@@ -75,7 +77,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
         setState(() {
           _speechInitializing = false;
           _speechAvailable = false;
-          _speechError = 'Speech recognition is unavailable. Check the Android speech service and microphone permission.';
+          _speechError = context.l10n.voiceRecognitionUnavailable;
         });
         return;
       }
@@ -106,7 +108,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
         _englishLocaleId = englishLocaleId;
         _speechAvailable = englishLocaleId != null;
         _speechError = englishLocaleId == null
-            ? 'No English speech language is installed on this device.'
+            ? context.l10n.voiceNoEnglishLanguageInstalled
             : null;
       });
     } catch (error) {
@@ -115,7 +117,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
       setState(() {
         _speechInitializing = false;
         _speechAvailable = false;
-        _speechError = 'Could not start speech recognition: $error';
+        _speechError = context.l10n.voiceStartFailed(error.toString());
       });
     }
   }
@@ -160,7 +162,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
 
       setState(() {
         _isListening = false;
-        _speechError = 'Could not start listening: $error';
+        _speechError = context.l10n.voiceListeningFailed(error.toString());
       });
     }
   }
@@ -171,7 +173,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
     } catch (error) {
       if (mounted) {
         setState(() {
-          _speechError = 'Could not stop listening: $error';
+          _speechError = context.l10n.voiceStopFailed(error.toString());
         });
       }
     } finally {
@@ -193,27 +195,24 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
   @override
   Widget build(BuildContext context) {
     final statusMessage = !_isAndroid
-        ? 'Android voice purchase input is enabled in this step.'
+        ? context.l10n.voicePurchaseAndroidOnly
         : _speechInitializing
-        ? 'Preparing speech recognition...'
+        ? context.l10n.voicePreparingSpeechRecognition
         : _isListening
-        ? 'Listening. Say the customer and purchase details.'
+        ? context.l10n.voiceListeningInstructions
         : _speechAvailable
-        ? 'Speak in English. Selected language: $_englishLocaleId.'
-        : 'Speech recognition is not ready.';
+        ? context.l10n.voiceSpeakInEnglish(_englishLocaleId ?? '')
+        : context.l10n.voiceRecognitionNotReady;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Voice Purchase')),
+      appBar: AppBar(title: Text(context.l10n.voicePurchase)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Say the customer name and what they bought. For example: '
-                '“Ahmed Ali bought 2 milks today.”',
-              ),
+              Text(context.l10n.voicePurchaseInstructions),
               const SizedBox(height: 12),
               Text(statusMessage),
               if (_speechError != null) ...[
@@ -238,17 +237,17 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
                       icon: Icon(_isListening ? Icons.stop : Icons.mic),
                       label: Text(
                         _speechInitializing
-                            ? 'Preparing...'
+                            ? context.l10n.voicePreparing
                             : _isListening
-                            ? 'Stop listening'
-                            : 'Start speaking',
+                            ? context.l10n.voiceStopListening
+                            : context.l10n.voiceStartSpeaking,
                       ),
                     ),
                   ),
                   if (_transcriptController.text.isNotEmpty)
                     IconButton(
                       onPressed: _isListening ? null : _clearTranscript,
-                      tooltip: 'Clear transcript',
+                      tooltip: context.l10n.voiceClearTranscript,
                       icon: const Icon(Icons.clear),
                     ),
                 ],
@@ -257,7 +256,7 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
               Expanded(
                 child: TextField(
                   controller: _transcriptController,
-
+                  textDirection: TextDirection.ltr,
                   onChanged: (_) {
                     setState(() {});
                   },
@@ -267,12 +266,11 @@ class _VoicePurchaseScreenState extends State<VoicePurchaseScreen> {
                   minLines: null,
                   maxLines: null,
                   textAlignVertical: TextAlignVertical.top,
-                  decoration: const InputDecoration(
-                    labelText: 'Transcript',
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(),
-                    hintText: 'Your recognized words will appear here.',
-                  ),
+                  decoration: AppFormFieldHelper.decoration(
+                    context: context,
+                    label: context.l10n.voiceTranscript,
+                    hintText: context.l10n.voiceTranscriptHint,
+                  ).copyWith(alignLabelWithHint: true),
                 ),
               ),
             ],

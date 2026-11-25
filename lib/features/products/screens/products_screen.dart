@@ -12,6 +12,7 @@ import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
 import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 import 'product_detail_screen.dart';
 import 'add_product_screen.dart';
@@ -221,47 +222,49 @@ class _ProductsScreenState extends State<ProductsScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchProducts,
+
               onChanged: (value) {
                 searchQuery = value;
                 applyFilters();
               },
 
-              decoration: InputDecoration(
-                hintText: context.l10n.searchProducts,
-                prefixIcon: const Icon(Icons.search),
+              onClear: () {
+                searchController.clear();
+                searchQuery = '';
+                applyFilters();
+              },
 
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.qr_code_scanner),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.qr_code_scanner),
 
-                  onPressed: () async {
-                    final messenger = ScaffoldMessenger.of(context);
-                    final productNotFoundText = context.l10n.productNotFound;
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final productNotFoundText = context.l10n.productNotFound;
 
-                    final barcode = await Navigator.push(
-                      context,
+                  final barcode = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BarcodeScannerScreen(),
+                    ),
+                  );
 
-                      MaterialPageRoute(
-                        builder: (_) => const BarcodeScannerScreen(),
-                      ),
+                  if (!mounted || barcode == null) {
+                    return;
+                  }
+
+                  searchController.text = barcode.toString();
+                  searchQuery = barcode.toString();
+                  applyFilters();
+
+                  if (filteredProducts.isEmpty) {
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(productNotFoundText)),
                     );
-
-                    if (!mounted || barcode == null) {
-                      return;
-                    }
-
-                    searchController.text = barcode.toString();
-                    searchQuery = barcode.toString();
-                    applyFilters();
-
-                    if (filteredProducts.isEmpty) {
-                      messenger.showSnackBar(
-                        SnackBar(content: Text(productNotFoundText)),
-                      );
-                    }
-                  },
-                ),
+                  }
+                },
               ),
             ),
           ),

@@ -17,6 +17,9 @@ import '../models/voice_purchase_item.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/localization/app_localized_name.dart';
+import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class VoiceRecorderScreen extends StatefulWidget {
   const VoiceRecorderScreen({super.key});
@@ -82,7 +85,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
   Future<void> startRecording() async {
     if (selectedCustomer == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a customer first')),
+        SnackBar(content: Text(context.l10n.customerRequiredBeforeRecording)),
       );
 
       return;
@@ -98,18 +101,17 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
     if (await _audioRecorder.hasPermission()) {
       final baseDir = await getApplicationDocumentsDirectory();
       final customerId = selectedCustomer!.id;
-      final customerName = sanitizeFolderName(selectedCustomer!.name);
+      // final customerName = sanitizeFolderName(selectedCustomer!.name);
 
       final customerFolder = Directory(
-        '${baseDir.path}/voices/customer_${customerId}_$customerName',
+        '${baseDir.path}/voices/customer_$customerId',
       );
 
       await customerFolder.create(recursive: true);
 
       final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-      final path =
-          '${customerFolder.path}/${customerId}_${customerName}_$timestamp.m4a';
+      final path = '${customerFolder.path}/${customerId}_$timestamp.m4a';
 
       await _audioRecorder.start(const RecordConfig(), path: path);
 
@@ -231,8 +233,12 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
     return products
         .where((product) {
           final name = normalizeProductName(product.name);
+          final nameEn = normalizeProductName(product.nameEn);
+          final nameAr = normalizeProductName(product.nameAr);
 
           return name.contains(search) ||
+              nameEn.contains(search) ||
+              nameAr.contains(search) ||
               search.contains(name) ||
               name.startsWith(search.isNotEmpty ? search[0] : '');
         })
@@ -265,9 +271,13 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       final search = normalizeProductName(item.productName);
 
       final matches = products.where((product) {
-        final productName = normalizeProductName(product.name);
+        final name = normalizeProductName(product.name);
+        final nameEn = normalizeProductName(product.nameEn);
+        final nameAr = normalizeProductName(product.nameAr);
 
-        return productName.contains(search);
+        return name.contains(search) ||
+            nameEn.contains(search) ||
+            nameAr.contains(search);
       }).toList();
 
       if (matches.isEmpty) {
@@ -291,7 +301,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
       builder: (_) {
         return AlertDialog(
-          title: const Text('Purchase Draft'),
+          title: Text(context.l10n.purchaseDraft),
 
           content: SizedBox(
             width: double.maxFinite,
@@ -301,7 +311,10 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  Text('Customer: ${selectedCustomer?.name}'),
+                  Text(
+                    '${context.l10n.customerLabel}: '
+                    '${selectedCustomer?.name ?? ''}',
+                  ),
 
                   const SizedBox(height: 16),
 
@@ -312,7 +325,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 4),
 
                           child: Text(
-                            '${item.matchedProduct!.name} x ${item.quantity}',
+                            '${AppLocalizedName.resolve(context: context, name: item.matchedProduct!.name, nameEn: item.matchedProduct!.nameEn, nameAr: item.matchedProduct!.nameAr)} x ${item.quantity}',
                           ),
                         ),
                       ),
@@ -320,7 +333,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                   const Divider(),
 
                   Text(
-                    'Total: ${AppFormatters.currency(context, voicePurchaseTotal, context.read<ShopProvider>().currency)}',
+                    '${context.l10n.total}: '
+                    '${AppFormatters.currency(context, voicePurchaseTotal, context.read<ShopProvider>().currency)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -334,7 +348,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 Navigator.pop(context);
               },
 
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
 
             ElevatedButton.icon(
@@ -342,7 +356,11 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
               icon: const Icon(Icons.save),
 
-              label: Text(isSavingPurchase ? 'Saving...' : 'Confirm Purchase'),
+              label: Text(
+                isSavingPurchase
+                    ? context.l10n.saving
+                    : context.l10n.confirmPurchase,
+              ),
             ),
           ],
         );
@@ -360,9 +378,9 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
         .toList();
 
     if (validItems.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No valid products found')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.noValidProductsFound)),
+      );
 
       return;
     }
@@ -374,7 +392,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
     try {
       final purchaseId = await CreatePurchaseService().createPurchase(
         customerId: selectedCustomer!.id,
-        notes: 'Created from Voice Purchase',
+        notes: context.l10n.createdFromVoicePurchase,
       );
 
       for (final item in validItems) {
@@ -401,16 +419,16 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Voice Purchase Saved Successfully')),
+        SnackBar(content: Text(context.l10n.voicePurchaseSavedSuccessfully)),
       );
     } catch (e) {
       debugPrint(e.toString());
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save purchase')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToSavePurchase)),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -484,7 +502,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
   Future<void> startListening() async {
     if (!speechEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Speech recognition unavailable')),
+        SnackBar(content: Text(context.l10n.speechRecognitionUnavailable)),
       );
 
       return;
@@ -525,7 +543,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Voice Recording')),
+      appBar: AppBar(title: Text(context.l10n.voiceRecording)),
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -538,9 +556,10 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 DropdownButtonFormField<CustomerModel>(
                   initialValue: selectedCustomer,
 
-                  decoration: const InputDecoration(
-                    labelText: 'Customer',
-                    border: OutlineInputBorder(),
+                  decoration: AppFormFieldHelper.decoration(
+                    context: context,
+                    label: context.l10n.customer,
+                    required: true,
                   ),
 
                   items: customers.map((customer) {
@@ -569,13 +588,17 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
               const SizedBox(height: 20),
 
-              Text(isRecording ? 'Recording...' : 'Ready'),
+              Text(isRecording ? context.l10n.recording : context.l10n.ready),
 
               const SizedBox(height: 20),
 
               ElevatedButton.icon(
                 icon: Icon(isRecording ? Icons.stop : Icons.mic),
-                label: Text(isRecording ? 'Stop' : 'Start Recording'),
+                label: Text(
+                  isRecording
+                      ? context.l10n.stopRecording
+                      : context.l10n.startRecording,
+                ),
 
                 onPressed: () {
                   if (isRecording) {
@@ -589,8 +612,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
               if (audioPath != null) ...[
                 const SizedBox(height: 30),
 
-                const Text(
-                  'Recording Saved',
+                Text(
+                  context.l10n.recordingSaved,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
 
@@ -657,14 +680,14 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 ElevatedButton.icon(
                   onPressed: playRecording,
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('Play Recording'),
+                  label: Text(context.l10n.playRecording),
                 ),
 
                 const SizedBox(height: 20),
 
                 OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
-                  label: const Text('New Recording'),
+                  label: Text(context.l10n.newRecording),
 
                   onPressed: () {
                     setState(() {
@@ -679,7 +702,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
               ],
 
               if (isListening)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -689,7 +712,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                       SizedBox(width: 8),
 
                       Text(
-                        'Listening...',
+                        context.l10n.listening,
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
@@ -708,8 +731,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Recognized Text',
+                        Text(
+                          context.l10n.recognizedText,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
 
@@ -724,8 +747,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                 if (parsedItems.isNotEmpty) ...[
                   const SizedBox(height: 20),
 
-                  const Text(
-                    'Detected Items',
+                  Text(
+                    context.l10n.detectedItems,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
 
@@ -744,10 +767,12 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
                                 builder: (_) {
                                   return AlertDialog(
-                                    title: const Text('Remove Item'),
+                                    title: Text(context.l10n.removeItem),
 
                                     content: Text(
-                                      'Remove ${item.productName}?',
+                                      context.l10n.removeItemQuestion(
+                                        item.productName,
+                                      ),
                                     ),
 
                                     actions: [
@@ -756,7 +781,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                           Navigator.pop(context, false);
                                         },
 
-                                        child: const Text('Cancel'),
+                                        child: Text(context.l10n.cancel),
                                       ),
 
                                       ElevatedButton(
@@ -764,7 +789,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                           Navigator.pop(context, true);
                                         },
 
-                                        child: const Text('Remove'),
+                                        child: Text(context.l10n.remove),
                                       ),
                                     ],
                                   );
@@ -779,14 +804,23 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                             },
                           ),
                           title: Text(
-                            item.matchedProduct?.name ?? item.productName,
+                            item.matchedProduct != null
+                                ? AppLocalizedName.resolve(
+                                    context: context,
+                                    name: item.matchedProduct!.name,
+                                    nameEn: item.matchedProduct!.nameEn,
+                                    nameAr: item.matchedProduct!.nameAr,
+                                  )
+                                : item.productName,
                           ),
 
                           subtitle: item.matchedProduct != null
                               ? Text(
-                                  'Price: ${AppFormatters.currency(context, double.tryParse(item.matchedProduct!.sellingPrice) ?? 0, context.read<ShopProvider>().currency)}'
-                                  '\nStock: ${AppFormatters.number(context, double.tryParse(item.matchedProduct!.currentStock) ?? 0)}'
-                                  '${hasInsufficientStock(item) ? '\n⚠ Insufficient Stock' : ''}',
+                                  '${context.l10n.priceLabel}: '
+                                  '${AppFormatters.currency(context, double.tryParse(item.matchedProduct!.sellingPrice) ?? 0, context.read<ShopProvider>().currency)}'
+                                  '\n${context.l10n.stockLabel}: '
+                                  '${AppFormatters.number(context, double.tryParse(item.matchedProduct!.currentStock) ?? 0)}'
+                                  '${hasInsufficientStock(item) ? '\n⚠ ${context.l10n.insufficientStock}' : ''}',
                                   style: TextStyle(
                                     color: hasInsufficientStock(item)
                                         ? Colors.red
@@ -799,8 +833,12 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                   children: [
                                     Text(
                                       item.candidateProducts.isNotEmpty
-                                          ? 'Multiple products found for "${item.productName}". Please select one:'
-                                          : 'Product Not Found. Suggested products:',
+                                          ? context.l10n.multipleProductsFound(
+                                              item.productName,
+                                            )
+                                          : context
+                                                .l10n
+                                                .productNotFoundSuggested,
                                       style: const TextStyle(
                                         color: Colors.red,
                                         fontWeight: FontWeight.bold,
@@ -838,11 +876,21 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                                 child: ListTile(
                                                   dense: true,
 
-                                                  title: Text(product.name),
+                                                  title: Text(
+                                                    AppLocalizedName.resolve(
+                                                      context: context,
+                                                      name: product.name,
+                                                      nameEn: product.nameEn,
+                                                      nameAr: product.nameAr,
+                                                    ),
+                                                  ),
 
                                                   subtitle: Text(
-                                                    'Stock: ${AppFormatters.number(context, double.tryParse(product.currentStock) ?? 0)}'
-                                                    ' | Price: ${AppFormatters.currency(context, double.tryParse(product.sellingPrice) ?? 0, context.read<ShopProvider>().currency)}',
+                                                    '${context.l10n.stockLabel}: '
+                                                    '${AppFormatters.number(context, double.tryParse(product.currentStock) ?? 0)}'
+                                                    ' | '
+                                                    '${context.l10n.priceLabel}: '
+                                                    '${AppFormatters.currency(context, double.tryParse(product.sellingPrice) ?? 0, context.read<ShopProvider>().currency)}',
                                                   ),
 
                                                   onTap: () {
@@ -912,8 +960,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
-                        const Text(
-                          'Purchase Summary',
+                        Text(
+                          context.l10n.purchaseSummary,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -923,7 +971,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                         const Divider(),
 
                         Text(
-                          'Customer: ${selectedCustomer?.name ?? ''}',
+                          '${context.l10n.customerLabel}: '
+                          '${selectedCustomer?.name ?? ''}',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
@@ -946,7 +995,14 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(item.matchedProduct!.name),
+                                      child: Text(
+                                        AppLocalizedName.resolve(
+                                          context: context,
+                                          name: item.matchedProduct!.name,
+                                          nameEn: item.matchedProduct!.nameEn,
+                                          nameAr: item.matchedProduct!.nameAr,
+                                        ),
+                                      ),
                                     ),
 
                                     Text(
@@ -977,8 +1033,8 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                           children: [
-                            const Text(
-                              'Total',
+                            Text(
+                              context.l10n.total,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -1011,7 +1067,7 @@ class _VoiceRecorderScreenState extends State<VoiceRecorderScreen> {
 
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.save),
-                    label: const Text('Create Purchase'),
+                    label: Text(context.l10n.createPurchase),
                     onPressed: canCreatePurchase ? showPurchaseDraft : null,
                   ),
                 ),

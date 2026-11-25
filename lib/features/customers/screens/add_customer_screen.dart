@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/create_customer_service.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class AddCustomerScreen extends StatefulWidget {
   const AddCustomerScreen({super.key});
@@ -100,8 +101,12 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               controller: nameController,
               textCapitalization: TextCapitalization.words,
               textDirection: Directionality.of(context),
-              decoration: InputDecoration(labelText: context.l10n.name),
               textInputAction: TextInputAction.next,
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.name,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -111,9 +116,13 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               keyboardType: TextInputType.phone,
               autocorrect: false,
               enableSuggestions: false,
-              textDirection: Directionality.of(context),
-              decoration: InputDecoration(labelText: context.l10n.phone),
+              textDirection: TextDirection.ltr,
               textInputAction: TextInputAction.next,
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.phone,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -121,7 +130,10 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             TextField(
               controller: addressController,
               textDirection: Directionality.of(context),
-              decoration: InputDecoration(labelText: context.l10n.address),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.address,
+              ),
               textInputAction: TextInputAction.next,
             ),
 
@@ -131,7 +143,10 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               controller: notesController,
               maxLines: 3,
               textDirection: Directionality.of(context),
-              decoration: InputDecoration(labelText: context.l10n.notes),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.notes,
+              ),
               textInputAction: TextInputAction.done,
 
               onSubmitted: (_) {

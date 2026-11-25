@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
 import '../services/user_service.dart';
+import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 
 class InactiveUsersScreen extends StatefulWidget {
@@ -98,6 +99,22 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
     }
   }
 
+  String roleLabel(String role) {
+    switch (role) {
+      case 'ADMIN':
+        return context.l10n.adminRole;
+
+      case 'MANAGER':
+        return context.l10n.managerRole;
+
+      case 'CASHIER':
+        return context.l10n.cashierRole;
+
+      default:
+        return role;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -114,12 +131,10 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.inactiveUsers)),
       body: users.isEmpty
-          ? ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                const SizedBox(height: 150),
-                Center(child: Text(context.l10n.noInactiveUsersFound)),
-              ],
+          ? AppRefreshableEmptyState(
+              message: context.l10n.noInactiveUsersFound,
+              icon: Icons.person_off_outlined,
+              onRefresh: loadUsers,
             )
           : RefreshIndicator(
               onRefresh: loadUsers,
@@ -144,7 +159,7 @@ class _InactiveUsersScreenState extends State<InactiveUsersScreen> {
                         ),
                       ),
                       title: Text(user.username),
-                      subtitle: Text(user.role.replaceAll('_', ' ')),
+                      subtitle: Text(roleLabel(user.role)),
                       trailing: IconButton(
                         icon: const Icon(Icons.restore, color: Colors.green),
                         onPressed: () {

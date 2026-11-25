@@ -8,6 +8,7 @@ import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 class TopDebtorsScreen extends StatefulWidget {
   const TopDebtorsScreen({super.key});
@@ -154,30 +155,16 @@ class _TopDebtorsScreenState extends State<TopDebtorsScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchDebtor,
 
-              onChanged: (value) {
-                searchDebtors(value);
-                setState(() {});
+              onChanged: searchDebtors,
+
+              onClear: () {
+                searchController.clear();
+                searchDebtors('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchDebtor,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchDebtors('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 

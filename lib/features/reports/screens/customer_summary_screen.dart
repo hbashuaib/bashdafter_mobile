@@ -8,6 +8,7 @@ import '../../../core/widgets/app_refreshable_empty_state.dart';
 import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
+import '../../../core/widgets/app_search_field.dart';
 
 class CustomerSummaryScreen extends StatefulWidget {
   const CustomerSummaryScreen({super.key});
@@ -143,30 +144,16 @@ class _CustomerSummaryScreenState extends State<CustomerSummaryScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
 
-            child: TextField(
+            child: AppSearchField(
               controller: searchController,
+              hintText: context.l10n.searchCustomer,
 
-              onChanged: (value) {
-                searchCustomers(value);
-                setState(() {});
+              onChanged: searchCustomers,
+
+              onClear: () {
+                searchController.clear();
+                searchCustomers('');
               },
-
-              decoration: InputDecoration(
-                hintText: context.l10n.searchCustomer,
-                prefixIcon: const Icon(Icons.search),
-
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-
-                        onPressed: () {
-                          searchController.clear();
-                          searchCustomers('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
             ),
           ),
 

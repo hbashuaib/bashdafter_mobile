@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../../core/navigation/main_navigation_screen.dart';
 import '../../../core/localization/localization_extension.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -108,16 +109,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextField(
                 controller: usernameController,
-                textDirection: context.l10n.localeName == 'ar'
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-
+                textDirection: TextDirection.ltr,
                 textInputAction: TextInputAction.next,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: InputDecoration(
-                  labelText: context.l10n.username,
-                  border: OutlineInputBorder(),
+                decoration: AppFormFieldHelper.decoration(
+                  context: context,
+                  label: context.l10n.username,
+                  required: true,
+                  border: const OutlineInputBorder(),
                 ),
               ),
 
@@ -125,10 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextField(
                 controller: passwordController,
-                textDirection: context.l10n.localeName == 'ar'
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-
+                textDirection: TextDirection.ltr,
                 obscureText: obscurePassword,
                 textInputAction: TextInputAction.done,
                 autocorrect: false,
@@ -140,8 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
 
-                decoration: InputDecoration(
-                  labelText: context.l10n.password,
+                decoration: AppFormFieldHelper.decoration(
+                  context: context,
+                  label: context.l10n.password,
+                  required: true,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(

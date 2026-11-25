@@ -12,6 +12,7 @@ import '../../../core/localization/localization_extension.dart';
 import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers/shop_provider.dart';
 import '../../../core/localization/app_localized_name.dart';
+import '../../../core/widgets/app_form_field_helper.dart';
 
 class AddPurchaseScreen extends StatefulWidget {
   final int customerId;
@@ -129,7 +130,12 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
     purchaseItems.add({
       'product_id': selectedProduct!.id,
-      'item_name': selectedProduct!.name,
+      'item_name': AppLocalizedName.resolve(
+        context: context,
+        name: selectedProduct!.name,
+        nameEn: selectedProduct!.nameEn,
+        nameAr: selectedProduct!.nameAr,
+      ),
       'quantity': quantityController.text.trim(),
       'unit_price': unitPriceController.text.trim(),
     });
@@ -303,7 +309,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             DropdownButtonFormField<ProductModel>(
               initialValue: selectedProduct,
-              decoration: InputDecoration(labelText: context.l10n.product),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.product,
+                required: true,
+              ),
 
               items: products.map((product) {
                 return DropdownMenuItem(
@@ -333,6 +343,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             TextField(
               focusNode: quantityFocusNode,
               controller: quantityController,
+              textDirection: TextDirection.ltr,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -342,13 +353,18 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
               onSubmitted: (_) {
                 addItem();
               },
-              decoration: InputDecoration(labelText: context.l10n.quantity),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.quantity,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
 
             TextField(
               controller: unitPriceController,
+              textDirection: TextDirection.ltr,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -364,7 +380,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                 addItem();
               },
 
-              decoration: InputDecoration(labelText: context.l10n.unitPrice),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.unitPrice,
+                required: true,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -511,7 +531,11 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
             TextField(
               controller: notesController,
-              decoration: InputDecoration(labelText: context.l10n.notes),
+              textDirection: Directionality.of(context),
+              decoration: AppFormFieldHelper.decoration(
+                context: context,
+                label: context.l10n.notes,
+              ),
             ),
 
             const SizedBox(height: 15),

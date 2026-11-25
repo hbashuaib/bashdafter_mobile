@@ -1025,5 +1025,136 @@
 "customerStatementNoTransactions": "No transactions available",
 
 "englishName": "English Name",
-"arabicName": "Arabic Name"
+"arabicName": "Arabic Name",
+
+"fieldRequired": "This field is required",
+"englishNameRequired": "English name is required",
+
+"voicePurchase": "Voice Purchase",
+"voicePurchaseInstructions": "Say the customer name and what they bought. For example: \"Ahmed Ali bought 2 milks today.\"",
+
+"voicePurchaseAndroidOnly": "Voice purchase input is currently enabled on Android.",
+
+"voicePreparingSpeechRecognition": "Preparing speech recognition...",
+
+"voiceListeningInstructions": "Listening. Say the customer and purchase details.",
+
+"voiceSpeakInEnglish": "Speak in English. Selected language: {language}",
+"@voiceSpeakInEnglish": {
+  "placeholders": {
+    "language": {}
+  }
+},
+
+"voiceRecognitionNotReady": "Speech recognition is not ready.",
+
+"voiceRecognitionUnavailable": "Speech recognition is unavailable. Check the Android speech service and microphone permission.",
+
+"voiceNoEnglishLanguageInstalled": "No English speech language is installed on this device.",
+
+"voiceStartFailed": "Could not start speech recognition: {error}",
+"@voiceStartFailed": {
+  "placeholders": {
+    "error": {}
+  }
+},
+
+"voiceListeningFailed": "Could not start listening: {error}",
+"@voiceListeningFailed": {
+  "placeholders": {
+    "error": {}
+  }
+},
+
+"voiceStopFailed": "Could not stop listening: {error}",
+"@voiceStopFailed": {
+  "placeholders": {
+    "error": {}
+  }
+},
+
+"voicePreparing": "Preparing...",
+
+"voiceStartSpeaking": "Start Speaking",
+
+"voiceStopListening": "Stop Listening",
+
+"voiceClearTranscript": "Clear Transcript",
+
+"voiceTranscript": "Transcript",
+
+"voiceTranscriptHint": "Your recognized words will appear here.",
+
+"voiceRecording": "Voice Recording",
+
+"customerRequiredBeforeRecording": "Please select a customer first",
+
+"recording": "Recording...",
+
+"ready": "Ready",
+
+"startRecording": "Start Recording",
+
+"stopRecording": "Stop Recording",
+
+"recordingSaved": "Recording Saved",
+
+"playRecording": "Play Recording",
+
+"newRecording": "New Recording",
+
+"listening": "Listening...",
+
+"recognizedText": "Recognized Text",
+
+"detectedItems": "Detected Items",
+
+"removeItem": "Remove Item",
+
+"removeItemQuestion": "Remove {itemName}?",
+"@removeItemQuestion": {
+  "placeholders": {
+    "itemName": {}
+  }
+},
+
+"remove": "Remove",
+
+"productNotFoundSuggested": "Product Not Found. Suggested products:",
+
+"multipleProductsFound": "Multiple products found for \"{productName}\". Please select one:",
+"@multipleProductsFound": {
+  "placeholders": {
+    "productName": {}
+  }
+},
+
+"price": "Price",
+
+"insufficientStock": "Insufficient Stock",
+
+"purchaseSummary": "Purchase Summary",
+
+"createPurchase": "Create Purchase",
+
+"purchaseDraft": "Purchase Draft",
+
+"confirmPurchase": "Confirm Purchase",
+
+"saving": "Saving...",
+
+"noValidProductsFound": "No valid products found",
+
+"voicePurchaseSavedSuccessfully":
+    "Voice Purchase Saved Successfully",
+
+"createdFromVoicePurchase":
+    "Created from Voice Purchase",
+
+"speechRecognitionUnavailable":
+    "Speech recognition unavailable",
+
+"priceLabel": "Price",
+
+"stockLabel": "Stock"
 }
