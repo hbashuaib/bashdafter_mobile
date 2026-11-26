@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,6 +42,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       setState(() {
         dashboardData = data;
+        isLoading = false;
+      });
+    } on DioException catch (e) {
+      if (!mounted) return;
+
+      if (e.response?.statusCode == 401) {
+        await TokenStorage.clear();
+
+        if (!mounted) return;
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (_) => false,
+        );
+
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.failedToLoadDashboard)),
+      );
+
+      setState(() {
         isLoading = false;
       });
     } catch (e) {

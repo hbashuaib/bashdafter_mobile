@@ -13,6 +13,8 @@ class ApiClient {
     ),
   );
 
+  static bool _initialized = false;
+
   static Future<Dio> get instance async {
     final token = await TokenStorage.getAccessToken();
 
@@ -20,6 +22,22 @@ class ApiClient {
       _dio.options.headers['Authorization'] = 'Bearer $token';
     } else {
       _dio.options.headers.remove('Authorization');
+    }
+
+    if (!_initialized) {
+      _initialized = true;
+
+      _dio.interceptors.add(
+        InterceptorsWrapper(
+          onError: (error, handler) async {
+            if (error.response?.statusCode == 401) {
+              await TokenStorage.clear();
+            }
+
+            handler.next(error);
+          },
+        ),
+      );
     }
 
     return _dio;
