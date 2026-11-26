@@ -60,6 +60,12 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Image.asset('assets/images/bashsoft_logo.png', height: 120),
             const SizedBox(height: 20),
+            Text(
+              'BashDafter',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 24),
             const CircularProgressIndicator(),
             const SizedBox(height: 20),
             Text(

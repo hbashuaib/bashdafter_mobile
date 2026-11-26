@@ -17,22 +17,11 @@ class AppFormFieldHelper {
       suffixIcon: suffixIcon,
       hintText: hintText,
       border: border ?? const OutlineInputBorder(),
-      label: RichText(
-        text: TextSpan(
-          text: label,
-          style: Theme.of(context).inputDecorationTheme.labelStyle,
-          children: required
-              ? const [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ]
-              : [],
-        ),
+
+      labelText: required ? '$label *' : label,
+
+      floatingLabelStyle: TextStyle(
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }
